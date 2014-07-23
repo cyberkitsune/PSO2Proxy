@@ -29,4 +29,20 @@ To convert SEGAKey.blob to SEGAKey.pem, use this OpenSSL command:
 `openssl rsa -pubin -inform MS\ PUBLICKEYBLOB -in SEGAKey.blob -outform PEM -out SEGAKey.pem`
 
 ## Getting clients to connect
-`TODO`
+### Rebind hosts file
+To get clients to connect to your proxy, they need to think SEGA's servers are your servers. An easy way to do this is to modify Windows's hosts file, add the following code below to the hosts file in `c:\Windows\System32\Drivers\etc\hosts`, replacing 0.0.0.0 with the proxy's **IP address**.
+`
+0.0.0.0 gs001.pso2gs.net #Also ship 1
+0.0.0.0 gs016.pso2gs.net #Also ship 2
+0.0.0.0 gs031.pso2gs.net #Also ship 3
+0.0.0.0 gs046.pso2gs.net #Also ship 4
+0.0.0.0 gs061.pso2gs.net #Also ship 5
+0.0.0.0 gs076.pso2gs.net #Also ship 6
+0.0.0.0 gs091.pso2gs.net #Also ship 7
+0.0.0.0 gs106.pso2gs.net #Also ship 8
+0.0.0.0 gs121.pso2gs.net #Also ship 9
+0.0.0.0 gs136.pso2gs.net #Also ship 10
+`
+### Use your RSA keys
+To get the proxy to decrypt the client's packets, place the publickey.blob you generated in the same folder as PSO2.exe, and rename the RSAKeyInjector.dll to ddraw.dll in that same folder. **If you use PSO2Tweaker to launch PSO2**, enable the item translation patch and rename ddraw.dll to rsainject.dll instead.
+
