@@ -22,7 +22,7 @@ Generate a compatible publickey.blob for your clients:
 
 `openssl rsa -in myKey.pem -outform MS\ PUBLICKEYBLOB -pubout -out publickey.blob`
 ### SEGA's Public key
-You'll ALSO need to import SEGA's RSA public keys from the PSO2 client. For instructions on how to get SEGAKey.blob, see [this wiki page]().
+You'll ALSO need to import SEGA's RSA public keys from the PSO2 client. For instructions on how to get SEGAKey.blob, see [this wiki page](https://github.com/cyberkitsune/PSO2Proxy/wiki/Getting-SEGA's-RSA-Keys).
 
 To convert SEGAKey.blob to SEGAKey.pem, use this OpenSSL command:
 
