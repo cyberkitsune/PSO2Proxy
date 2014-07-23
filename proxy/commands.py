@@ -1,5 +1,6 @@
-import packetFactory, bans, data.clients, data.players
+import packetFactory, bans, data.clients, data.players, data.blocks
 from twisted.protocols import basic
+from twisted.python import log
 
 commandList = {}
 
@@ -42,5 +43,10 @@ def listClients(sender, params):
 				cPName = data.players.playerList[cPID][0].rstrip('\0')
 			else:
 				cPName = None
-			sender.transport.write(str("[ClientList] IP: %s SEGA ID: %s Player ID: %s Player Name: %s\n" % (cHost, cSID, cPID, cPName)))
+			blockNum = cHandle.transport.getHost().port
+			if blockNum in data.blocks.blockList:
+				cPBlock = data.blocks.blockList[1]
+			else:
+				cPBlock = None
+			sender.transport.write(str("[ClientList] IP: %s SEGA ID: %s Player ID: %s Player Name: %s Block: %s\n" % (cHost, cSID, cPID, cPName, cPBlock)))
 		sender.transport.write("[ClientList] There are %i clients in total.\n" % len(data.clients.connectedClients))
