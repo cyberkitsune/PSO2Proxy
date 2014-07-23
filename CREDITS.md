@@ -9,6 +9,6 @@ LightningDragon96 - Packet Analysis.
 ## Special Thanks
 AIDA - For updating his tweaker to support RSAInject, community support, and developer support
 
-#pso2 on BadnikNET - For being a great place to share information
+\#pso2 on BadnikNET - For being a great place to share information
 
-#egs - For being supportive and entertaining during development ;)
+\#egs - For being supportive and entertaining during development ;)
