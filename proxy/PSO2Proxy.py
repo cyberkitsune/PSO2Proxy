@@ -1,6 +1,6 @@
 from twisted.internet import protocol, reactor, stdio
 from twisted.protocols import basic
-from twisted.python import log
+from twisted.python import log, logfile
 from twisted.internet.endpoints import TCP4ServerEndpoint
 from commands import commandList
 from PSOCryptoUtils import PSO2RC4
@@ -177,7 +177,8 @@ class ServerConsole(basic.LineReceiver):
 		self.transport.write('>>> ')
 		
 def main():
-	log.startLogging(open('serverlog.log', 'a'))
+	logFile = logfile.LogFile.fromFullPath('serverlog.log')
+	log.addObserver(log.FileLogObserver(logFile).emit)
 	log.msg("===== PSO2Proxy v0 GIT =====")
 	timestring = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())
 	log.msg("[ServerStart] Trying to start server at %s" % timestring)
