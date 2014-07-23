@@ -1,0 +1,3 @@
+Please place your custom RSA private key and SEGA's public key in this folder.
+Your private key = myKey.pem
+SEGA's public key = SEGAKey.pem
