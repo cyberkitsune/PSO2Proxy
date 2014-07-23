@@ -4,7 +4,7 @@ from twisted.python import log
 from twisted.internet.endpoints import TCP4ServerEndpoint
 from commands import commandList
 from PSOCryptoUtils import PSO2RC4
-import packets, packetUtils, io, struct, time, bans, calendar, datetime, os, exceptions
+import packets, packetUtils, io, struct, time, bans, calendar, datetime, os, exceptions, sys
 import data.blocks as blocks
 import data.ships as ships
 import data.clients as clients
@@ -176,19 +176,46 @@ class ServerConsole(basic.LineReceiver):
 			commandList[command](self, line)
 		self.transport.write('>>> ')
 		
-		
-for shipNum in xrange(0, 10):
-	qEndpoint = TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=myIp)
-	qEndpoint.listen(BlockScraperFactory())
-	sEndpoint = TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=myIp)
-	sEndpoint.listen(ShipAdvertiserFactory())
-	print("[ShipProxy] Bound port %i for ship %i query server!" % ((12000 + (100 * shipNum)), shipNum))
-	bound = 0
-	for blockNum in xrange(1,99):
-		endpoint = TCP4ServerEndpoint(reactor, 12000 + (shipNum * 100) + blockNum, interface=myIp)
-		endpoint.listen(ProxyFactory())
-		bound += 1
-	print("[ShipProxy] Bound to %i ports for all blocks on ship %i!" % (bound, shipNum))
-bans.loadBans()
-stdio.StandardIO(ServerConsole())
-reactor.run()
+def main():
+	if myIp == "0.0.0.0":
+		print("==== ERROR 001 ====")
+		print("You have NOT configured the IP address for PSO2Proxy!")
+		print("Please edit config.py and change myIpAddr to your IP public IP address (Not LAN address if you're on a LAN!) ")
+		print("After you fix this, please restart PSO2Proxy.")
+		sys.exit(0)
+		return
+
+	if not os.path.isfile("keys/myKey.pem"):
+		print("==== ERROR 002 ====")
+		print("You do NOT have your local RSA private key installed to 'keys/myKey.pem'!")
+		print("Please see README.md's section on RSA keys for more information.")
+		print("After you fix this, please restart PSO2Proxy.")
+		sys.exit(0)
+		return
+	
+	if not os.path.isfile("keys/SEGAKey.pem"):
+		print("==== ERROR 003 ====")
+		print("You do NOT have a SEGA RSA public key installed to 'keys/SEGAKey.pem'!")
+		print("Please see README.md's section on RSA keys for more information.")
+		print("After you fix this, please restart PSO2Proxy.")
+		sys.exit(0)
+		return
+
+	for shipNum in xrange(0, 10):
+		qEndpoint = TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=myIp)
+		qEndpoint.listen(BlockScraperFactory())
+		sEndpoint = TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=myIp)
+		sEndpoint.listen(ShipAdvertiserFactory())
+		print("[ShipProxy] Bound port %i for ship %i query server!" % ((12000 + (100 * shipNum)), shipNum))
+		bound = 0
+		for blockNum in xrange(1,99):
+			endpoint = TCP4ServerEndpoint(reactor, 12000 + (shipNum * 100) + blockNum, interface=myIp)
+			endpoint.listen(ProxyFactory())
+			bound += 1
+		print("[ShipProxy] Bound to %i ports for all blocks on ship %i!" % (bound, shipNum))
+	bans.loadBans()
+	stdio.StandardIO(ServerConsole())
+	reactor.run()
+
+if __name__ == "__main__":
+	main()
