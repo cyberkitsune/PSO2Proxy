@@ -48,5 +48,5 @@ def listClients(sender, params):
 				cPBlock = data.blocks.blockList[blockNum][1].rstrip('\0')
 			else:
 				cPBlock = None
-			print(str("[ClientList] IP: %s SEGA ID: %s Player ID: %s Player Name: %s Block: %s\n" % (cHost, cSID, cPID, cPName, cPBlock)))
+			print("[ClientList] IP: %s SEGA ID: %s Player ID: %s Player Name: %s Block: %s\n" % (cHost, cSID, cPID, cPName, cPBlock))
 		sender.transport.write("[ClientList] There are %i clients in total.\n" % len(data.clients.connectedClients))
