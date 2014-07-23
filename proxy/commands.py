@@ -45,7 +45,7 @@ def listClients(sender, params):
 				cPName = None
 			blockNum = cHandle.transport.getHost().port
 			if blockNum in data.blocks.blockList:
-				cPBlock = data.blocks.blockList[1]
+				cPBlock = data.blocks.blockList[blockNum][1]
 			else:
 				cPBlock = None
 			sender.transport.write(str("[ClientList] IP: %s SEGA ID: %s Player ID: %s Player Name: %s Block: %s\n" % (cHost, cSID, cPID, cPName, cPBlock)))
