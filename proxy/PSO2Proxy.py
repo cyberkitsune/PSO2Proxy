@@ -4,7 +4,7 @@ from twisted.python import log, logfile
 from twisted.internet.endpoints import TCP4ServerEndpoint
 from commands import commandList
 from PSOCryptoUtils import PSO2RC4
-import packetUtils, io, struct, time, bans, calendar, datetime, os, exceptions, sys
+import packetUtils, io, struct, time, bans, calendar, datetime, os, exceptions, sys, packets
 import data.blocks as blocks
 import data.ships as ships
 import data.clients as clients
@@ -206,8 +206,6 @@ def main():
 		log.msg("After you fix this, please restart PSO2Proxy.")
 		sys.exit(0)
 		return
-
-	import packets
 
 	for shipNum in xrange(0, 10):
 		qEndpoint = TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=myIp)
