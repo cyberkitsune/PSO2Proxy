@@ -11,6 +11,7 @@ import data.clients as clients
 from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
 from config import packetLogging as logPackets
 from config import myIpAddr as myIp
+from config import bindIp as ifaceIp
 
 class ShipProxy(protocol.Protocol):
 	noisy = False
@@ -207,14 +208,14 @@ def main():
 		return
 
 	for shipNum in xrange(0, 10):
-		qEndpoint = TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=myIp)
+		qEndpoint = TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=ifaceIp)
 		qEndpoint.listen(BlockScraperFactory())
-		sEndpoint = TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=myIp)
+		sEndpoint = TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=ifaceIp)
 		sEndpoint.listen(ShipAdvertiserFactory())
 		print("[ShipProxy] Bound port %i for ship %i query server!" % ((12000 + (100 * shipNum)), shipNum))
 		bound = 0
 		for blockNum in xrange(1,99):
-			endpoint = TCP4ServerEndpoint(reactor, 12000 + (shipNum * 100) + blockNum, interface=myIp)
+			endpoint = TCP4ServerEndpoint(reactor, 12000 + (shipNum * 100) + blockNum, interface=ifaceIp)
 			endpoint.listen(ProxyFactory())
 			bound += 1
 		print("[ShipProxy] Bound to %i ports for all blocks on ship %i!" % (bound, shipNum))
