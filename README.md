@@ -11,7 +11,7 @@ If you have setuptools and pip installed, use this command:
 
 `pip install twisted pycrypto`
 ## Configuring the Server
-In order to make the server work, you need to (at the very least) specify your system's public IP address in config.py and install a RSA private key of your own, and a SEGA RSA Public key imported from the PSO2 Client.
+In order to make the server work, you need to (at the very least) specify your system's public IP address in config.py and install a RSA private key of your own, and a SEGA RSA Public key imported from the PSO2 Client. If your server has a different LAN IP from your public IP, set the bind IP in config.py to that. If unsure, keep that 0.0.0.0
 ## RSA Keys
 ### Your private / public keypair
 You'll need to generate a RSA public and private keypair for your server and your proxy's clients for the proxy to work. You can use OpenSSL to do this.
