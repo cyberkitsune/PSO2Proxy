@@ -190,6 +190,8 @@ def main():
 		print("After you fix this, please restart PSO2Proxy.")
 		sys.exit(0)
 		return
+	if ifaceIp == "0.0.0.0":
+		ifaceIp = myIp
 
 	if not os.path.isfile("keys/myKey.pem"):
 		print("==== ERROR 002 ====")
