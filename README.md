@@ -27,3 +27,6 @@ You'll ALSO need to import SEGA's RSA public keys from the PSO2 client. For inst
 To convert SEGAKey.blob to SEGAKey.pem, use this OpenSSL command:
 
 `openssl rsa -pubin -inform MS\ PUBLICKEYBLOB -in SEGAKey.blob -outform PEM -out SEGAKey.pem`
+
+## Getting clients to connect
+`TODO`
