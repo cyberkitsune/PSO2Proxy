@@ -178,6 +178,7 @@ class ServerConsole(basic.LineReceiver):
 		
 def main():
 	logFile = logfile.LogFile.fromFullPath('serverlog.log')
+	log.startLogging(sys.stdout)
 	log.addObserver(log.FileLogObserver(logFile).emit)
 	log.msg("===== PSO2Proxy v0 GIT =====")
 	timestring = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())
