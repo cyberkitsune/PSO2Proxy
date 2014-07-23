@@ -6,6 +6,7 @@ from PSOCryptoUtils import PSO2RSADecrypt, PSO2RC4, PSO2RSAEncrypt
 import commands
 import bans
 from config import myIpAddr as ip
+from twisted.python import log
 
 i0, i1, i2, i3 = ip.split(".")
 rsaDecryptor = PSO2RSADecrypt("keys/myKey.pem")
@@ -28,11 +29,11 @@ class packetHandler(object):
 def loginPacket(context, data):
 	username = data[0x8:0x48].decode('utf-8')
 	username = username.rstrip('\0')
-	print("[LoginPacket] Logging player %s in..." % username)
+	log.msg("[LoginPacket] Logging player %s in..." % username)
 	context.myUsername = username
 	context.peer.myUsername = username
 	if username in bans.banList:
-		print("[Bans] %s is banned! Disconnecting..." % username)
+		log.msg("[Bans] %s is banned! Disconnecting..." % username)
 		context.transport.loseConnection()
 		context.peer.transport.loseConnection()
 		return None
@@ -40,14 +41,14 @@ def loginPacket(context, data):
 
 @packetHandler(0x11, 0xB)
 def keyPacket(context, data):
-	print("[KeyPacket] Decrypting RC4 key packet!")
+	log.msg("[KeyPacket] Decrypting RC4 key packet!")
 	rsaBlob = data[0x8:0x88]
 	unEncrypted = rsaDecryptor.decrypt(rsaBlob)
 	if unEncrypted is None:
-		print("[KeyPacket] Could not decrypt RSA for client %s, Perhaps their client's key is unmodified? Hanging up." % context.transport.getPeer().host)
+		log.msg("[KeyPacket] Could not decrypt RSA for client %s, Perhaps their client's key is unmodified? Hanging up." % context.transport.getPeer().host)
 		context.transport.loseConnection()
 		return None
-	print("[KeyPacket] Client %s RC4 key %s" % (context.transport.getPeer().host, ''.join("%02x " % b for b in bytearray(unEncrypted[0x10:0x20])),))
+	log.msg("[KeyPacket] Client %s RC4 key %s" % (context.transport.getPeer().host, ''.join("%02x " % b for b in bytearray(unEncrypted[0x10:0x20])),))
 	context.c4crypto = PSO2RC4(unEncrypted[0x10:0x20])
 	context.peer.c4crypto = PSO2RC4(unEncrypted[0x10:0x20])
 	#Re-RSA packet
@@ -77,7 +78,7 @@ def teamRoomInfoPacket(context, data):
 	ipStr = "%i.%i.%i.%i" % (o1, o2, o3, o4)
 	port = struct.unpack_from('H', buffer(data), 0x28)[0]
 	if port not in blocks.blockList:
-		print("[BlockPacket] Discovered a 'Team Room' block at %s:%i!" % (ipStr, port))
+		log.msg("[BlockPacket] Discovered a 'Team Room' block at %s:%i!" % (ipStr, port))
 		blocks.blockList[port] = (ipStr, "Team Room", port)
 	struct.pack_into('BBBB', data, 0x20, int(i0), int(i1), int(i2), int(i3))
 	return str(data)
@@ -89,7 +90,7 @@ def myRoomInfoPacket(context, data):
 	ipStr = "%i.%i.%i.%i" % (o1, o2, o3, o4)
 	port = struct.unpack_from('H', buffer(data), 0x28)[0]
 	if port not in blocks.blockList:
-		print("[BlockPacket] Discovered a 'My Room' block at %s:%i!" % (ipStr, port))
+		log.msg("[BlockPacket] Discovered a 'My Room' block at %s:%i!" % (ipStr, port))
 		blocks.blockList[port] = (ipStr, "My Room", port)
 	struct.pack_into('BBBB', data, 0x20, int(i0), int(i1), int(i2), int(i3))
 	return str(data)
@@ -111,13 +112,13 @@ def chatHandler(context, data):
 		name = players.playerList[pId][0]
 	else:
 		name = "ID:%i" % pId
-	print("[ChatPacket] <%s> %s" % (name, message))
+	log.msg("[ChatPacket] <%s> %s" % (name, message))
 	return data
 
 @packetHandler(0x11,0x10)
 def blockListPacket(context, data):
 	data = bytearray(data)
-	print("[BlockList] Got block list! Updating local cache and rewriting packet...")
+	log.msg("[BlockList] Got block list! Updating local cache and rewriting packet...")
 	# Jump to 0x28, 0x88 sep
 	pos = 0x28
 	while pos < len(data) and data[pos] != 0:
@@ -125,7 +126,7 @@ def blockListPacket(context, data):
 		o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), pos+0x40)
 		ipStr = "%i.%i.%i.%i" % (o1, o2, o3, o4)
 		if port not in blocks.blockList:
-			print("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (name, ipStr, port))
+			log.msg("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (name, ipStr, port))
 		blocks.blockList[port] = (ipStr, name)
 		blockstring = ("%s%s:%i" % (name[:6], ipStr, port)).encode('utf-16le')
 		struct.pack_into('%is' % len(blockstring), data, pos, blockstring)
@@ -141,7 +142,7 @@ def blockListPacket(context, data):
 def blockQueryResponse(context, data):
 	data = bytearray(data)
 	struct.pack_into('BBBB', data, 0x14, int(i0), int(i1), int(i2), int(i3))
-	print("[ShipProxy] rewriting block ip address in query response.")
+	log.msg("[ShipProxy] rewriting block ip address in query response.")
 	return str(data)
 
 
@@ -157,6 +158,6 @@ def playerNamePacket(context, data):
 	pId = struct.unpack_from('I', data, 0xC)[0]
 	if pId not in players.playerList:
 		pName = data[0x14:0x56].decode('utf-16')
-		print("[PlayerData] Found new player %s with player ID %i" % (pName, pId))
+		log.msg("[PlayerData] Found new player %s with player ID %i" % (pName, pId))
 		players.playerList[pId] = (pName,) # For now
 	return data

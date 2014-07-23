@@ -1,4 +1,5 @@
 import socket, io, struct, blocks
+from twisted.python import log
 
 shipList = {
 	12100 : "210.189.208.1",
@@ -15,7 +16,7 @@ shipList = {
 
 def scrapeBlockPacket(shipIp, shipPort, dstIp):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	print("[BlockQuery] Scraping %s:%i for a initial block..." % (shipIp, shipPort))
+	log.msg("[BlockQuery] Scraping %s:%i for a initial block..." % (shipIp, shipPort))
 	s.connect((shipIp, shipPort))
 	data = io.BytesIO()
 	data.write(s.recv(4))
@@ -28,7 +29,7 @@ def scrapeBlockPacket(shipIp, shipPort, dstIp):
 	o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), 0x64)
 	ipStr = '%i.%i.%i.%i' % (o1, o2, o3, o4)
 	if port not in blocks.blockList:
-		print("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (name, ipStr, port))
+		log.msg("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (name, ipStr, port))
 		blocks.blockList[port] = (ipStr, name)
 	o1, o2, o3, o4 = dstIp.split(".")
 	struct.pack_into('BBBB', data, 0x64, int(o1), int(o2), int(o3), int(o4))
@@ -37,7 +38,7 @@ def scrapeBlockPacket(shipIp, shipPort, dstIp):
 def scrapeShipPacket(shipIp, shipPort, dstIp):
 	o1, o2, o3, o4 = dstIp.split(".")
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	print("[ShipQuery] Scraping %s:%i for ship status..." % (shipIp, shipPort))
+	log.msg("[ShipQuery] Scraping %s:%i for ship status..." % (shipIp, shipPort))
 	s.connect((shipIp, shipPort))
 	data = io.BytesIO()
 	data.write(s.recv(4))
