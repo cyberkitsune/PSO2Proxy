@@ -178,6 +178,7 @@ class ServerConsole(basic.LineReceiver):
 		self.transport.write('>>> ')
 		
 def main():
+	global ifaceIp
 	logFile = logfile.LogFile.fromFullPath('serverlog.log')
 	log.addObserver(log.FileLogObserver(logFile).emit)
 	print("===== PSO2Proxy v0 GIT =====")
