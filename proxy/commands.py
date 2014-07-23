@@ -31,7 +31,7 @@ def listBans(sender, params):
 @CommandHandler("clients")
 def listClients(sender, params):
 	if isinstance(sender, basic.LineReceiver):
-		sender.transport.write("[ClientList] === Connected Clients ===\n")
+		print("[ClientList] === Connected Clients ===\n")
 		for ip, client in data.clients.connectedClients.iteritems():
 			cHandle = client.getHandle()
 			cHost = cHandle.transport.getPeer().host
@@ -49,4 +49,4 @@ def listClients(sender, params):
 			else:
 				cPBlock = None
 			print("[ClientList] IP: %s SEGA ID: %s Player ID: %s Player Name: %s Block: %s\n" % (cHost, cSID, cPID, cPName, cPBlock))
-		sender.transport.write("[ClientList] There are %i clients in total.\n" % len(data.clients.connectedClients))
+		print("[ClientList] There are %i clients in total.\n" % len(data.clients.connectedClients))
