@@ -80,7 +80,7 @@ class ShipProxy(protocol.Protocol):
 					path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (self.myUsername, self.connTimestamp, self.packetCount, packetType[0], packetType[1], self.transport.getPeer().host)
 				else:
 					#path = 'packets/orphan_packets/%s/%i.%x-%x.%s.bin' % (self.connTimestamp, self.packetCount, packetType[0], packetType[1], self.transport.getPeer().host)
-					self.orphans.add({'data' : packet, 'count' : self.packetCount, 'type' : packetType[0], "sub" : packetType[1]})
+					self.orphans.append({'data' : packet, 'count' : self.packetCount, 'type' : packetType[0], "sub" : packetType[1]})
 				try:
 					os.makedirs(os.path.dirname(path))
 				except exceptions.OSError:
