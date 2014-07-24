@@ -75,7 +75,10 @@ class ShipProxy(protocol.Protocol):
 			packet = self.readBuffer[:packetSize]
 			self.readBuffer = self.readBuffer[packetSize:]
 			if logPackets:
-				path = 'packets/%s/%i.%x-%x.%s.bin' % (self.connTimestamp, self.packetCount, packetType[0], packetType[1], self.transport.getPeer().host)
+				if self.myUsername is not None:
+					path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (self.myUsername, self.connTimestamp, self.packetCount, packetType[0], packetType[1], self.transport.getPeer().host)
+				else:
+					path = 'packets/orphan_packets/%s/%i.%x-%x.%s.bin' % (self.connTimestamp, self.packetCount, packetType[0], packetType[1], self.transport.getPeer().host)
 				try:
 					os.makedirs(os.path.dirname(path))
 				except exceptions.OSError:
