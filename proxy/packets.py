@@ -7,6 +7,7 @@ from PSOCryptoUtils import PSO2RSADecrypt, PSO2RC4, PSO2RSAEncrypt
 import commands
 import bans
 from config import myIpAddr as ip
+from config import showBlockNamesAsIp as ipBlockNames
 from twisted.python import log
 
 i0, i1, i2, i3 = ip.split(".")
@@ -66,8 +67,9 @@ def blockInfoPacket(context, data):
 	blockport = context.peer.transport.getHost().port
 	if blockport in blocks.blockList:
 		blockInfo = blocks.blockList[blockport]
-		addrString = ('%s%s:%i' % ((blockInfo[1])[:6], blockInfo[0], blockport)).encode('utf-16le')
-		struct.pack_into('%is' % len(addrString), data, 0x1C, addrString)
+		if ipBlockNames:
+			addrString = ('%s%s:%i' % ((blockInfo[1])[:6], blockInfo[0], blockport)).encode('utf-16le')
+			struct.pack_into('%is' % len(addrString), data, 0x1C, addrString)
 		if len(addrString) < 0x40:
 			struct.pack_into('%ix' % (0x40 - len(addrString)), data, 0x1C + len(addrString))
 	return str(data)
@@ -143,8 +145,9 @@ def blockListPacket(context, data):
 		if port not in blocks.blockList:
 			print("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (name, ipStr, port))
 		blocks.blockList[port] = (ipStr, name)
-		blockstring = ("%s%s:%i" % (name[:6], ipStr, port)).encode('utf-16le')
-		struct.pack_into('%is' % len(blockstring), data, pos, blockstring)
+		if ipBlockNames:
+			blockstring = ("%s%s:%i" % (name[:6], ipStr, port)).encode('utf-16le')
+			struct.pack_into('%is' % len(blockstring), data, pos, blockstring)
 		if len(blockstring) < 0x40:
 			struct.pack_into('%ix' % (0x40 - len(blockstring)), data, pos + len(blockstring))
 		struct.pack_into('BBBB', data, pos+0x40, int(i0), int(i1), int(i2), int(i3))
