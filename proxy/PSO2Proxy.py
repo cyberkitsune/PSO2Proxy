@@ -95,7 +95,7 @@ class ShipProxy(protocol.Protocol):
 				if playerId not in clients.connectedClients: #Inital add
 					clients.addClient(self)
 					self.loaded = True
-				else if self.loaded == False:
+				elif self.loaded == False:
 					clients.populateData(self)
 
 			if encryptionEnabled:
