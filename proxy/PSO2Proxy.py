@@ -28,6 +28,7 @@ class ShipProxy(protocol.Protocol):
 	packetCount = 0
 	readBuffer = ''
 	c4crypto = None
+	orphans = []
 
 	def setPeer(self, peer):
 		self.peer = peer
@@ -78,7 +79,8 @@ class ShipProxy(protocol.Protocol):
 				if self.myUsername is not None:
 					path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (self.myUsername, self.connTimestamp, self.packetCount, packetType[0], packetType[1], self.transport.getPeer().host)
 				else:
-					path = 'packets/orphan_packets/%s/%i.%x-%x.%s.bin' % (self.connTimestamp, self.packetCount, packetType[0], packetType[1], self.transport.getPeer().host)
+					#path = 'packets/orphan_packets/%s/%i.%x-%x.%s.bin' % (self.connTimestamp, self.packetCount, packetType[0], packetType[1], self.transport.getPeer().host)
+					self.orphans.add({'data' : packet, 'count' : self.packetCount, 'type' : packetType[0], "sub" : packetType[1]})
 				try:
 					os.makedirs(os.path.dirname(path))
 				except exceptions.OSError:
@@ -100,6 +102,20 @@ class ShipProxy(protocol.Protocol):
 					self.loaded = True
 				elif self.loaded == False:
 					clients.populateData(self)
+
+			if self.myUsername is not None and len(self.orphans) > 0:
+				count = 0
+				while len(self.orphans) > 0:
+					oPacket = self.orphans.pop()
+					path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (self.myUsername, self.connTimestamp, oPacket['count'], oPacket['type'], oPacket['sub'], self.transport.getPeer().host)
+					try:
+						os.makedirs(os.path.dirname(path))
+					except exceptions.OSError:
+						pass
+					with open(path, 'wb') as f:
+						f.write(oPacket['data'])
+					count += 1
+				print('[ShipProxy] Flushed %i orphan packets for %s.' % (count, self.myUsername))
 
 			if encryptionEnabled:
 				packet = self.c4crypto.encrypt(packet)
