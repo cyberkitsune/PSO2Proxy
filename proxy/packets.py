@@ -1,6 +1,7 @@
 import struct, io
 import data.blocks as blocks
 import data.players as players
+import data.clients as clients
 import packetFactory
 from PSOCryptoUtils import PSO2RSADecrypt, PSO2RC4, PSO2RSAEncrypt
 import commands
@@ -95,6 +96,18 @@ def myRoomInfoPacket(context, data):
 		blocks.blockList[port] = (ipStr, "My Room", port)
 	struct.pack_into('BBBB', data, 0x20, int(i0), int(i1), int(i2), int(i3))
 	context.peer.switchingBlocks = True
+	return str(data)
+
+@packetHandler(0x11, 0x14)
+def blockSwitchedLoginPacket(context, data):
+	data = bytearray(data)
+	pId = struct.unpack_from('I', data, 0x8)[0]
+	if pId in clients.connectedClients:
+		cInfo = clients.connectedClients[pId]
+		print("[ShipProxy] Got blockchange login from player %i, (SID: %s)" % (pId, cInfo.segaId))
+	else:
+		print("[ShipProxy] Got blockchange login for unknown client?! (ID: %i)" % pId)
+	context.playerId = pId
 	return str(data)
 
 @packetHandler(0x7,0x0)
