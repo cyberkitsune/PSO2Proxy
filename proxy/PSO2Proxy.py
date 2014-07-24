@@ -91,8 +91,8 @@ class ShipProxy(protocol.Protocol):
 			if packet is None:
 				return
 
-			if playerId is not None:
-				if playerId not in clients.connectedClients: #Inital add
+			if self.playerId is not None:
+				if self.playerId not in clients.connectedClients: #Inital add
 					clients.addClient(self)
 					self.loaded = True
 				elif self.loaded == False:
