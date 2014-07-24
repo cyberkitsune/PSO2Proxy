@@ -14,10 +14,13 @@ from config import myIpAddr as myIp
 from config import bindIp as ifaceIp
 
 class ShipProxy(protocol.Protocol):
-	noisy = False
+	noisy = False # Move to config
 	peer = None
 	psoClient = False
 	bufPacket = None
+
+	loaded = False
+	changingBlocks = False
 
 	connTimestamp = None
 	playerId = None
@@ -36,7 +39,7 @@ class ShipProxy(protocol.Protocol):
 		if self.peer is not None:
 			self.peer.transport.loseConnection()
 			self.peer = None
-		if self.psoClient:
+		if self.playerId is not None and not self.changingBlocks:
 			clients.removeClient(self)
 		if self.psoClient and self.myUsername is not None:
 			print("[ShipProxy] %s logged out or changed blocks." % self.myUsername)
@@ -87,6 +90,13 @@ class ShipProxy(protocol.Protocol):
 
 			if packet is None:
 				return
+
+			if playerId not None:
+				if playerId not in clients.connectedClients: #Inital add
+					clients.addClient(self)
+					self.loaded = True
+				else if self.loaded == False:
+					clients.populateData(self)
 
 			if encryptionEnabled:
 				packet = self.c4crypto.encrypt(packet)
@@ -148,7 +158,6 @@ class ProxyServer(ShipProxy):
         	print("[ShipProxy] Found address %s for port %i, named %s" % (blocks.blockList[port][0], port, blocks.blockList[port][1]))
         	addr = blocks.blockList[port][0]
         self.setIsClient(True)
-        clients.addClient(self)
 
         client = ProxyClientFactory()
         client.setServer(self)
