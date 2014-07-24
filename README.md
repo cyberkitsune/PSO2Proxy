@@ -1,7 +1,7 @@
 # PSO2Proxy
 PSO2Proxy is a open source protocol proxy for the Japanese MMORPG, Phantasy Star Online 2 written in python. It allows the game's packet data to be unencrypted, logged, parsed and modified to both the client and server. It can also be used to connect to the game's servers if a client is blocked from normally connecting for any reason.
 
-**This program allows you to host your own PSO2Proxy on a server you have access to. If you just want to play the game via the proxy,** a public PSO2Proxy server is provided for both users who can't connect to PSO2 and users who want to contribute data for packet analysis at [pso2proxy.cyberkitsune.net](http://pso2proxy.cyberkitsune.net/). Below are the instructions for installing and setting up your own PSO2Proxy server.
+**This program allows you to host your own PSO2Proxy on a server you have access to. If you just want to play the game via the proxy, a public PSO2Proxy server is provided for both users who can't connect to PSO2 and users who want to contribute data for packet analysis at [pso2proxy.cyberkitsune.net](http://pso2proxy.cyberkitsune.net/). Below are the instructions for installing and setting up your own PSO2Proxy server.**
 
 Feel free to contact us on [IRC](irc://irc.badnik.net/pso2proxypublic): irc.badnik.net, #pso2proxypublic
 ## Installing
