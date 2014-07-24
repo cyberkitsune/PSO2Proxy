@@ -82,7 +82,7 @@ def teamRoomInfoPacket(context, data):
 		print("[BlockPacket] Discovered a 'Team Room' block at %s:%i!" % (ipStr, port))
 		blocks.blockList[port] = (ipStr, "Team Room", port)
 	struct.pack_into('BBBB', data, 0x20, int(i0), int(i1), int(i2), int(i3))
-	context.peer.switchingBlocks = True
+	context.peer.changingBlocks = True
 	return str(data)
 
 @packetHandler(0x11, 0x17)
@@ -95,7 +95,7 @@ def myRoomInfoPacket(context, data):
 		print("[BlockPacket] Discovered a 'My Room' block at %s:%i!" % (ipStr, port))
 		blocks.blockList[port] = (ipStr, "My Room", port)
 	struct.pack_into('BBBB', data, 0x20, int(i0), int(i1), int(i2), int(i3))
-	context.peer.switchingBlocks = True
+	context.peer.changingBlocks = True
 	return str(data)
 
 @packetHandler(0x11, 0x14)
@@ -158,7 +158,7 @@ def blockQueryResponse(context, data):
 	data = bytearray(data)
 	struct.pack_into('BBBB', data, 0x14, int(i0), int(i1), int(i2), int(i3))
 	print("[ShipProxy] rewriting block ip address in query response.")
-	context.peer.switchingBlocks = True
+	context.peer.changingBlocks = True
 	return str(data)
 
 
