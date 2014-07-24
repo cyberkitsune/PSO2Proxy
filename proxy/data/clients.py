@@ -25,6 +25,7 @@ def populateData(handle):
 	cData = connectedClients[handle.playerId]
 	cData.handle = handle
 	handle.myUsername = cData.segaId
+	handle.peer.myUsername = cData.segaId
 	if handle.transport.getHost().port in blocks.blockList:
 		bName = blocks.blockList[handle.transport.getHost().port][1]
 	else:
