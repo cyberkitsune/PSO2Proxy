@@ -101,7 +101,7 @@ def myRoomInfoPacket(context, data):
 @packetHandler(0x11, 0x14)
 def blockSwitchedLoginPacket(context, data):
 	data = bytearray(data)
-	pId = struct.unpack_from('I', data, 0x8)[0]
+	pId = struct.unpack_from('I', buffer(data), 0x8)[0]
 	if pId in clients.connectedClients:
 		cInfo = clients.connectedClients[pId]
 		print("[ShipProxy] Got blockchange login from player %i, (SID: %s)" % (pId, cInfo.segaId))
