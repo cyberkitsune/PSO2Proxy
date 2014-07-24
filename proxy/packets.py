@@ -70,8 +70,8 @@ def blockInfoPacket(context, data):
 		if ipBlockNames:
 			addrString = ('%s%s:%i' % ((blockInfo[1])[:6], blockInfo[0], blockport)).encode('utf-16le')
 			struct.pack_into('%is' % len(addrString), data, 0x1C, addrString)
-		if len(addrString) < 0x40:
-			struct.pack_into('%ix' % (0x40 - len(addrString)), data, 0x1C + len(addrString))
+			if len(addrString) < 0x40:
+				struct.pack_into('%ix' % (0x40 - len(addrString)), data, 0x1C + len(addrString))
 	return str(data)
 
 @packetHandler(0x11, 0x4f)
@@ -148,8 +148,8 @@ def blockListPacket(context, data):
 		if ipBlockNames:
 			blockstring = ("%s%s:%i" % (name[:6], ipStr, port)).encode('utf-16le')
 			struct.pack_into('%is' % len(blockstring), data, pos, blockstring)
-		if len(blockstring) < 0x40:
-			struct.pack_into('%ix' % (0x40 - len(blockstring)), data, pos + len(blockstring))
+			if len(blockstring) < 0x40:
+				struct.pack_into('%ix' % (0x40 - len(blockstring)), data, pos + len(blockstring))
 		struct.pack_into('BBBB', data, pos+0x40, int(i0), int(i1), int(i2), int(i3))
 		pos += 0x88
 
