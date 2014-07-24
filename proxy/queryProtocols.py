@@ -6,7 +6,7 @@ from twisted.python import log
 class BlockScraper(protocol.Protocol):
 	def connectionMade(self):
 		port = self.transport.getHost().port
-		log.msg('[BlockQuery] %s:%i wants to load-balance on port %i!' % (self.transport.getPeer().host, self.transport.getPeer().port, port))
+		print('[BlockQuery] %s:%i wants to load-balance on port %i!' % (self.transport.getPeer().host, self.transport.getPeer().port, port))
 		if port in ships.shipList:
 			self.transport.write(ships.scrapeBlockPacket(ships.shipList[port], port, myIpAddr))
 		self.transport.loseConnection()
@@ -17,7 +17,7 @@ class BlockScraperFactory(protocol.Factory):
 
 class ShipAdvertiser(protocol.Protocol):
 	def connectionMade(self):
-		log.msg("[ShipStatus] Client connected " + str(self.transport.getPeer()) + "! Sending ship list packet...")
+		print("[ShipStatus] Client connected " + str(self.transport.getPeer()) + "! Sending ship list packet...")
 		self.transport.write(ships.scrapeShipPacket("210.189.208.1", 12199, myIpAddr))
 		self.transport.loseConnection()
 
