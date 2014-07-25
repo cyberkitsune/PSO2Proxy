@@ -1,5 +1,5 @@
 
-SRCS+=dllmain.cpp
+SRCS+=dllmain.c
 
 DLLS=rsainject.dll dumper.dll
 
