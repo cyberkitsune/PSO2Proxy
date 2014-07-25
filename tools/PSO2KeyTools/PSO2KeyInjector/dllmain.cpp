@@ -1,18 +1,22 @@
-#include <Windows.h>
+#include <windows.h>
 #include <stdio.h>
 #if DUMPER
-#include <string>
+#include <string.h>
 #endif
+
+byte *RSAaddr = (byte *)0x33BDBE0;
 
 #if DUMPER
 void grabRSAKeysToFile()
 {
-	void* ptr = malloc(0xA0);
-	for (int i = 0; i < 4; i++)
+	void* str = malloc(14); // SEGAKey#.blob\0
+	int i;
+	FILE* outFile;
+	for (i = 0; i < 4; i++)
 	{
-		memcpy(ptr, (void*)(0x33BDBE0 + (i * 0xA0)), 0xA0); // Copy key to memory
-		FILE* outFile;
-		fopen_s(&outFile, ("SEGAKey" + std::to_string(i) + ".blob").c_str(), "wb"); // Write memory to disk
+		const void *ptr = (void*)(RSAaddr + (i * 0xA0)); // setup pointer
+		sprintf(str, "SEGAKey%d.blob", i);
+		fopen_s(&outFile, str, "wb"); // Write memory to disk
 		fwrite(ptr, 0xA0, 1, outFile);
 		fclose(outFile);
 	}
@@ -21,22 +25,25 @@ void grabRSAKeysToFile()
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
+	UNREFERENCED_PARAMETER(hinstDLL)
+	UNREFERENCED_PARAMETER(lpvReserved)
 	if (fdwReason == DLL_PROCESS_ATTACH)
-	{		
-		#if DUMPER
+	{
+#if DUMPER
 		grabRSAKeysToFile();
-		#else
+#else
 		FILE* filePtr;
+		int i;
 		fopen_s(&filePtr, "publickey.blob", "rb");
 		void* keyPtr = malloc(0xA0);
 		fread(keyPtr, 0xA0, 1, filePtr);
 		fclose(filePtr);
 		
-		for (int i = 0; i < 4; i++)
+		for (i = 0; i < 4; i++)
 		{
-			memcpy((void*)(0x33BDBE0 + (0xA0 * i)), keyPtr, 0xA0);
+			memcpy((void*)(RSAaddr + (0xA0 * i)), keyPtr, 0xA0);
 		}
-		#endif
+#endif
 	}
 
 	return TRUE;
