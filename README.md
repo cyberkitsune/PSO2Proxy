@@ -8,9 +8,14 @@ Feel free to contact us on [IRC](irc://irc.badnik.net/pso2proxypublic): irc.badn
 ## Installing
 PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyCrypto](https://www.dlitz.net/software/pycrypto/). Please install these from their respective websites.
 
-If you have setuptools and pip installed, use this command:
+If you have a git commandline client, setuptools and pip installed, you can install it like this:
 
-`pip install twisted pycrypto`
+```
+    git clone https://github.com/PolCPP/PSO2Proxy.git
+    cd PSO2Proxy
+    pip install -r requirements.txt
+```
+
 ## Configuring the Server
 In order to make the server work, you need to (at the very least) specify your system's public IP address in config.py and install a RSA private key of your own, and a SEGA RSA Public key imported from the PSO2 Client. If your server has a different LAN IP from your public IP, set the bind IP in config.py to that. If unsure, keep that 0.0.0.0
 ## RSA Keys
