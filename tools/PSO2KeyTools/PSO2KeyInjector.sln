@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PSO2KeyInjector", "PSO2KeyInjector\PSO2KeyInjector.vcxproj", "{AA32A14B-F479-4DCA-B825-264BD52BD3FF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Dumper|Win32 = Dumper|Win32
+		Dumper|x64 = Dumper|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AA32A14B-F479-4DCA-B825-264BD52BD3FF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{AA32A14B-F479-4DCA-B825-264BD52BD3FF}.Debug|Win32.Build.0 = Debug|Win32
+		{AA32A14B-F479-4DCA-B825-264BD52BD3FF}.Debug|x64.ActiveCfg = Debug|Win32
+		{AA32A14B-F479-4DCA-B825-264BD52BD3FF}.Dumper|Win32.ActiveCfg = Dumper|Win32
+		{AA32A14B-F479-4DCA-B825-264BD52BD3FF}.Dumper|Win32.Build.0 = Dumper|Win32
+		{AA32A14B-F479-4DCA-B825-264BD52BD3FF}.Dumper|x64.ActiveCfg = Dumper|Win32
+		{AA32A14B-F479-4DCA-B825-264BD52BD3FF}.Release|Win32.ActiveCfg = Release|Win32
+		{AA32A14B-F479-4DCA-B825-264BD52BD3FF}.Release|Win32.Build.0 = Release|Win32
+		{AA32A14B-F479-4DCA-B825-264BD52BD3FF}.Release|x64.ActiveCfg = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
