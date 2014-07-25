@@ -37,7 +37,7 @@ const unsigned char* RSAaddr = (unsigned char*)0x33BDBE0;
 			const void* ptr = (void*)(RSAaddr + (i * 0xA0));
 
 			// Prepare the file name, then open the output file-stream:
-			#if !defined(_CRT_SECURE_NO_WARNINGS)
+			#if !defined(_CRT_SECURE_NO_WARNINGS) && defined(_MSC_VER)
 				// This is just for the sake of shutting MSVC up:
 				sprintf_s(str, 14, "SEGAKey%d.blob", i);
 				fopen_s(&outFile, str, "wb");
@@ -74,7 +74,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			FILE* filePtr;
 			
 			// Open the public-key file.
-			#if !defined(_CRT_SECURE_NO_WARNINGS)
+			#if !defined(_CRT_SECURE_NO_WARNINGS) && defined(_MSC_VER)
 				fopen_s(&filePtr, "publickey.blob", "rb");
 			#else
 				filePtr = fopen("publickey.blob", "rb");
