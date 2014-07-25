@@ -11,7 +11,7 @@ PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyC
 If you have a git commandline client, setuptools and pip installed, you can install it like this:
 
 ```
-    git clone https://github.com/PolCPP/PSO2Proxy.git
+    git clone https://github.com/cyberkitsune/PSO2Proxy.git
     cd PSO2Proxy
     pip install -r requirements.txt
 ```
