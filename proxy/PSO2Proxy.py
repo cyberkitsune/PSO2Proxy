@@ -207,9 +207,12 @@ class ServerConsole(basic.LineReceiver):
 		self.transport.write('>>> ')
 
 	def lineReceived(self, line):
-		command = line.split(' ')[0]
-		if command in commandList:
-			commandList[command](self, line)
+		try:
+			command = line.split(' ')[0]
+			if command in commandList:
+				commandList[command](self, line)
+		except:
+			print("[ShipProxy] Error Occured")
 		self.transport.write('>>> ')
 		
 def main():
