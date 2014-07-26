@@ -36,8 +36,9 @@ def listClients(sender, params):
 			cHandle = client.getHandle()
 			cHost = cHandle.transport.getPeer().host
 			cSID = cHandle.myUsername
-			if cSID is not None:
-				cSID = cSID.rstrip('\0')
+			if cSID is None:
+				continue
+			cSID = cSID.rstrip('\0')
 			cPID = cHandle.playerId
 			if cPID in data.players.playerList:
 				cPName = data.players.playerList[cPID][0].rstrip('\0')
