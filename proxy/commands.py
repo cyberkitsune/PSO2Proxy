@@ -55,4 +55,5 @@ def listClients(sender, params):
 def globalMessage(sender, params):
 	if isinstance(sender, basic.LineReceiver):
 		for client in data.clients.connectedClients.values():
+			print("[GlobalMessage] Sending %s a global message." % client.segaId)
 			client.getHandle().sendCryptoPacket(packetFactory.GlobalMessagePacket("[Proxy Global Message ] %s" % params).build())
