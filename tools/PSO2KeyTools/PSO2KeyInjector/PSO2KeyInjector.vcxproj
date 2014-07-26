@@ -112,6 +112,6 @@
   <ItemGroup>
     <ClCompile Include="dllmain.c" />
   </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.C.targets" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>
