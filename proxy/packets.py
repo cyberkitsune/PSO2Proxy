@@ -8,6 +8,7 @@ import commands
 import bans
 from config import myIpAddr as ip
 from config import showBlockNamesAsIp as ipBlockNames
+from config import noisy as verbose
 from twisted.python import log
 
 i0, i1, i2, i3 = ip.split(".")
@@ -43,14 +44,14 @@ def loginPacket(context, data):
 
 @packetHandler(0x11, 0xB)
 def keyPacket(context, data):
-	print("[KeyPacket] Decrypting RC4 key packet!")
+	if verbose: print("[KeyPacket] Decrypting RC4 key packet!")
 	rsaBlob = data[0x8:0x88]
 	unEncrypted = rsaDecryptor.decrypt(rsaBlob)
 	if unEncrypted is None:
 		print("[KeyPacket] Could not decrypt RSA for client %s, Perhaps their client's key is unmodified? Hanging up." % context.transport.getPeer().host)
 		context.transport.loseConnection()
 		return None
-	print("[KeyPacket] Client %s RC4 key %s" % (context.transport.getPeer().host, ''.join("%02x " % b for b in bytearray(unEncrypted[0x10:0x20])),))
+	if verbose: print("[KeyPacket] Client %s RC4 key %s" % (context.transport.getPeer().host, ''.join("%02x " % b for b in bytearray(unEncrypted[0x10:0x20])),))
 	context.c4crypto = PSO2RC4(unEncrypted[0x10:0x20])
 	context.peer.c4crypto = PSO2RC4(unEncrypted[0x10:0x20])
 	#Re-RSA packet
@@ -81,7 +82,7 @@ def teamRoomInfoPacket(context, data):
 	ipStr = "%i.%i.%i.%i" % (o1, o2, o3, o4)
 	port = struct.unpack_from('H', buffer(data), 0x28)[0]
 	if port not in blocks.blockList:
-		print("[BlockPacket] Discovered a 'Team Room' block at %s:%i!" % (ipStr, port))
+		if verbose: print("[BlockPacket] Discovered a 'Team Room' block at %s:%i!" % (ipStr, port))
 		blocks.blockList[port] = (ipStr, "Team Room", port)
 	struct.pack_into('BBBB', data, 0x20, int(i0), int(i1), int(i2), int(i3))
 	context.peer.changingBlocks = True
@@ -94,7 +95,7 @@ def myRoomInfoPacket(context, data):
 	ipStr = "%i.%i.%i.%i" % (o1, o2, o3, o4)
 	port = struct.unpack_from('H', buffer(data), 0x28)[0]
 	if port not in blocks.blockList:
-		print("[BlockPacket] Discovered a 'My Room' block at %s:%i!" % (ipStr, port))
+		if verbose: print("[BlockPacket] Discovered a 'My Room' block at %s:%i!" % (ipStr, port))
 		blocks.blockList[port] = (ipStr, "My Room", port)
 	struct.pack_into('BBBB', data, 0x20, int(i0), int(i1), int(i2), int(i3))
 	context.peer.changingBlocks = True
@@ -144,8 +145,8 @@ def blockListPacket(context, data):
 		o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), pos+0x40)
 		ipStr = "%i.%i.%i.%i" % (o1, o2, o3, o4)
 		if port not in blocks.blockList:
-			print("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (name, ipStr, port))
-		blocks.blockList[port] = (ipStr, name)
+			if verbose: print("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (name, ipStr, port))
+			blocks.blockList[port] = (ipStr, name)
 		if ipBlockNames:
 			blockstring = ("%s%s:%i" % (name[:6], ipStr, port)).encode('utf-16le')
 			struct.pack_into('%is' % len(blockstring), data, pos, blockstring)
@@ -161,7 +162,7 @@ def blockListPacket(context, data):
 def blockQueryResponse(context, data):
 	data = bytearray(data)
 	struct.pack_into('BBBB', data, 0x14, int(i0), int(i1), int(i2), int(i3))
-	print("[ShipProxy] rewriting block ip address in query response.")
+	if verbose: print("[ShipProxy] rewriting block ip address in query response.")
 	context.peer.changingBlocks = True
 	return str(data)
 
@@ -178,6 +179,6 @@ def playerNamePacket(context, data):
 	pId = struct.unpack_from('I', data, 0xC)[0]
 	if pId not in players.playerList:
 		pName = data[0x14:0x56].decode('utf-16')
-		print("[PlayerData] Found new player %s with player ID %i" % (pName, pId))
+		if verbose: print("[PlayerData] Found new player %s with player ID %i" % (pName, pId))
 		players.playerList[pId] = (pName,) # For now
 	return data

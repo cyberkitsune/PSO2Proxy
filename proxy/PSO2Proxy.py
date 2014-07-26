@@ -12,9 +12,9 @@ from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
 from config import packetLogging as logPackets
 from config import myIpAddr as myIp
 from config import bindIp as ifaceIp
+from config import noisy as verbose
 
 class ShipProxy(protocol.Protocol):
-	noisy = False # Move to config
 	peer = None
 	psoClient = False
 	bufPacket = None
@@ -52,14 +52,14 @@ class ShipProxy(protocol.Protocol):
 			if logPackets: 
 				with open('packets/%i.constucted.%s.bin' % (self.packetCount, self.transport.getPeer().host), 'wb') as f:
 					f.write(data)
-			if self.noisy:
+			if verbose:
 				print("[ShipProxy] Sending %s a constucted packet..." % self.transport.getPeer().host)
 			data = self.peer.c4crypto.encrypt(data)
 			self.transport.write(data)
 
 
 	def dataReceived(self, data):
-		if self.noisy: print("[ShipProxy] [%i] Received data from %s!" % (self.packetCount, self.transport.getPeer().host,))
+		if verbose: print("[ShipProxy] [%i] Received data from %s!" % (self.packetCount, self.transport.getPeer().host,))
 
 		encryptionEnabled = (self.c4crypto is not None)
 		if encryptionEnabled:
@@ -69,10 +69,10 @@ class ShipProxy(protocol.Protocol):
 		while len(self.readBuffer) >= 8:
 			packetSize = struct.unpack_from('i', self.readBuffer)[0]
 			packetType = struct.unpack_from('BB', self.readBuffer, 4)
-			if self.noisy: print("[ShipProxy] [%i] Received packet with size %i, id %x:%x" % (self.packetCount, packetSize, packetType[0], packetType[1]))
+			if verbose: print("[ShipProxy] [%i] Received packet with size %i, id %x:%x" % (self.packetCount, packetSize, packetType[0], packetType[1]))
 
 			if len(self.readBuffer) < packetSize:
-				if self.noisy: print("[ShipProxy] [%i] Buffer only contains %i, waiting for more data." % (self.packetCount, len(self.readBuffer)))
+				if verbose: print("[ShipProxy] [%i] Buffer only contains %i, waiting for more data." % (self.packetCount, len(self.readBuffer)))
 				break
 
 			packet = self.readBuffer[:packetSize]
@@ -93,7 +93,7 @@ class ShipProxy(protocol.Protocol):
 			try:
 				packet = packets.packetList[packetType](self, packet)
 			except KeyError:
-				if self.noisy: print("[ShipProxy] No packet function for id %x:%x, using default functionality..." % (packetType[0], packetType[1]))
+				if verbose: print("[ShipProxy] No packet function for id %x:%x, using default functionality..." % (packetType[0], packetType[1]))
 
 			if packet is None:
 				return
