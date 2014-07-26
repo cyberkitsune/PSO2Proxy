@@ -52,6 +52,7 @@ class ShipProxy(protocol.Protocol):
 			if logPackets: 
 				with open('packets/%i.constucted.%s.bin' % (self.packetCount, self.transport.getPeer().host), 'wb') as f:
 					f.write(data)
+			print("[ShipProxy] Sending %s a constucted packet..." % self.transport.getPeer().host)
 			data = self.peer.c4crypto.encrypt(data)
 			self.transport.write(data)
 
