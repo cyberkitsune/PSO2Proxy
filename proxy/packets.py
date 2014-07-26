@@ -117,13 +117,13 @@ def chatHandler(context, data):
 	pId = struct.unpack_from('I', data, 0x8)[0]
 	message = data[0x1C:].decode('utf-16') # This is technically improper. Should use the xor byte to check string length (See packetReader)
 	if pId == 0: # Prolly the wrong way to check, but check if a PSO2 client sent this packet
-		#if message[0] == '!':
-	#		command = (message.split(' ')[0])[1:] # Get the first word (the command) and strip the '!''
-	#		if command in commands.commandList:
-	#			commands.commandList[command](context, message) # Lazy...
-	#		else:
-	#			context.sendCryptoPacket(packetFactory.ChatPacket(context.playerId, "[Proxy] %s is not a command!" % command).build())
-	#		return None
+		if message[0] == '!':
+			command = (message.split(' ')[0])[1:] # Get the first word (the command) and strip the '!''
+			if command in commands.commandList:
+				commands.commandList[command](context, message) # Lazy...
+			else:
+				context.sendCryptoPacket(packetFactory.ChatPacket(context.playerId, "[Proxy] %s is not a command!" % command).build())
+			return None
 		return data
 	if pId in players.playerList:
 		name = players.playerList[pId][0]
