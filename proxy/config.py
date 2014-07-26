@@ -4,9 +4,10 @@ configKeys = {'packetLogging' : False, 'myIpAddr': "0.0.0.0", 'bindIp' : "0.0.0.
 
 def loadConfig():
 	global configKeys
-	if not os.path.exists('pso2proxy.config.json'):
+	if not os.path.exists('cfg/pso2proxy.config.json'):
+		os.makedirs('cfg/')
 		makeDefaultConfig()
-	f = open('pso2proxy.config.json', 'r')
+	f = open('cfg/pso2proxy.config.json', 'r')
 	newcfg = f.read()
 	configKeys = json.loads(newcfg)
 	print("[ShipProxy] Config loaded!")
@@ -16,7 +17,7 @@ def loadConfig():
 def makeDefaultConfig():
 	global configKeys
 	jsonEnc = json.dumps(configKeys, indent=1)
-	f = open('pso2proxy.config.json', 'w')
+	f = open('cfg/pso2proxy.config.json', 'w')
 	f.write(jsonEnc)
 	f.close()
 
