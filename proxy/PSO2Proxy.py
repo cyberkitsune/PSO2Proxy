@@ -50,7 +50,7 @@ class ShipProxy(protocol.Protocol):
 			print("[ShipProxy] Client at %s lost connection." % self.transport.getPeer().host)
 
 	def sendCryptoPacket(self, data):
-		if self.c4crypto is not None:
+		if self.c4crypto is not None and self.peer is not None:
 			if logPackets: 
 				with open('packets/%i.constucted.%s.bin' % (self.packetCount, self.transport.getPeer().host), 'wb') as f:
 					f.write(data)
