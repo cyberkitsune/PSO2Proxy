@@ -50,3 +50,9 @@ def listClients(sender, params):
 				cPBlock = None
 			print("[ClientList] IP: %s SEGA ID: %s Player ID: %s Player Name: %s Block: %s" % (cHost, cSID, cPID, cPName, cPBlock))
 		print("[ClientList] There are %i clients in total." % len(data.clients.connectedClients))
+
+@CommandHandler("globalmsg")
+def globalMessage(sender, params):
+	if isinstance(sender, basic.LineReceiver):
+		for client in data.clients.connectedClients.values():
+			client.getHandle().sendCryptoPacket(packetFactory.GlobalMessagePacket("[Proxy Global Message ] %s" % params).build())
