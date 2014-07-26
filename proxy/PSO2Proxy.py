@@ -6,7 +6,7 @@ from twisted.python import log, logfile
 from twisted.internet.endpoints import TCP4ServerEndpoint
 from commands import commandList
 from PSOCryptoUtils import PSO2RC4
-import packetUtils, io, struct, time, bans, calendar, datetime, os, exceptions, sys, packets
+import packetUtils, io, struct, time, bans, calendar, datetime, os, exceptions, sys, packets, traceback
 import data.blocks as blocks
 import data.ships as ships
 import data.clients as clients
@@ -212,7 +212,7 @@ class ServerConsole(basic.LineReceiver):
 			if command in commandList:
 				commandList[command](self, line)
 		except:
-			e = sys.exc_info()[0]
+			e = traceback.format_exc()
 			print("[ShipProxy] Error Occured: %s" % e)
 		self.transport.write('>>> ')
 		
