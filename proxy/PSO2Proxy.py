@@ -45,7 +45,10 @@ class ShipProxy(protocol.Protocol):
 		if self.playerId is not None and not self.changingBlocks:
 			clients.removeClient(self)
 		if self.psoClient and self.myUsername is not None:
-			print("[ShipProxy] %s logged out or changed blocks." % self.myUsername)
+			if self.changingBlocks:
+				print("[ShipProxy] %s is changing blocks." % self.myUsername)
+			else:
+				print("[ShipProxy] %s logged out." % self.myUsername)
 		elif self.psoClient and self.myUsername is None:
 			print("[ShipProxy] Client at %s lost connection." % self.transport.getPeer().host)
 

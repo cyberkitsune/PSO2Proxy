@@ -1,0 +1,6 @@
+{
+ "bindIp": "0.0.0.0", 
+ "myIpAddr": "0.0.0.0", 
+ "packetLogging": false, 
+ "showBlockNamesAsIp": false
+}
