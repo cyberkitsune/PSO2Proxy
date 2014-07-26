@@ -1,0 +1,7 @@
+*.ncb
+*.opt
+*.plg
+*.suo
+*.vcproj.*.*.user
+*.bsc
+*.dgb

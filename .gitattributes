@@ -1,0 +1,13 @@
+# Windows EOL
+*.cs -crlf -whitespace
+*.mk -crlf -whitespace
+*.bat -crlf -whitespace
+*.dev -crlf -whitespace
+*.dsp -crlf -whitespace
+*.dsw -crlf -whitespace
+*.sln -crlf -whitespace
+*.resx -crlf -whitespace
+*.vcproj -crlf -whitespace
+*.csproj* -crlf -whitespace
+*.vcxproj* -crlf -whitespace
+*.manifest -crlf -whitespace
