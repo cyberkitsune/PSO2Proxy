@@ -54,7 +54,11 @@ def listClients(sender, params):
 @CommandHandler("globalmsg")
 def globalMessage(sender, params):
 	if isinstance(sender, basic.LineReceiver):
+		if len(params.split(' ',1)) < 2:
+			print("[ShipProxy] That message is not long enough!")
+			return
 		message = params.split(' ',1)[1]
 		for client in data.clients.connectedClients.values():
-			client.getHandle().sendCryptoPacket(packetFactory.GoldGlobalMessagePacket("[Proxy Global Message] %s" % message).build())
+			if client.getHandle() is not None:
+				client.getHandle().sendCryptoPacket(packetFactory.GoldGlobalMessagePacket("[Proxy Global Message] %s" % message).build())
 		print("[ShipProxy] Sent global message!")
