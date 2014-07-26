@@ -7,7 +7,6 @@ class PSO2RC4(object):
         self.rc4key = key
         self.rc4de = ARC4.new(key)
         self.rc4en = ARC4.new(key)
-        print("[CryptoUtils] Loaded RC4 decryptor!")
 
     def decrypt(self, data):
         return self.rc4de.decrypt(data)
