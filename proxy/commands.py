@@ -1,6 +1,7 @@
 import packetFactory, bans, data.clients, data.players, data.blocks
 from twisted.protocols import basic
 from twisted.python import log
+from twisted.internet import reactor
 
 commandList = {}
 
@@ -62,3 +63,9 @@ def globalMessage(sender, params):
 			if client.getHandle() is not None:
 				client.getHandle().sendCryptoPacket(packetFactory.GoldGlobalMessagePacket("[Proxy Global Message] %s" % message).build())
 		print("[ShipProxy] Sent global message!")
+
+@CommandHandler("exit")
+def exit(sender, params):
+	if isinstance(sender, basic.LineReceiver):
+		print("[ShipProxy] Exiting...")
+		reactor.callFromThread(reactor.stop)
