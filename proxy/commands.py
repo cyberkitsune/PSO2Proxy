@@ -15,7 +15,7 @@ class CommandHandler(object):
 def aboutMe(sender, params):
 	if not isinstance(sender, basic.LineReceiver):
 		string = '[Command] %s, how may I help you?' % sender.transport.getPeer().host
-		sender.sendPacketCrypto(packetFactory.ChatPacket(sender.playerId, string).build())
+		sender.sendCryptoPacket(packetFactory.ChatPacket(sender.playerId, string).build())
 	else:
 		sender.transport.write("[Command] Hello Console! Valid commands: %s\n" % ', '.join(commandList.keys()) )
 @CommandHandler("reloadbans")
