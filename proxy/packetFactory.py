@@ -55,8 +55,8 @@ class ChatPacket(object):
 		#buf += struct.pack('xx') #pad!
 		return Packet(0x7, 0x0, 0x44, 0x0, buf).build()
 
-class GlobalMessagePacket(object):
-	"""docstring for GlobalMessagePacket"""
+class GoldGlobalMessagePacket(object):
+	"""Golden Global Message Packet"""
 	def __init__(self, message):
 		self.message = message
 
