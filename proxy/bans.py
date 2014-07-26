@@ -1,8 +1,12 @@
+import os
 banList = []
 
 
 def loadBans():
 	global banList
+	if not os.path.exists('banList.txt'):
+		f = open('banList.txt', 'w+')
+		f.close()
 	banList = []
 	f = open('banList.txt')
 	bans = f.read()
