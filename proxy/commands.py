@@ -57,4 +57,4 @@ def globalMessage(sender, params):
 		message = params.split(' ',1)[1]
 		for client in data.clients.connectedClients.values():
 			client.getHandle().sendCryptoPacket(packetFactory.GoldGlobalMessagePacket("[Proxy Global Message] %s" % message).build())
-		print("[ShipProxy] Sent global message!", ...)
+		print("[ShipProxy] Sent global message!")
