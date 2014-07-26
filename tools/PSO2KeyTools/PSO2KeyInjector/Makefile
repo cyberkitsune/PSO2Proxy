@@ -1,5 +1,5 @@
 
-SRCS+=dllmain.cpp
+SRCS+=dllmain.c
 
 DLLS=rsainject.dll dumper.dll
 
@@ -8,7 +8,7 @@ DLLS=rsainject.dll dumper.dll
 WFLAGS:=-Wall -W (WFLAGS)
 
 #Default Compiler Flags
-CFLAGS:=-Os -Wall -W $(CFLAGS) -x c
+CFLAGS:=-Os -Wall -W $(CFLAGS)
 
 #Default Linker Flags
 LDFLAGS+=-shared -s
