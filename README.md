@@ -17,7 +17,7 @@ If you have a git commandline client, setuptools and pip installed, you can inst
 ```
 
 ## Configuring the Server
-In order to make the server work, you need to (at the very least) specify your system's public IP address in config.py and install a RSA private key of your own, and a SEGA RSA Public key imported from the PSO2 Client. If your server has a different LAN IP from your public IP, set the bind IP in config.py to that. If unsure, keep that 0.0.0.0
+To configure the server, run it once to generate the pso2proxy.config.json, then edit that. You need at least your Public IP address set and your adapter IP set if it's different from your public ip. If unsure, leave the bindIp `0.0.0.0`.
 ## RSA Keys
 ### Your private / public keypair
 You'll need to generate a RSA public and private keypair for your server and your proxy's clients for the proxy to work. You can use OpenSSL to do this.
