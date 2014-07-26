@@ -62,6 +62,9 @@ class GlobalMessagePacket(object):
 
 	def build(self):
 		buf = bytearray()
+		buf += encodeStringUtf16(self.message, 0xf339, 0x57)
+		return Packet(0x19, 0x00, 0x4, 0x0, buf).build()
+
 		
 
 
