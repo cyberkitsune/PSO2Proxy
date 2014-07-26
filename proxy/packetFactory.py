@@ -1,5 +1,16 @@
 import io, struct
 
+
+def encodeStringUtf16(string, xorVal, subVal):
+    prefix = ((len(string) + 1) + subVal) ^ xorVal
+
+    data = string.encode('utf-16le') + '\0\0'
+    if (len(data) % 4) == 2:
+        data += '\0\0'
+
+    return struct.pack('<I', prefix) + data
+
+
 class Packet(object):
 	"""docstring for PacketFactory"""
 	def __init__(self, pId, subId, flag1, flag2, data):
@@ -28,8 +39,6 @@ class PlayerHeader(object):
 		buf += struct.pack('<IIHH', self.playerId, self._4, self._8, self._A)
 		return buf
 		
-		
-
 
 class ChatPacket(object):
 	def __init__(self, senderId, message):
@@ -42,12 +51,18 @@ class ChatPacket(object):
 		buf += struct.pack('xx') # TODO: FIXME
 		buf += struct.pack('<H', 0) # TODO: FIXME
 		# Magical xor man
-		charLength = len(self.message + '\0')
-		xor = (charLength + 0x44) ^ 0x9D3F
-		buf += struct.pack('<I', xor)
-		buf += (self.message + '\0').encode('utf-16le')
-		buf += struct.pack('xx') #pad!
+		buf += encodeStringUtf16(self.message, 0x9d3f, 0x44)
+		#buf += struct.pack('xx') #pad!
 		return Packet(0x7, 0x0, 0x44, 0x0, buf).build()
+
+class GlobalMessagePacket(object):
+	"""docstring for GlobalMessagePacket"""
+	def __init__(self, message):
+		self.message = message
+
+	def build(self):
+		buf = bytearray()
+		
 
 
 
