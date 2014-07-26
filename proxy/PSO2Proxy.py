@@ -212,7 +212,8 @@ class ServerConsole(basic.LineReceiver):
 			if command in commandList:
 				commandList[command](self, line)
 		except:
-			print("[ShipProxy] Error Occured")
+			e = sys.exc_info()[0]
+			print("[ShipProxy] Error Occured: %s" % e)
 		self.transport.write('>>> ')
 		
 def main():
