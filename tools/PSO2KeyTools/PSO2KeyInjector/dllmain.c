@@ -82,9 +82,10 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			
 			// Allocate the key.
 			void* keyPtr = malloc(0xA0);
+			memset(keyPtr, 0, 0xA0);
 			
 			// Read the key from the file.
-			fread(keyPtr, 0xA0, 1, filePtr);
+			size_t read = fread(keyPtr, 0x94, 1, filePtr);
 			
 			// Close the file.
 			fclose(filePtr);
@@ -95,7 +96,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 			*/
 			int i;
 
-			for (i = 0; i < 4; i++)
+			for (i = 0; i < 4 && read == 1; i++)
 			{
 				memcpy((void*)(RSAaddr + (0xA0 * i)), keyPtr, 0xA0);
 			}
