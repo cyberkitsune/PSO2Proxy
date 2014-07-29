@@ -147,7 +147,7 @@ def blockListPacket(context, data):
 	# Jump to 0x28, 0x88 sep
 	pos = 0x28
 	while pos < len(data) and data[pos] != 0:
-		name = data[pos:pos+0x40].decode('utf-16')
+		name = data[pos:pos+0x40].decode('utf-16le')
 		o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), pos+0x40)
 		ipStr = "%i.%i.%i.%i" % (o1, o2, o3, o4)
 		if port not in blocks.blockList:

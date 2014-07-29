@@ -18,7 +18,7 @@ def loadConfig():
 	configKeys = json.loads(newcfg)
 	print("[ShipProxy] Config loaded!")
 	if os.path.exists('cfg/blocknames.config.json'):
-		b = open('cfg/pso2proxy.config.json', 'r')
+		b = open('cfg/blocknames.config.json', 'r')
 		bStr = b.read()
 		blockNames = json.loads(bStr)
 		print('[ShipProxy] Block names loaded!')
