@@ -9,5 +9,5 @@ class WebAPI(Resource):
 
 	def render_GET(self, request):
 		currData = {'playerCount' : len(data.clients.connectedClients), 'blocksCached' : len(data.blocks.blockList), 'playersCached' : len(data.players.playerList), 'upSince' : upStart}
-		request.setHeader("content-type", "text/plain")
+		request.setHeader("content-type", "application/json")
 		return json.dumps(currData)
