@@ -1,4 +1,4 @@
-import ..data.clients, ..data.players, ..data.blocks 
+import .data.clients, .data.players, .data.blocks 
 from twisted.web.resource import Resource
 import json, time
 
