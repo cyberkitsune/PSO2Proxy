@@ -6,6 +6,7 @@ blockNames = {}
 
 def loadConfig():
 	global configKeys
+	global blockNames
 	if not os.path.exists('cfg/pso2proxy.config.json'):
 		try:
 			os.makedirs('cfg/')
