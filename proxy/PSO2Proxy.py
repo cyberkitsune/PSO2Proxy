@@ -15,6 +15,7 @@ from config import packetLogging as logPackets
 from config import myIpAddr as myIp
 from config import bindIp as ifaceIp
 from config import noisy as verbose
+from config import webapi as webapi 
 
 class ShipProxy(protocol.Protocol):
 	peer = None
@@ -263,6 +264,10 @@ def main():
 		print("[ShipProxy] Bound to %i ports for all blocks on ship %i!" % (bound, shipNum))
 	bans.loadBans()
 	stdio.StandardIO(ServerConsole())
+	if webapi:
+		from twisted.web import server
+		import plugins.WebAPI as jsonsite
+		reactor.listenTCP(8080, server.Site(jsonsite.WebAPI())
 	reactor.run()
 
 if __name__ == "__main__":

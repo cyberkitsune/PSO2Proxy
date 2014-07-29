@@ -1,6 +1,6 @@
 import json, os.path
 
-configKeys = {'packetLogging' : False, 'myIpAddr': "0.0.0.0", 'bindIp' : "0.0.0.0", 'showBlockNamesAsIp' : False, 'noisy' : False}
+configKeys = {'packetLogging' : False, 'myIpAddr': "0.0.0.0", 'bindIp' : "0.0.0.0", 'showBlockNamesAsIp' : False, 'noisy' : False, 'webapi' : False}
 
 def loadConfig():
 	global configKeys
@@ -28,3 +28,4 @@ myIpAddr = configKeys['myIpAddr']
 bindIp = configKeys['bindIp']
 showBlockNamesAsIp = configKeys['showBlockNamesAsIp']
 noisy = configKeys['noisy']
+webapi = configKeys['webapi']
