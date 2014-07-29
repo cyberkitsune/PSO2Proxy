@@ -1,5 +1,4 @@
-from ..data import clients, blocks, players
-from twisted.web.server import Site
+from .data import clients, blocks, players
 from twisted.web.resource import Resource
 import json, time
 
