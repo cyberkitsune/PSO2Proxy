@@ -9,7 +9,7 @@ import bans
 from config import myIpAddr as ip
 from config import blockNameMode as bNameMode
 from config import noisy as verbose
-from config import blockNames
+import config
 from twisted.python import log
 
 i0, i1, i2, i3 = ip.split(".")
