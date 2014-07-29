@@ -69,12 +69,12 @@ def blockInfoPacket(context, data):
 	blockport = context.peer.transport.getHost().port
 	if blockport in blocks.blockList:
 		blockInfo = blocks.blockList[blockport]
-		if bNameMode == 1:
+		if bNameMode == 0:
 			addrString = ('%s%s:%i' % ((blockInfo[1])[:6], blockInfo[0], blockport)).encode('utf-16le')
 			struct.pack_into('%is' % len(addrString), data, 0x1C, addrString)
 			if len(addrString) < 0x40:
 				struct.pack_into('%ix' % (0x40 - len(addrString)), data, 0x1C + len(addrString))
-		elif bNameMode == 2 and ((blockInfo[1])[:5]) in config.blockNames:
+		elif bNameMode == 1 and ((blockInfo[1])[:5]) in config.blockNames:
 			addrString = config.blockNames[(blockInfo[1])[:5]].encode('utf-16le')
 			struct.pack_into('%is' % len(addrString), data, 0x1C, addrString)
 			if len(addrString) < 0x40:
