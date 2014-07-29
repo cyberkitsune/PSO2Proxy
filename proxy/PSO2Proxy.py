@@ -267,7 +267,7 @@ def main():
 	if webapi:
 		from twisted.web import server
 		import plugins.WebAPI as jsonsite
-		reactor.listenTCP(8080, server.Site(jsonsite.WebAPI())
+		reactor.listenTCP(8080, server.Site(jsonsite.WebAPI()))
 	reactor.run()
 
 if __name__ == "__main__":
