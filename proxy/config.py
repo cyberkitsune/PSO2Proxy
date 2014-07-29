@@ -34,6 +34,6 @@ loadConfig()
 packetLogging = configKeys['packetLogging']
 myIpAddr = configKeys['myIpAddr']
 bindIp = configKeys['bindIp']
-blockNameMode = configKeys['showBlockNamesAsIp']
+blockNameMode = configKeys['blockNameMode']
 noisy = configKeys['noisy']
 webapi = configKeys['webapi']
