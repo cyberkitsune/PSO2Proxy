@@ -1,6 +1,8 @@
 import json, os.path
 
-configKeys = {'packetLogging' : False, 'myIpAddr': "0.0.0.0", 'bindIp' : "0.0.0.0", 'showBlockNamesAsIp' : False, 'noisy' : False, 'webapi' : False}
+configKeys = {'packetLogging' : False, 'myIpAddr': "0.0.0.0", 'bindIp' : "0.0.0.0", 'blockNameMode' : 0, 'noisy' : False, 'webapi' : False}
+
+blockNames = {}
 
 def loadConfig():
 	global configKeys
@@ -9,8 +11,14 @@ def loadConfig():
 		makeDefaultConfig()
 	f = open('cfg/pso2proxy.config.json', 'r')
 	newcfg = f.read()
+	f.close()
 	configKeys = json.loads(newcfg)
 	print("[ShipProxy] Config loaded!")
+	if os.path.exists('cfg/blocknames.config.json'):
+		b = open('cfg/pso2proxy.config.json', 'r')
+		bStr = b.read()
+		blockNames = json.loads(bStr)
+		print('[ShipProxy] Block names loaded!')
 
 
 
@@ -26,6 +34,6 @@ loadConfig()
 packetLogging = configKeys['packetLogging']
 myIpAddr = configKeys['myIpAddr']
 bindIp = configKeys['bindIp']
-showBlockNamesAsIp = configKeys['showBlockNamesAsIp']
+blockNameMode = configKeys['showBlockNamesAsIp']
 noisy = configKeys['noisy']
 webapi = configKeys['webapi']
