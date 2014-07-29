@@ -19,6 +19,15 @@ def aboutMe(sender, params):
 		sender.sendCryptoPacket(packetFactory.ChatPacket(sender.playerId, string).build())
 	else:
 		sender.transport.write("[Command] Hello Console! Valid commands: %s\n" % ', '.join(commandList.keys()) )
+
+@CommandHandler("count")
+def count(sender, params):
+	if not isinstance(sender, basic.LineReceiver):
+		string = '[Command] There are %s users currently connected to your proxy.' % len(data.clients.connectedClients)
+		sender.sendCryptoPacket(packetFactory.ChatPacket(sender.playerId, string).build())
+	else:
+		print("[ShipProxy] There are %s users currently on the proxy." % len(data.clients.connectedClients))
+
 @CommandHandler("reloadbans")
 def reloadBans(sender, params):
 	if isinstance(sender, basic.LineReceiver):
