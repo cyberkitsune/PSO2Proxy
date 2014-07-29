@@ -227,7 +227,7 @@ def main():
 	if myIp == "0.0.0.0":
 		print("==== ERROR 001 ====")
 		print("You have NOT configured the IP address for PSO2Proxy!")
-		print("Please edit config.py and change myIpAddr to your IP public IP address (Not LAN address if you're on a LAN!) ")
+		print("Please edit cfg/pso2proxy.config.json and change myIpAddr to your IP public IP address (Not LAN address if you're on a LAN!) ")
 		print("After you fix this, please restart PSO2Proxy.")
 		sys.exit(0)
 		return
