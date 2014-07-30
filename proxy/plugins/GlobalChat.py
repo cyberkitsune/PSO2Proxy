@@ -1,7 +1,7 @@
 import plugins, packetFactory
 import data.clients
 
-@plugins.onConnection
+@plugins.onConnectionHook
 def checkConfig(user):
 	if user.playerId in data.clients.connectedClients:
 		clientPrefs = data.clients.connectedClients[user.playerId].getPrefs()
