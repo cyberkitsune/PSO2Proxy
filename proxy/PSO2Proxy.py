@@ -47,7 +47,7 @@ class ShipProxy(protocol.Protocol):
 		if self.playerId is not None and not self.changingBlocks:
 			clients.removeClient(self)
 		if self.playerId is not None and self.psoClient:
-			for f in pManager.onConnectionLossHook:
+			for f in pManager.onConnectionLoss:
 				f(self)
 		if self.psoClient and self.myUsername is not None:
 			if self.changingBlocks:
@@ -116,11 +116,11 @@ class ShipProxy(protocol.Protocol):
 				if self.playerId not in clients.connectedClients: #Inital add
 					clients.addClient(self)
 					self.loaded = True
-					for f in pManager.onConnectionHook:
+					for f in pManager.onConnection:
         					f(self)
 				elif self.loaded == False:
 					clients.populateData(self)
-					for f in pManager.onConnectionHook:
+					for f in pManager.onConnection:
         					f(self)
 			if logPackets:
 				if self.myUsername is not None and len(self.orphans) > 0:
