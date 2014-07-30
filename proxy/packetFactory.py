@@ -80,7 +80,7 @@ class TeamChatPacket(object):
 		buf += encodeStringUtf16(self.senderName, 0x7ED7, 0x41)
 		buf += encodeStringUtf16(self.senderName, 0x7ED7, 0x41)
 		buf += encodeStringUtf16(self.message, 0x7ED7, 0x41)
-		return Packet(0x7, 0x110, 0x4, 0x00, buf).build()
+		return Packet(0x7, 0x11, 0x4, 0x00, buf).build()
 
 		
 
