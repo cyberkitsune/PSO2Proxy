@@ -28,6 +28,7 @@ def chat(context, params):
 	if not data.clients.connectedClients[context.playerId].getPrefs()['globalChat']:
 		context.sendCryptoPacket(packetFactory.ChatPacket(context.playerId, "[GlobalChat] You do not have global chat enabled, and can not send a global message.").build())
 		return
+	print("[GlobalChat] <%s> %s" % (data.players.playerList[context.playerId][0], params[3:]))
 	for client in data.clients.connectedClients.values():
 		if client.getPrefs()['globalChat'] and client.getHandle() is not None:
 			client.getHandle().sendCryptoPacket(packetFactory.TeamChatPacket(context.playerId, data.players.playerList[context.playerId][0], "[G] %s" % params[3:]).build())
