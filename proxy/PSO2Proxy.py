@@ -10,6 +10,7 @@ import packetUtils, io, struct, time, bans, calendar, datetime, os, exceptions, 
 import data.blocks as blocks
 import data.ships as ships
 import data.clients as clients
+import plugins.plugins
 from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
 from config import packetLogging as logPackets
 from config import myIpAddr as myIp
@@ -269,6 +270,8 @@ def main():
 	for plug in glob.glob("plugins/*.py"):
 		plug = plug[:-3]
 		__import__(plug)
+	for f in plugins.onStart:
+		f()
 	reactor.run()
 
 if __name__ == "__main__":
