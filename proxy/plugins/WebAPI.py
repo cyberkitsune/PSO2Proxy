@@ -18,7 +18,6 @@ class WebAPI(Resource):
 def setupWebAPI():
 	if webapi:
 		from twisted.web import server
-		import plugins.WebAPI as jsonsite
 		wEndpoint = TCP4ServerEndpoint(reactor, 8080, interface=ifaceIp)
-		wEndpoint.listen(server.Site(jsonsite.WebAPI()))
+		wEndpoint.listen(server.Site(WebAPI()))
 	
