@@ -5,11 +5,11 @@ import data.clients as clients
 import packetFactory
 from PSOCryptoUtils import PSO2RSADecrypt, PSO2RC4, PSO2RSAEncrypt
 import commands
-import bans
 import plugins.plugins as pManager
 from config import myIpAddr as ip
 from config import blockNameMode as bNameMode
 from config import noisy as verbose
+from config import banList
 import config
 from twisted.python import log
 
@@ -37,7 +37,7 @@ def loginPacket(context, data):
 	print("[LoginPacket] Logging player %s in..." % username)
 	context.myUsername = username
 	context.peer.myUsername = username
-	if username in bans.banList:
+	if username in banList:
 		print("[Bans] %s is banned! Disconnecting..." % username)
 		context.transport.loseConnection()
 		context.peer.transport.loseConnection()
