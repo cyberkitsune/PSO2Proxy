@@ -15,6 +15,12 @@
 // Constant variable(s):
 const unsigned char* RSAaddr = (unsigned char*)0x33BDBE0;
 
+// Text to Inject failed to open publickey.blob
+LPCTSTR InjectText = "Failed to open publickey.blob";
+// Caption to Inject failed to open publickey.blob
+LPCTSTR InjectCaptionText = "fopen() failed";
+const UINT InjectBoxFlags = MB_OK|MB_ICONERROR;
+
 // Functions:
 #if DUMPER
 	// Just in case we want to export this, I'm using 'VOID'.
@@ -107,6 +113,10 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
 				// Free the key.
 				free(keyPtr);
+			}
+			else
+			{
+				MessageBoxA(NULL, InjectText, InjectCaptionText, InjectBoxFlags);
 			}
 #endif
 	}
