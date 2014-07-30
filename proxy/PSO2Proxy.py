@@ -6,7 +6,7 @@ from twisted.python import log, logfile
 from twisted.internet.endpoints import TCP4ServerEndpoint
 from commands import commandList
 from PSOCryptoUtils import PSO2RC4
-import packetUtils, io, struct, time, bans, calendar, datetime, os, exceptions, sys, packets, traceback
+import packetUtils, io, struct, time, calendar, datetime, os, exceptions, sys, packets, traceback
 import data.blocks as blocks
 import data.ships as ships
 import data.clients as clients
@@ -262,7 +262,6 @@ def main():
 			endpoint.listen(ProxyFactory())
 			bound += 1
 		print("[ShipProxy] Bound to %i ports for all blocks on ship %i!" % (bound, shipNum))
-	bans.loadBans()
 	stdio.StandardIO(ServerConsole())
 	if webapi:
 		from twisted.web import server
