@@ -11,7 +11,9 @@ class packetHook(object):
 
 	def __call__(self, f):
 		global packetFunctions
-		packetFunctions[(self.pktType, self.pktSubtype)] = f
+		if (self.pktType, self.pktSubtype) not in packetFunctions:
+			packetFunctions[(self.pktType, self.pktSubtype)] = []
+		packetFunctions[(self.pktType, self.pktSubtype)].append(f)
 
 class commandHook(object):
 	"""docstring for commandHook"""
