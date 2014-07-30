@@ -105,6 +105,10 @@ class ShipProxy(protocol.Protocol):
 			except KeyError:
 				if verbose: print("[ShipProxy] No packet function for id %x:%x, using default functionality..." % (packetType[0], packetType[1]))
 
+			if (packetType[0], packetType[1]) in pManager.packetFunctions:
+				for f in pManager.packetFunctions[(packetType[0], packetType[1])]:
+					packet = f(self, packet)
+
 			if packet is None:
 				return
 
