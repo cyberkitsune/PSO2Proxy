@@ -46,6 +46,9 @@ class ShipProxy(protocol.Protocol):
 			self.peer = None
 		if self.playerId is not None and not self.changingBlocks:
 			clients.removeClient(self)
+		if self.playerId is not None and self.psoClient:
+			for f in pManager.onConnectionLossHook:
+				f(self)
 		if self.psoClient and self.myUsername is not None:
 			if self.changingBlocks:
 				print("[ShipProxy] %s is changing blocks." % self.myUsername)
@@ -186,7 +189,8 @@ class ProxyServer(ShipProxy):
         	print("[ShipProxy] Found address %s for port %i, named %s" % (blocks.blockList[port][0], port, blocks.blockList[port][1]))
         	addr = blocks.blockList[port][0]
         self.setIsClient(True)
-
+        for f in pManager.onConnectionHook:
+        	f(self)
         client = ProxyClientFactory()
         client.setServer(self)
 
