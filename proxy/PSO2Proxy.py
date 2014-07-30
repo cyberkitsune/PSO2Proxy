@@ -116,8 +116,12 @@ class ShipProxy(protocol.Protocol):
 				if self.playerId not in clients.connectedClients: #Inital add
 					clients.addClient(self)
 					self.loaded = True
+					for f in pManager.onConnectionHook:
+        				f(self)
 				elif self.loaded == False:
 					clients.populateData(self)
+					for f in pManager.onConnectionHook:
+        				f(self)
 			if logPackets:
 				if self.myUsername is not None and len(self.orphans) > 0:
 					count = 0
@@ -193,8 +197,6 @@ class ProxyServer(ShipProxy):
         	print("[ShipProxy] Found address %s for port %i, named %s" % (blocks.blockList[port][0], port, blocks.blockList[port][1]))
         	addr = blocks.blockList[port][0]
         self.setIsClient(True)
-        for f in pManager.onConnectionHook:
-        	f(self)
         client = ProxyClientFactory()
         client.setServer(self)
 
