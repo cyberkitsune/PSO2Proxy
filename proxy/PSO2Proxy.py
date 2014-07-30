@@ -264,11 +264,11 @@ def main():
 		print("[ShipProxy] Bound to %i ports for all blocks on ship %i!" % (bound, shipNum))
 	bans.loadBans()
 	stdio.StandardIO(ServerConsole())
-	if webapi:
-		from twisted.web import server
-		import plugins.WebAPI as jsonsite
-		wEndpoint = TCP4ServerEndpoint(reactor, 8080, interface=ifaceIp)
-		wEndpoint.listen(server.Site(jsonsite.WebAPI()))
+	print("[ShipProxy] Loading plugins...")
+	import glob
+	for plug in glob.glob("plugins/*.py"):
+		plug = plug[:-3]
+		__import__(plug)
 	reactor.run()
 
 if __name__ == "__main__":
