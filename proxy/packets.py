@@ -6,6 +6,7 @@ import packetFactory
 from PSOCryptoUtils import PSO2RSADecrypt, PSO2RC4, PSO2RSAEncrypt
 import commands
 import bans
+import plugins.plugins as pManager
 from config import myIpAddr as ip
 from config import blockNameMode as bNameMode
 from config import noisy as verbose
@@ -129,6 +130,8 @@ def chatHandler(context, data):
 			command = (message.split(' ')[0])[1:] # Get the first word (the command) and strip the '!''
 			if command in commands.commandList:
 				commands.commandList[command](context, message) # Lazy...
+			elif command in pManager.commands:
+				pManager.commands[command](context, message)
 			else:
 				context.sendCryptoPacket(packetFactory.ChatPacket(context.playerId, "[Proxy] %s is not a command!" % command).build())
 			return None

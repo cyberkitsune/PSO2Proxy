@@ -10,6 +10,7 @@ import packetUtils, io, struct, time, bans, calendar, datetime, os, exceptions, 
 import data.blocks as blocks
 import data.ships as ships
 import data.clients as clients
+import plugins.plugins as pManager
 from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
 from config import packetLogging as logPackets
 from config import myIpAddr as myIp
@@ -45,6 +46,9 @@ class ShipProxy(protocol.Protocol):
 			self.peer = None
 		if self.playerId is not None and not self.changingBlocks:
 			clients.removeClient(self)
+		if self.playerId is not None and self.psoClient:
+			for f in pManager.onConnectionLoss:
+				f(self)
 		if self.psoClient and self.myUsername is not None:
 			if self.changingBlocks:
 				print("[ShipProxy] %s is changing blocks." % self.myUsername)
@@ -101,6 +105,10 @@ class ShipProxy(protocol.Protocol):
 			except KeyError:
 				if verbose: print("[ShipProxy] No packet function for id %x:%x, using default functionality..." % (packetType[0], packetType[1]))
 
+			if (packetType[0], packetType[1]) in pManager.packetFunctions:
+				for f in pManager.packetFunctions[(packetType[0], packetType[1])]:
+					packet = f(self, packet)
+
 			if packet is None:
 				return
 
@@ -108,8 +116,12 @@ class ShipProxy(protocol.Protocol):
 				if self.playerId not in clients.connectedClients: #Inital add
 					clients.addClient(self)
 					self.loaded = True
+					for f in pManager.onConnection:
+        					f(self)
 				elif self.loaded == False:
 					clients.populateData(self)
+					for f in pManager.onConnection:
+        					f(self)
 			if logPackets:
 				if self.myUsername is not None and len(self.orphans) > 0:
 					count = 0
@@ -185,7 +197,6 @@ class ProxyServer(ShipProxy):
         	print("[ShipProxy] Found address %s for port %i, named %s" % (blocks.blockList[port][0], port, blocks.blockList[port][1]))
         	addr = blocks.blockList[port][0]
         self.setIsClient(True)
-
         client = ProxyClientFactory()
         client.setServer(self)
 
@@ -264,11 +275,15 @@ def main():
 		print("[ShipProxy] Bound to %i ports for all blocks on ship %i!" % (bound, shipNum))
 	bans.loadBans()
 	stdio.StandardIO(ServerConsole())
-	if webapi:
-		from twisted.web import server
-		import plugins.WebAPI as jsonsite
-		wEndpoint = TCP4ServerEndpoint(reactor, 8080, interface=ifaceIp)
-		wEndpoint.listen(server.Site(jsonsite.WebAPI()))
+	print("[ShipProxy] Loading plugins...")
+	import glob
+	for plug in glob.glob("plugins/*.py"):
+		plug = plug[:-3]
+		plug = plug.replace('/','.')
+		print("[ShipProxy] Importing %s..." % plug)
+		__import__(plug)
+	for f in pManager.onStart:
+		f()
 	reactor.run()
 
 if __name__ == "__main__":
