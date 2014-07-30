@@ -219,7 +219,7 @@ class ServerConsole(basic.LineReceiver):
 		
 def main():
 	global ifaceIp
-	logFile = logfile.LogFile.fromFullPath('serverlog.log')
+	logFile = logfile.LogFile.fromFullPath('log/serverlog.log')
 	log.addObserver(log.FileLogObserver(logFile).emit)
 	print("===== PSO2Proxy v0 GIT =====")
 	timestring = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())
