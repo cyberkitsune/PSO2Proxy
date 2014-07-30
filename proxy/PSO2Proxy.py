@@ -10,7 +10,7 @@ import packetUtils, io, struct, time, bans, calendar, datetime, os, exceptions, 
 import data.blocks as blocks
 import data.ships as ships
 import data.clients as clients
-import plugins.plugins
+import plugins.plugins as pManager
 from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
 from config import packetLogging as logPackets
 from config import myIpAddr as myIp
@@ -269,8 +269,10 @@ def main():
 	import glob
 	for plug in glob.glob("plugins/*.py"):
 		plug = plug[:-3]
+		plug = plug.replace('/','.')
+		print("[ShipProxy] Importing %s..." % plug)
 		__import__(plug)
-	for f in plugins.onStart:
+	for f in pManager.onStart:
 		f()
 	reactor.run()
 
