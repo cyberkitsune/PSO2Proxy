@@ -117,11 +117,11 @@ class ShipProxy(protocol.Protocol):
 					clients.addClient(self)
 					self.loaded = True
 					for f in pManager.onConnectionHook:
-        				f(self)
+        					f(self)
 				elif self.loaded == False:
 					clients.populateData(self)
 					for f in pManager.onConnectionHook:
-        				f(self)
+        					f(self)
 			if logPackets:
 				if self.myUsername is not None and len(self.orphans) > 0:
 					count = 0
