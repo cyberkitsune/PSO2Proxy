@@ -30,4 +30,4 @@ def chat(context, params):
 		return
 	for client in data.clients.connectedClients.values():
 		if client.getPrefs()['globalChat'] and client.getHandle() is not None:
-			client.getHandle().sendCryptoPacket(packetFactory.TeamChatPacket(context.playerId, data.players.playerList[context.playerId][0], "[G] %s" % params).build())
+			client.getHandle().sendCryptoPacket(packetFactory.TeamChatPacket(context.playerId, data.players.playerList[context.playerId][0], "[G] %s" % params[3:]).build())
