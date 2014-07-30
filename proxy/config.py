@@ -1,5 +1,7 @@
 import json, os.path
 
+banList = []
+
 configKeys = {'packetLogging' : False, 'myIpAddr': "0.0.0.0", 'bindIp' : "0.0.0.0", 'blockNameMode' : 0, 'noisy' : False, 'webapi' : False}
 
 blockNames = {}
@@ -33,7 +35,21 @@ def makeDefaultConfig():
 	f.write(jsonEnc)
 	f.close()
 
+
+def loadBans():
+	global banList
+	if not os.path.exists('cfg/pso2proxy.bans.json'):
+		f = open('cfg/pso2proxy.bans.json', 'w')
+		f.write(json.dumps(banList))
+		f.close()
+	f = open('cfg/pso2proxy.bans.json', 'r')
+	bans = f.read()
+	f.close()
+	banList = json.loads(bans)
+	print("[Bans] %i bans loaded!" % len(bans))
+
 loadConfig()
+loadBans()
 
 packetLogging = configKeys['packetLogging']
 myIpAddr = configKeys['myIpAddr']
