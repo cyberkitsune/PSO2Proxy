@@ -25,11 +25,14 @@ class commandHook(object):
 def onStartHook(f):
 	global onStart
 	onStart.append(f)
+	return f
 
 def onConnectionHook(f):
 	global onConnection
 	onConnection.append(f)
+	return f
 
 def onConnectionLossHook(f):
 	global onConnectionLoss
 	onConnectionLoss.append(f)
+	return f
