@@ -8,10 +8,15 @@ class ClientData(object):
 		self.ipAddress = ipAddress
 		self.segaId = segaId
 		self.handle = handle
+		self.prefs = {}
 	def getHandle(self):
 		return self.handle
 	def setHandle(self, handle):
 		self.handle = handle
+	def getPrefs(self):
+		return self.prefs
+	def setPrefs(self, prefs):
+		self.prefs = prefs
 
 def addClient(handle):
 	connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, handle.myUsername, handle)
