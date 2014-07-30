@@ -1,5 +1,5 @@
 import plugins, packetFactory
-import data.clients
+import data.clients, data.players
 
 @plugins.onConnectionHook
 def checkConfig(user):
@@ -28,6 +28,6 @@ def chat(context, params):
 	if not data.clients.connectedClients[context.playerId].getPrefs()['globalChat']:
 		context.sendCryptoPacket(packetFactory.ChatPacket(context.playerId, "[GlobalChat] You do not have global chat enabled, and can not send a global message.").build())
 		return
-	for client in data.clients.connectedClients:
+	for client in data.clients.connectedClients.values():
 		if client.getPrefs()['globalChat'] and client.getHandle() is not None:
-			client.getHandle().sendCryptoPacket(packetFactory.ChatPacket(context.playerId, "[G] %s" % params).build())
+			client.getHandle().sendCryptoPacket(packetFactory.TeamChatPacket(context.playerId, data.players[context.playerId], "[G] %s" % params).build())

@@ -66,6 +66,24 @@ class GoldGlobalMessagePacket(object):
 		buf += struct.pack('4x')
 		return Packet(0x19, 0x01, 0x4, 0x0, buf).build()
 
+class TeamChatPacket(object):
+	"""docstring for TeamChatPacket"""
+	def __init__(self, senderId, senderName, message):
+		self.senderId = senderId
+		self.senderName = senderName
+		self.message = message
+
+	def build(self):
+		buf = bytearray()
+		buf += PlayerHeader(self.senderId).build()
+		buf += struct.pack('<I', 0x2)
+		buf += encodeStringUtf16(self.senderName, 0x7ED7, 0x41)
+		buf += encodeStringUtf16(self.senderName, 0x7ED7, 0x41)
+		buf += encodeStringUtf16(self.message, 0x7ED7, 0x41)
+		return Packet(0x7, 0x110, 0x4, 0x00, buf).build()
+
+		
+
 		
 
 
