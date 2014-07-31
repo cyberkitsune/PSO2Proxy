@@ -29,14 +29,27 @@ if enabled:
 		if sid is None or timestamp is None:
 			print("[Redpill] Unable to check-in session, SID or timestamp is none.")
 			return
-		if not os.path.exists("packets/%s/%s/" % (sid, timestamp)):
-			print("[Redpill] Could not check-in session for %s, timestamp %s does not exist" % (sid, timestamp))
+		if not os.path.exists("packets/%s/%i/" % (sid, timestamp)):
+			print("[Redpill] Could not check-in session for %s, timestamp %i does not exist" % (sid, timestamp))
 			return
 
 		sessionId = create_session(get_userid(sid), timestamp)
-		packets = glob.glob("packets/%s/%s/*.bin" % (sid, timestamp))
+		packets = glob.glob("packets/%s/%i/*.bin" % (sid, timestamp))
 		count = 0
 		for packet in packets:
+			order, typeSub, pSender = packet.split(".")
+			pType, pSubType = typeSub.split("-")
+			if pSender == "C":
+				pFrom = 0
+			if pSender == "S":
+				pFrom = 1
+			pID = get_packetId(int(pType, 16), int(pSubType, 16))
+			if pID is None:
+				pID = create_packet(int(pType, 16), int(pSubType, 16), get_userid(sid))
+			add_sessionData(sessionId, pID, pFrom)
+			incr_packetCount(pID)
+			count += 1
+		print("[Redpill] Checked in session %i for %s with %i packets" % (timestamp, sid, count))
 
 
 	def getConn():
@@ -100,5 +113,5 @@ if enabled:
 		con = getConn()
 		with con:
 			cur = con.cursor()
-			cur.execute("insert into packets (type, subType, firstLoggedBy, count) values (?, ?, ?, 1)", (pType, subType, logger))
+			cur.execute("insert into packets (type, subType, firstLoggedBy, count) values (?, ?, ?, 0)", (pType, subType, logger))
 			return cur.lastrowid
