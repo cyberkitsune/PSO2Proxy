@@ -17,6 +17,7 @@ if enabled:
 		if get_userid(username) is None:
 			context.transport.loseConnection()
 			print("[Redpill] %s is not in the whitelist database. Hanging up." % username)
+		return packet
 
 	@plugins.onConnectionHook
 	def registerClient(client):
