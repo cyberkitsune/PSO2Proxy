@@ -1,6 +1,6 @@
 # redpill.py PSO2Proxy plugin
 # For use with redpill.py flask webapp and website for packet logging and management
-import sqlite, plugins, os, glob
+import sqlite, plugins, os, glob, tarfile, shutil
 
 dbLocation = '/var/pso2-www/redpill/redpill.db'
 enabled = True
@@ -50,6 +50,12 @@ if enabled:
 			incr_packetCount(pID)
 			count += 1
 		print("[Redpill] Checked in session %i for %s with %i packets" % (timestamp, sid, count))
+		tar = tarfile.open("packets/%s/%i.tar.gz" % (sid, timestamp), "w:gz")
+		tar.add("packets/%s/%i/" % (sid, timestamp), arcname="%i" % timestamp)
+		tar.close()
+		shutil.rmtree("packets/%s/%i/" % (sid, timestamp))
+		print("[Redpill] Archived as %i.tar.gz and deleted base folder." % timestamp)
+
 
 
 	def getConn():
