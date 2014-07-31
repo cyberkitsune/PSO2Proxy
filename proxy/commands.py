@@ -61,6 +61,19 @@ def ban(sender, params):
 			print("[Command] Invalid usage! Proper usage, >>> ban <segaid/pid> <value>")
 			return
 
+@CommandHandler("kick")
+def kick(sender, params):
+	if isinstance(sender, basic.LineReceiver):
+		args = params.split(' ')
+		if len(args) < 2:
+			print("[Command] Invalid usage! Proper usage: >>> kick <playerId>")
+			return
+		if args[1] in data.clients.connectedClients:
+			data.clients.connectedClients[args[1]].getHandle().transport.loseConnection()
+			print("[Command] Kicked %s." % args[1])
+		else:
+			print("[Command] I couldn't find %s!" % args[1])
+
 @CommandHandler("clients")
 def listClients(sender, params):
 	if isinstance(sender, basic.LineReceiver):
