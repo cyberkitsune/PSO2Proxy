@@ -3,7 +3,7 @@
 import sqlite, plugins, os, glob
 
 dbLocation = '/var/pso2-www/redpill/redpill.db'
-enabled = False
+enabled = True
 
 if enabled:
 	@plugins.onStartHook
