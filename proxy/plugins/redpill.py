@@ -15,7 +15,7 @@ if enabled:
 		username = packet[0x8:0x48].decode('utf-8')
 		username = username.rstrip('\0')
 		if get_userid(username) is None:
-			context.loseConnection()
+			context.transport.loseConnection()
 			print("[Redpill] %s is not in the whitelist database. Hanging up." % username)
 
 	@plugins.onConnectionHook
@@ -67,7 +67,7 @@ if enabled:
 		con = getConn()
 		with con:
 			cur = con.cursor()
-			cur.execute("select id from users where username = ?", (username, ))
+			cur.execute("select id from users where username = ?", (segaid, ))
 			out = cur.fetchone()
 			if out is None:
 				return None
