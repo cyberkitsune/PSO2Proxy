@@ -89,8 +89,9 @@ class ShipProxy(protocol.Protocol):
 			self.readBuffer = self.readBuffer[packetSize:]
 			if logPackets:
 				if packetType[0] == 0x11 and packetType[1] == 0x0:
-					pData = packet
+					pData = bytearray(packet)
 					struct.pack_into("64x", pData, 0x48)
+					pData = str(pData)
 				else:
 					pData = packet
  				if self.myUsername is not None:
