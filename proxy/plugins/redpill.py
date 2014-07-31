@@ -67,7 +67,7 @@ if enabled:
 		con = getConn()
 		with con:
 			cur = con.cursor()
-			cur.execute("select id from users where username = ?", (segaid, ))
+			cur.execute("select id from users where segaid = ?", (username, ))
 			out = cur.fetchone()
 			if out is None:
 				return None
