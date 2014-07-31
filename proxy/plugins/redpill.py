@@ -38,7 +38,7 @@ if enabled:
 		packets = glob.glob("packets/%s/%i/*.bin" % (sid, timestamp))
 		count = 0
 		for packet in packets:
-			order, typeSub, pSender = packet.split(".")
+			order, typeSub, pSender, dotbin = packet.split(".")
 			pType, pSubType = typeSub.split("-")
 			if pSender == "C":
 				pFrom = 0
