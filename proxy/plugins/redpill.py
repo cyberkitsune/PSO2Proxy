@@ -1,6 +1,6 @@
 # redpill.py PSO2Proxy plugin
 # For use with redpill.py flask webapp and website for packet logging and management
-import sqlite, plugins
+import sqlite, plugins, os, glob
 
 dbLocation = '/var/pso2-www/redpill/redpill.db'
 enabled = False
@@ -24,7 +24,19 @@ if enabled:
 
 	@plugins.onConnectionLossHook
 	def archivePackets(client):
-		pass
+		sid = client.myUsername
+		timestamp = client.connTimestamp
+		if sid is None or timestamp is None:
+			print("[Redpill] Unable to check-in session, SID or timestamp is none.")
+			return
+		if not os.path.exists("packets/%s/%s/" % (sid, timestamp)):
+			print("[Redpill] Could not check-in session for %s, timestamp %s does not exist" % (sid, timestamp))
+			return
+
+		packets = glob.glob("packets/%s/%s/*.bin" % (sid, timestamp))
+		count = 0
+		for packet in packets:
+
 
 	def getConn():
 		conn = sqlite3.connect(dbLocation)
@@ -41,3 +53,31 @@ if enabled:
 				return False
 			else:
 				return True
+
+	def get_userid(username):
+		con = getConn()
+		with con:
+			cur = con.cursor()
+			cur.execute("select id from users where username = ?", (username, ))
+			out = cur.fetchone()
+			if out is None:
+				return None:
+			else:
+				return out[0]
+
+	def create_session(userid, timestamp):
+		con = getConn()
+		with con:
+			cur = con.cursor()
+			cur.execute("insert into sessions (user, timestamp, name, notes) VALUES (?,?,?,?) ", (userid, timestamp, "Unnamed Session %s" % timestamp, "No notes."))
+
+	def get_session_id(userid, timestamp):
+		con = getConn()
+		with con:
+			cur = con.cursor()
+			cur.execute("select id from sessions where user = ? and timestamp = ?", (userid, timestamp))
+			out = cur.fetchone()
+			if out is None:
+				return None
+			else:
+				return out
