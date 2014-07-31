@@ -234,6 +234,8 @@ class ServerConsole(basic.LineReceiver):
 		
 def main():
 	global ifaceIp
+	if not os.path.exists("log/"):
+		os.makedirs("log/")
 	logFile = logfile.LogFile.fromFullPath('log/serverlog.log')
 	log.addObserver(log.FileLogObserver(logFile).emit)
 	print("===== PSO2Proxy v0 GIT =====")
