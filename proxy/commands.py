@@ -38,6 +38,29 @@ def listBans(sender, params):
 	if isinstance(sender, basic.LineReceiver):
 		sender.transport.write(''.join(config.banList))
 
+@CommandHandler("ban")
+def ban(sender, params):
+	if isinstance(sender, basic.LineReceiver):
+		args = params.split(' ')
+		if len(args) < 3:
+			print("[Command] Invalid usage! Proper usage, >>> ban <segaid/pid> <value>")
+			return
+		if args[1] == "segaid":
+			if config.isIdBanned(args[2]):
+				print("[Command] %s is already banned!" % args[2])
+				return
+			config.banList.append({'segaId' : args[2]})
+			config.saveBans()
+		elif args[1] == "pid":
+			if config.isPlayerBanned(args[2]):
+				print('[Command] %s is already banned!' % args[2])
+				return
+			config.banList.append({'playerId' : args[2]})
+			config.saveBans()
+		else:
+			print("[Command] Invalid usage! Proper usage, >>> ban <segaid/pid> <value>")
+			return
+
 @CommandHandler("clients")
 def listClients(sender, params):
 	if isinstance(sender, basic.LineReceiver):
