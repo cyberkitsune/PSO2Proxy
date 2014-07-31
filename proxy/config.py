@@ -48,6 +48,29 @@ def loadBans():
 	banList = json.loads(bans)
 	print("[Bans] %i bans loaded!" % len(bans))
 
+def saveBans():
+	global banList
+	f = open('cfg/pso2proxy.bans.json', 'w')
+	f.write(json.dumps(banList))
+	f.close()
+	print("[Bans] %i bans saved!" % len(banList))
+
+def isIdBanned(segaId):
+	global banList
+	for ban in banList:
+		if 'segaId' in ban:
+			if ban['segaId'] == segaId:
+				return True
+	return False
+
+def isPlayerBanned(playerId):
+	global banList
+	for ban in banList:
+		if 'playerId' in ban:
+			if ban['playerId'] == playerId:
+				return True
+	return False
+
 loadConfig()
 loadBans()
 
