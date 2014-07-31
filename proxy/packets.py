@@ -9,7 +9,6 @@ import plugins.plugins as pManager
 from config import myIpAddr as ip
 from config import blockNameMode as bNameMode
 from config import noisy as verbose
-from config import banList
 import config
 from twisted.python import log
 
@@ -37,7 +36,7 @@ def loginPacket(context, data):
 	print("[LoginPacket] Logging player %s in..." % username)
 	context.myUsername = username
 	context.peer.myUsername = username
-	if username in banList:
+	if config.isIdBanned(username):
 		print("[Bans] %s is banned! Disconnecting..." % username)
 		context.transport.loseConnection()
 		context.peer.transport.loseConnection()
