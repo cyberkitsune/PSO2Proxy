@@ -91,13 +91,13 @@ if enabled:
 			if out is None:
 				return None
 			else:
-				return out
+				return out[0]
 
 	def add_sessionData(sessionId, packetId, sentFrom):
 		con = getConn()
 		with con:
 			cur = con.cursor()
-			cur.execute("insert into session_data (sessionID, sentFrom, packetId, notes) values (?,?,?,?)", (sessionId, sentFrom, packetId, "No notes."))
+			cur.execute("insert into session_data (sessionID, sentFrom, packetId, notes) values (?,?,?,?)", (sessionId, int(sentFrom), packetId, "No notes."))
 
 	def get_packetId(pType, subType):
 		con = getConn()
@@ -108,7 +108,7 @@ if enabled:
 			if out is None:
 				return None
 			else:
-				return out
+				return out[0]
 
 	def incr_packetCount(packetId):
 		con = getConn()
