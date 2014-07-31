@@ -6,7 +6,7 @@ def checkConfig(user):
 	if user.playerId in data.clients.connectedClients:
 		clientPrefs = data.clients.connectedClients[user.playerId].getPrefs()
 		if 'globalChat' not in clientPrefs:
-			clientPrefs['globalChat'] = True
+			clientPrefs['globalChat'] = False
 		data.clients.connectedClients[user.playerId].setPrefs(clientPrefs)
 
 @plugins.commandHook("gon")
