@@ -88,6 +88,11 @@ class ShipProxy(protocol.Protocol):
 			packet = self.readBuffer[:packetSize]
 			self.readBuffer = self.readBuffer[packetSize:]
 			if logPackets:
+				if self.psoClient:
+					pSender = "C"
+				else:
+					pSender = "S"
+
 				if packetType[0] == 0x11 and packetType[1] == 0x0:
 					pData = bytearray(packet)
 					struct.pack_into("64x", pData, 0x48)
@@ -95,7 +100,7 @@ class ShipProxy(protocol.Protocol):
 				else:
 					pData = packet
  				if self.myUsername is not None:
-					path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (self.myUsername, self.connTimestamp, self.packetCount, packetType[0], packetType[1], self.transport.getPeer().host)
+					path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (self.myUsername, self.connTimestamp, self.packetCount, packetType[0], packetType[1], pSender)
 					try:
 						os.makedirs(os.path.dirname(path))
 					except exceptions.OSError:
@@ -103,7 +108,7 @@ class ShipProxy(protocol.Protocol):
 					with open(path, 'wb') as f:
 						f.write(pData)
 				else:
-					self.orphans.append({'data' : pData, 'count' : self.packetCount, 'type' : packetType[0], "sub" : packetType[1]})
+					self.orphans.append({'data' : pData, 'count' : self.packetCount, 'type' : packetType[0], "sub" : packetType[1], "from": pSender})
 
 			try:
 				packet = packets.packetList[packetType](self, packet)
@@ -132,7 +137,7 @@ class ShipProxy(protocol.Protocol):
 					count = 0
 					while len(self.orphans) > 0:
 						oPacket = self.orphans.pop()
-						path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (self.myUsername, self.connTimestamp, oPacket['count'], oPacket['type'], oPacket['sub'], self.transport.getPeer().host)
+						path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (self.myUsername, self.connTimestamp, oPacket['count'], oPacket['type'], oPacket['sub'], oPacket['from'])
 						try:
 							os.makedirs(os.path.dirname(path))
 						except exceptions.OSError:
