@@ -14,7 +14,7 @@ if enabled:
 	def loginPacketHook(context, packet):
 		username = packet[0x8:0x48].decode('utf-8')
 		username = username.rstrip('\0')
-		if not user_exists(username):
+		if get_userid(username) is None:
 			context.loseConnection()
 			print("[Redpill] %s is not in the whitelist database. Hanging up." % username)
 
@@ -42,17 +42,6 @@ if enabled:
 		conn = sqlite3.connect(dbLocation)
 		conn.row_factory = sqlite3.Row
 		return conn
-
-	def user_exists(username):
-		con = getConn()
-		with con:
-			cur = con.cursor()
-			cur.execute("select * from users where username = ? COLLATE NOCASE", (username, ))
-			check = cur.fetchone()
-			if check == None:
-				return False
-			else:
-				return True
 
 	def get_userid(username):
 		con = getConn()
