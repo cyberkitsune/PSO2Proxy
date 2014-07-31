@@ -1,4 +1,4 @@
-import packetFactory, bans, data.clients, data.players, data.blocks
+import packetFactory, config, data.clients, data.players, data.blocks
 from twisted.protocols import basic
 from twisted.python import log
 from twisted.internet import reactor
@@ -31,12 +31,12 @@ def count(sender, params):
 @CommandHandler("reloadbans")
 def reloadBans(sender, params):
 	if isinstance(sender, basic.LineReceiver):
-		bans.loadBans()
+		config.loadBans()
 
 @CommandHandler("listbans")
 def listBans(sender, params):
 	if isinstance(sender, basic.LineReceiver):
-		sender.transport.write(''.join(bans.banList))
+		sender.transport.write(''.join(config.banList))
 
 @CommandHandler("clients")
 def listClients(sender, params):
