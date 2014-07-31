@@ -1,6 +1,6 @@
 # redpill.py PSO2Proxy plugin
 # For use with redpill.py flask webapp and website for packet logging and management
-import sqlite, plugins, os, glob, tarfile, shutil
+import sqlite3, plugins, os, glob, tarfile, shutil
 
 dbLocation = '/var/pso2-www/redpill/redpill.db'
 enabled = True
@@ -70,7 +70,7 @@ if enabled:
 			cur.execute("select id from users where username = ?", (username, ))
 			out = cur.fetchone()
 			if out is None:
-				return None:
+				return None
 			else:
 				return out[0]
 
@@ -105,7 +105,7 @@ if enabled:
 			cur.execute("select id from packets where type = ? and subType = ?", (pType, subType))
 			out = cur.fetchone()
 			if out is None:
-				return None:
+				return None
 			else:
 				return out
 
