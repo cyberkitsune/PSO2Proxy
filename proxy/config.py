@@ -67,7 +67,7 @@ def isPlayerBanned(playerId):
 	global banList
 	for ban in banList:
 		if 'playerId' in ban:
-			if ban['playerId'] == playerId:
+			if int(ban['playerId']) == playerId:
 				return True
 	return False
 

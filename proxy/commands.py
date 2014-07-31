@@ -36,7 +36,9 @@ def reloadBans(sender, params):
 @CommandHandler("listbans")
 def listBans(sender, params):
 	if isinstance(sender, basic.LineReceiver):
-		sender.transport.write(''.join(config.banList))
+		for ban in config.banList:
+			print('[Bans] %s is banned.' % str(ban))
+		print('[Bans] %i bans total.' % len(config.banList))
 
 @CommandHandler("ban")
 def ban(sender, params):
@@ -68,8 +70,8 @@ def kick(sender, params):
 		if len(args) < 2:
 			print("[Command] Invalid usage! Proper usage: >>> kick <playerId>")
 			return
-		if args[1] in data.clients.connectedClients:
-			data.clients.connectedClients[args[1]].getHandle().transport.loseConnection()
+		if int(args[1]) in data.clients.connectedClients:
+			data.clients.connectedClients[int(args[1])].getHandle().transport.loseConnection()
 			print("[Command] Kicked %s." % args[1])
 		else:
 			print("[Command] I couldn't find %s!" % args[1])
