@@ -20,11 +20,9 @@ if enabled:
 			if get_userid(con, username) is None:
 				context.transport.loseConnection()
 				print("[Redpill] %s is not in the whitelist database. Hanging up." % username)
+			else:
+				incr_loginCount(con, get_userid(con, username))
 		return packet
-
-	@plugins.onConnectionHook
-	def registerClient(client):
-		pass
 
 	@plugins.onConnectionLossHook
 	def archivePackets(client):
@@ -118,6 +116,10 @@ if enabled:
 	def incr_packetCount(con, packetId):
 		cur = con.cursor()
 		cur.execute("update packets set count=count+1 where id = ?", (packetId,))
+
+	def incr_loginCount(con, playerId):
+		cur = con.cursor()
+		cur.execute("update users set logincount=logincount+1 where id = ?"(playerId,))
 
 	def create_packet(con, pType, subType, logger):
 		cur = con.cursor()
