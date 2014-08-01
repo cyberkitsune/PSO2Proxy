@@ -1,12 +1,19 @@
 import plugins, packetFactory
 import data.clients, data.players
 
+userPrefs = {}
+
+@plugins.onStartHook
+def createPrefs():
+	pass
+
 @plugins.onConnectionHook
 def checkConfig(user):
 	if user.playerId in data.clients.connectedClients:
 		clientPrefs = data.clients.connectedClients[user.playerId].getPrefs()
 		if 'globalChat' not in clientPrefs:
 			clientPrefs['globalChat'] = True
+			user.sendCryptoPacket(packetFactory.ChatPacket(user.playerId, "[Proxy] Global chat is enabled, use |gon to join, use |g <Message> to chat and |goff to disable it.").build())
 		data.clients.connectedClients[user.playerId].setPrefs(clientPrefs)
 
 @plugins.commandHook("gon")
