@@ -52,7 +52,7 @@ if enabled:
 					pFrom = 1
 				pID = get_packetId(con, int(pType, 16), int(pSubType, 16))
 				if pID is None:
-					pID = create_packet(con, int(pType, 16), int(pSubType, 16), get_userid(sid))
+					pID = create_packet(con, int(pType, 16), int(pSubType, 16), get_userid(con, sid))
 				add_sessionData(con, sessionId, pID, pFrom)
 				incr_packetCount(con, pID)
 				count += 1
