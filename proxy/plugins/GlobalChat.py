@@ -28,6 +28,7 @@ def checkConfig(user):
 				clientPrefs['globalChat'] = gcUserPrefs[user.playerId]['toggle']
 			else:
 				clientPrefs['globalChat'] = True
+				gcUserPrefs[user.playerId] = {}
 				gcUserPrefs[user.playerId]['toggle'] = True
 				savePrefs()
 			if clientPrefs['globalChat'] == True:
