@@ -4,6 +4,7 @@ import sqlite3, plugins, os, glob, tarfile, shutil, cProfile, pstats, StringIO
 
 dbLocation = '/var/pso2-www/redpill/redpill.db'
 enabled = True
+profiling = True
 
 if enabled:
 	@plugins.onStartHook
@@ -27,6 +28,7 @@ if enabled:
 
 	@plugins.onConnectionLossHook
 	def archivePackets(client):
+		global profiling
 		sid = client.myUsername
 		timestamp = client.connTimestamp
 		if sid is None or timestamp is None:
@@ -36,8 +38,9 @@ if enabled:
 			print("[Redpill] Could not check-in session for %s, timestamp %i does not exist" % (sid, timestamp))
 			return
 
-		profile = cProfile.Profile()
-		profile.enable()
+		if profiling:
+			profile = cProfile.Profile()
+			profile.enable()
 		con = getConn()
 		with con:
 			sessionId = create_session(con, get_userid(con, sid), timestamp)
@@ -62,12 +65,12 @@ if enabled:
 			tar.close()
 			shutil.rmtree("packets/%s/%i/" % (sid, timestamp))
 			print("[Redpill] Archived as %i.tar.gz and deleted base folder." % timestamp)
-		profile.disable()
-		s = StringIO.StringIO()
-		sortby = 'cumulative'
-		ps = pstats.Stats(profile, stream=s).sort_stats(sortby)
-		ps.print_stats()
-		print s.getvalue()
+		if profiling:
+			profile.disable()
+			s = StringIO.StringIO()
+			sortby = 'cumulative'
+			ps = pstats.Stats(profile, stream=s).sort_stats(sortby)
+			ps.print_stats()
 
 
 
