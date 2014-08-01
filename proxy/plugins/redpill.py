@@ -1,6 +1,6 @@
 # redpill.py PSO2Proxy plugin
 # For use with redpill.py flask webapp and website for packet logging and management
-import sqlite3, plugins, os, glob, tarfile, shutil
+import sqlite3, plugins, os, glob, tarfile, shutil, cProfile, pstats, StringIO
 
 dbLocation = '/var/pso2-www/redpill/redpill.db'
 enabled = True
@@ -34,6 +34,8 @@ if enabled:
 			print("[Redpill] Could not check-in session for %s, timestamp %i does not exist" % (sid, timestamp))
 			return
 
+		profile = cProfile.Profile()
+		profile.enable()
 		sessionId = create_session(get_userid(sid), timestamp)
 		packets = glob.glob("packets/%s/%i/*.bin" % (sid, timestamp))
 		count = 0
@@ -56,6 +58,12 @@ if enabled:
 		tar.close()
 		shutil.rmtree("packets/%s/%i/" % (sid, timestamp))
 		print("[Redpill] Archived as %i.tar.gz and deleted base folder." % timestamp)
+		profile.disable()
+		s = StringIO.StringIO()
+		sortby = 'cumulative'
+		ps = pstats.Stats(profile, stream=s).sort_stats(sortby)
+		ps.print_stats()
+		print s.getvalue()
 
 
 
