@@ -1,4 +1,4 @@
-import blocks
+import blocks, config
 
 connectedClients = {}
 
@@ -21,6 +21,9 @@ class ClientData(object):
 def addClient(handle):
 	connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, handle.myUsername, handle)
 	print('[Clients] Registered client %s (ID:%i) in online clients' % (handle.myUsername, handle.playerId))
+	if config.isPlayerBanned(handle.playerId):
+		print('[Bans] Player %s (ID:%i) is banned!' % (handle.myUsername, handle.playerId))
+		handle.transport.loseConnection()
 
 def removeClient(handle):
 	print("[Clients] Removing client %s (ID:%i) from online clients" % (handle.myUsername, handle.playerId))

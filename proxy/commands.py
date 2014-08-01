@@ -1,4 +1,4 @@
-import packetFactory, bans, data.clients, data.players, data.blocks
+import packetFactory, config, data.clients, data.players, data.blocks
 from twisted.protocols import basic
 from twisted.python import log
 from twisted.internet import reactor
@@ -31,12 +31,50 @@ def count(sender, params):
 @CommandHandler("reloadbans")
 def reloadBans(sender, params):
 	if isinstance(sender, basic.LineReceiver):
-		bans.loadBans()
+		config.loadBans()
 
 @CommandHandler("listbans")
 def listBans(sender, params):
 	if isinstance(sender, basic.LineReceiver):
-		sender.transport.write(''.join(bans.banList))
+		for ban in config.banList:
+			print('[Bans] %s is banned.' % str(ban))
+		print('[Bans] %i bans total.' % len(config.banList))
+
+@CommandHandler("ban")
+def ban(sender, params):
+	if isinstance(sender, basic.LineReceiver):
+		args = params.split(' ')
+		if len(args) < 3:
+			print("[Command] Invalid usage! Proper usage, >>> ban <segaid/pid> <value>")
+			return
+		if args[1] == "segaid":
+			if config.isIdBanned(args[2]):
+				print("[Command] %s is already banned!" % args[2])
+				return
+			config.banList.append({'segaId' : args[2]})
+			config.saveBans()
+		elif args[1] == "pid":
+			if config.isPlayerBanned(args[2]):
+				print('[Command] %s is already banned!' % args[2])
+				return
+			config.banList.append({'playerId' : args[2]})
+			config.saveBans()
+		else:
+			print("[Command] Invalid usage! Proper usage, >>> ban <segaid/pid> <value>")
+			return
+
+@CommandHandler("kick")
+def kick(sender, params):
+	if isinstance(sender, basic.LineReceiver):
+		args = params.split(' ')
+		if len(args) < 2:
+			print("[Command] Invalid usage! Proper usage: >>> kick <playerId>")
+			return
+		if int(args[1]) in data.clients.connectedClients:
+			data.clients.connectedClients[int(args[1])].getHandle().transport.loseConnection()
+			print("[Command] Kicked %s." % args[1])
+		else:
+			print("[Command] I couldn't find %s!" % args[1])
 
 @CommandHandler("clients")
 def listClients(sender, params):
