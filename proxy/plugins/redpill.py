@@ -46,6 +46,7 @@ if enabled:
 			count = 0
 			for packet in packets:
 				order, typeSub, pSender, dotbin = packet.split(".")
+				order = order.split("/")[-1]
 				pType, pSubType = typeSub.split("-")
 				if pSender == "C":
 					pFrom = 0
@@ -54,7 +55,7 @@ if enabled:
 				pID = get_packetId(con, int(pType, 16), int(pSubType, 16))
 				if pID is None:
 					pID = create_packet(con, int(pType, 16), int(pSubType, 16), get_userid(con, sid))
-				add_sessionData(con, sessionId, pID, pFrom)
+				add_sessionData(con, sessionId, pID, pFrom, order)
 				incr_packetCount(con, pID)
 				count += 1
 			print("[Redpill] Checked in session %i for %s with %i packets" % (timestamp, sid, count))
@@ -100,9 +101,9 @@ if enabled:
 		else:
 			return out[0]
 
-	def add_sessionData(con, sessionId, packetId, sentFrom):
+	def add_sessionData(con, sessionId, packetId, sentFrom, order):
 		cur = con.cursor()
-		cur.execute("insert into session_data (sessionID, sentFrom, packetId, notes) values (?,?,?,?)", (sessionId, int(sentFrom), packetId, "No notes."))
+		cur.execute("insert into session_data (sessionID, sentFrom, packetId, notes, order) values (?,?,?,?,?)", (sessionId, int(sentFrom), packetId, "No notes.", int(order)))
 
 	def get_packetId(con, pType, subType):
 		cur = con.cursor()
