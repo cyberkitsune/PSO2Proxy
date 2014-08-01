@@ -103,7 +103,7 @@ if enabled:
 
 	def add_sessionData(con, sessionId, packetId, sentFrom, order):
 		cur = con.cursor()
-		cur.execute("insert into session_data (sessionID, sentFrom, packetId, notes, order) values (?,?,?,?,?)", (sessionId, int(sentFrom), packetId, "No notes.", int(order)))
+		cur.execute("insert into session_data (sessionID, sentFrom, packetId, notes, pOrder) values (?,?,?,?,?)", (sessionId, int(sentFrom), packetId, "No notes.", int(order)))
 
 	def get_packetId(con, pType, subType):
 		cur = con.cursor()
