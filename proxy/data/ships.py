@@ -33,6 +33,7 @@ class BlockScrapingManager(object):
 		while identifier not in line.results:
 			time.sleep(1)
 			if self.shuttingDown:
+				line.requests.remove({'identifier': identifier, 'shipIp': shipIp, 'shipPort': shipPort, 'dstIp': dstIp})
 				return None
 		prize = line.results[identifier]
 		print("[BlockLine] Request #%i got their prize." % identifier)
