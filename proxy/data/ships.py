@@ -30,6 +30,9 @@ class BlockScrapingManager(object):
 		print("[BlockLine] Request #%i got their prize." % identifier)
 		del self.bline.results[identifier]
 		return prize
+
+	def killBline(self):
+		self.bline.active = False
 	
 
 
@@ -37,9 +40,11 @@ class BlockLine(Thread):
 	requests = []
 	results = {}
 	identifier = 0
+	active = True
 
 	def run(self):
-		while True:
+		print("[BlockLine] Thread started.")
+		while self.active:
 			if len(self.requests) > 0:
 				currReq = self.requests.pop(0)
 				print("[BlockLine] Starting on request #%i" % currReq['identifier'])
@@ -47,6 +52,9 @@ class BlockLine(Thread):
 				self.results[currReq['identifier']] = data
 				print("[BlockLine] Finished request #%i, taking a nap." % currReq['identifier'])
 				time.sleep(4)
+			else:
+				time.sleep(1)
+		print("[BlockLine] Thread ended.")
 
 	def getNextIdentifier():
 		self.identifier =+ 1

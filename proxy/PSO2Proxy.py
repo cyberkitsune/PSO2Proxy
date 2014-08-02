@@ -293,6 +293,7 @@ def main():
 	for f in pManager.onStart:
 		f()
 	reactor.run()
+	ships.manager.killBline()
 
 if __name__ == "__main__":
 	main()
