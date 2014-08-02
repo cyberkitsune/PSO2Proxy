@@ -49,7 +49,7 @@ if ircMode:
 			return p
 
 		def clientConnectionLost(self, connector, reason):
-        	connector.connect()		
+			connector.connect()		
 
 @plugins.onStartHook
 def createPrefs():
