@@ -1,5 +1,6 @@
-import socket, io, struct, blocks
+import socket, io, struct, blocks, time
 from twisted.python import log
+from threading import Thread
 
 shipList = {
 	12100 : "210.189.208.1",
@@ -13,6 +14,56 @@ shipList = {
 	12900 : "210.189.208.121",
 	12000 : "210.189.208.136",
 }
+
+class BlockScrapingManager(object):
+	def __init__(self):
+		self.bline = BlockLine()
+		self.bline.start()
+
+	def getInLine(self, shipIp, shipPort, dstIp):
+		identifier = self.bline.getNextIdentifier()
+		self.bline.requests.append({'identifier': identifier, 'shipIp': shipIp, 'shipPort': shipPort, 'dstIp': dstIp})
+		print("[BlockLine] Request #%i got in line." % identifier)
+		while identifier not in self.bline.results:
+			time.sleep(1)
+		prize = self.bline.results[identifier]
+		print("[BlockLine] Request #%i got their prize." % identifier)
+		del self.bline.results[identifier]
+		return prize
+
+	def killBline(self):
+		self.bline.active = False
+	
+
+
+class BlockLine(Thread):
+	def __init__(self):
+		super(BlockLine, self).__init__()
+		self.requests = []
+		self.results = {}
+		self.identifier = 0
+		self.active = True
+
+	def run(self):
+		print("[BlockLine] Thread started.")
+		while self.active:
+			if len(self.requests) > 0:
+				currReq = self.requests.pop(0)
+				print("[BlockLine] Starting on request #%i" % currReq['identifier'])
+				data = scrapeBlockPacket(currReq['shipIp'], currReq['shipPort'], currReq['dstIp'])
+				self.results[currReq['identifier']] = data
+				print("[BlockLine] Finished request #%i, taking a nap." % currReq['identifier'])
+				time.sleep(4)
+			else:
+				time.sleep(.1)
+		print("[BlockLine] Thread ended.")
+
+	def getNextIdentifier(self):
+		self.identifier = self.identifier + 1
+		return self.identifier
+		
+
+
 
 def scrapeBlockPacket(shipIp, shipPort, dstIp):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -34,6 +85,8 @@ def scrapeBlockPacket(shipIp, shipPort, dstIp):
 	o1, o2, o3, o4 = dstIp.split(".")
 	struct.pack_into('BBBB', data, 0x64, int(o1), int(o2), int(o3), int(o4))
 	return str(data)
+
+manager = BlockScrapingManager()
 
 def scrapeShipPacket(shipIp, shipPort, dstIp):
 	o1, o2, o3, o4 = dstIp.split(".")
