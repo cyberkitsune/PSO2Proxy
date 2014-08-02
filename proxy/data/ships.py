@@ -50,6 +50,7 @@ class BlockLine(Thread):
 		print("[Line] Created line for port %i" % port)
 
 		self.bCount = 0
+		self.lB = 0
 		self.requests = []
 		self.results = {}
 		self.identifier = 0
@@ -59,9 +60,13 @@ class BlockLine(Thread):
 	def run(self):
 		print("[BlockLine] Thread for port %i started." % self.port)
 		while self.active:
+			if self.lB >= 1:
+				self.bCount = 0
+				self.lB = 0
+				print("[BlockLine] [%i] Re-enabled burst mode early." % self.port)
 			if len(self.requests) > 0:
 				currReq = self.requests.pop(0)
-				print("[BlockLine] [%i] Starting on request #%i" % (self.port, currReq['identifier']))
+				#print("[BlockLine] [%i] Starting on request #%i" % (self.port, currReq['identifier']))
 				data = None
 				try:
 					data = scrapeBlockPacket(currReq['shipIp'], currReq['shipPort'], currReq['dstIp'])
@@ -70,11 +75,13 @@ class BlockLine(Thread):
 				self.results[currReq['identifier']] = data
 				print("[BlockLine] [%i] Finished request #%i, taking a nap." % (self.port, currReq['identifier']))
 				self.bCount = self.bCount + 1
-				if self.bCount > 6:
+				if self.bCount > 5:
 					time.sleep(30)
 					self.bCount = 0
 			else:
 				time.sleep(.1)
+				self.lB = self.lB + .1
+
 		print("[BlockLine] Thread for port %i ended." % self.port)
 
 	def getNextIdentifier(self):
