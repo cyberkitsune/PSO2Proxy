@@ -37,7 +37,8 @@ class BlockScrapingManager(object):
 		return prize
 
 	def killBline(self):
-		self.bline.active = False
+		for line in self.lines:
+			line.active = False
 	
 
 
@@ -60,7 +61,11 @@ class BlockLine(Thread):
 			if len(self.requests) > 0:
 				currReq = self.requests.pop(0)
 				print("[BlockLine] [%i] Starting on request #%i" % (self.port, currReq['identifier']))
-				data = scrapeBlockPacket(currReq['shipIp'], currReq['shipPort'], currReq['dstIp'])
+				data = None
+				try:
+					data = scrapeBlockPacket(currReq['shipIp'], currReq['shipPort'], currReq['dstIp'])
+				except:
+					pass
 				self.results[currReq['identifier']] = data
 				print("[BlockLine] [%i] Finished request #%i, taking a nap." % (self.port, currReq['identifier']))
 				time.sleep(4)
