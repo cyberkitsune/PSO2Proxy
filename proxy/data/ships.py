@@ -64,7 +64,7 @@ class BlockLine(Thread):
 	def run(self):
 		print("[BlockLine] Thread for port %i started." % self.port)
 		while self.active:
-			if self.lB >= 1:
+			if self.lB >= 1 and self.bCount > 0:
 				self.bCount = 0
 				self.lB = 0
 				print("[BlockLine] [%i] Re-enabled burst mode early." % self.port)
