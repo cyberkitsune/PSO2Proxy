@@ -292,6 +292,7 @@ def main():
 		__import__(plug)
 	for f in pManager.onStart:
 		f()
+	reactor.suggestThreadPoolSize(50)
 	reactor.run()
 	ships.manager.killBline()
 
