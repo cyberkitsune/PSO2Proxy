@@ -8,7 +8,8 @@ class BlockScraper(protocol.Protocol):
 		port = self.transport.getHost().port
 		print('[BlockQuery] %s:%i wants to load-balance on port %i!' % (self.transport.getPeer().host, self.transport.getPeer().port, port))
 		if port in ships.shipList:
-			self.transport.write(ships.scrapeBlockPacket(ships.shipList[port], port, myIpAddr))
+			data = ships.manager.getInLine(ships.shipList[port], port, myIpAddr)
+			self.transport.write(data)
 		self.transport.loseConnection()
 
 class BlockScraperFactory(protocol.Factory):
