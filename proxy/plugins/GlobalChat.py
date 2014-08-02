@@ -3,16 +3,19 @@ import data.clients, data.players
 
 gcUserPrefs = {}
 ircMode = False
+ircNick = "PSO2IRCBot"
+ircServer = ("irc.badnik.net", 6667)
+ircChannel = "#pso2proxygchat"
 
 if ircMode:
 	from twisted.words.protocols import irc
 	from twisted.internet import reactor, protocol
 
 	ircBot = None
-	channel = "#pso2proxygchat"
 
 	class GChatIRC(irc.IRCClient):
-		nickname = "PSO2IRCBot"
+		global ircNick
+		nickname = ircNick
 
 		def connectionMade(self):
 			irc.IRCClient.connectionMade(self)
@@ -74,9 +77,10 @@ def createPrefs():
 		gcUserPrefs = json.loads(prefs)
 		print('[GlobalChat] Loaded %i users prefrences.' % len (gcUserPrefs))
 	if ircMode:
-		global channel
-		bot = GIRCFactory(channel)
-		reactor.connectTCP("irc.badnik.net", 6667, bot)
+		global ircChannel
+		global ircServer
+		bot = GIRCFactory(ircChannel)
+		reactor.connectTCP(ircServer[0], ircServer[1], bot)
 
 @plugins.onConnectionHook
 def checkConfig(user):
