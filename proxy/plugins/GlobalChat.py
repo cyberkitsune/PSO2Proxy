@@ -49,7 +49,6 @@ if ircMode:
 			return p
 
 		def clientConnectionLost(self, connector, reason):
-        """If we get disconnected, reconnect to server."""
         	connector.connect()		
 
 @plugins.onStartHook
