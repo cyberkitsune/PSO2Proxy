@@ -17,18 +17,23 @@ shipList = {
 
 class BlockScrapingManager(object):
 	def __init__(self):
-		self.bline = BlockLine()
-		self.bline.start()
+		global shipList
+		self.lines = {}
+		for port, addr in shipList.iteritems():
+			self.lines[port] = BlockLine(addr, port)
+			self.lines[port].start()
+		
 
 	def getInLine(self, shipIp, shipPort, dstIp):
-		identifier = self.bline.getNextIdentifier()
-		self.bline.requests.append({'identifier': identifier, 'shipIp': shipIp, 'shipPort': shipPort, 'dstIp': dstIp})
+		line = self.lines[shipPort]
+		identifier = line.getNextIdentifier()
+		line.requests.append({'identifier': identifier, 'shipIp': shipIp, 'shipPort': shipPort, 'dstIp': dstIp})
 		print("[BlockLine] Request #%i got in line." % identifier)
-		while identifier not in self.bline.results:
+		while identifier not in line.results:
 			time.sleep(1)
-		prize = self.bline.results[identifier]
+		prize = line.results[identifier]
 		print("[BlockLine] Request #%i got their prize." % identifier)
-		del self.bline.results[identifier]
+		del line.results[identifier]
 		return prize
 
 	def killBline(self):
@@ -37,26 +42,31 @@ class BlockScrapingManager(object):
 
 
 class BlockLine(Thread):
-	def __init__(self):
+	def __init__(self, addr, port):
 		super(BlockLine, self).__init__()
+		self.addr = addr
+		self.port = port
+		print("[Line] Created line for port %i" % port)
+
 		self.requests = []
 		self.results = {}
 		self.identifier = 0
 		self.active = True
 
+
 	def run(self):
-		print("[BlockLine] Thread started.")
+		print("[BlockLine] Thread for port %i started." % self.port)
 		while self.active:
 			if len(self.requests) > 0:
 				currReq = self.requests.pop(0)
-				print("[BlockLine] Starting on request #%i" % currReq['identifier'])
+				print("[BlockLine] [%i] Starting on request #%i" % (self.port, currReq['identifier']))
 				data = scrapeBlockPacket(currReq['shipIp'], currReq['shipPort'], currReq['dstIp'])
 				self.results[currReq['identifier']] = data
-				print("[BlockLine] Finished request #%i, taking a nap." % currReq['identifier'])
+				print("[BlockLine] [%i] Finished request #%i, taking a nap." % (self.port, currReq['identifier']))
 				time.sleep(4)
 			else:
 				time.sleep(.1)
-		print("[BlockLine] Thread ended.")
+		print("[BlockLine] Thread for port %i ended." % selfport)
 
 	def getNextIdentifier(self):
 		self.identifier = self.identifier + 1
