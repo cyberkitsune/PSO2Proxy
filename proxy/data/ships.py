@@ -38,7 +38,7 @@ class BlockScrapingManager(object):
 
 	def killBline(self):
 		for line in self.lines:
-			line.active = False
+			self.lines[line].active = False
 	
 
 
