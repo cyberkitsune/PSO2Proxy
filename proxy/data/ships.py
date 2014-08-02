@@ -1,5 +1,6 @@
-import socket, io, struct, blocks
+import socket, io, struct, blocks, time
 from twisted.python import log
+from threading import Thread
 
 shipList = {
 	12100 : "210.189.208.1",
@@ -13,6 +14,43 @@ shipList = {
 	12900 : "210.189.208.121",
 	12000 : "210.189.208.136",
 }
+
+manager = BlockScrapingManager()
+
+class BlockScrapingManager(object):
+	def __init__(self):
+		self.bline = BlockLine()
+		self.bline.start()
+
+	def getInLine(self, shipIp, shipPort, dstIp):
+		identifier = self.bline.getNextIdentifier()
+		self.bline.requests.append({'identifier': identifier, 'shipIp': shipIp, 'shipPort': shipPort, 'dstIp': dstIp})
+		while identifier not in self.bline.results:
+			time.sleep(1)
+		prize = self.bline.results[identifier]
+		del self.bline.results[identifier]
+		return prize
+	
+
+
+class BlockLine(Thread):	
+	requests = []
+	results = {}
+	identifier = 0
+
+	def run(self):
+		while True:
+			if len(requests) > 0:
+				currReq = requests.pop(0)
+				data = scrapeBlockPacket(currReq['shipIp'], currReq['shipPort'], currReq['dstIp'])
+				self.results[currReq['identifier']] = data
+				time.sleep(4)
+
+	def getNextIdentifier():
+		return self.identifier += 1
+		
+
+
 
 def scrapeBlockPacket(shipIp, shipPort, dstIp):
 	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
