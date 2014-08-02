@@ -191,7 +191,7 @@ def playerInfoPacket(context, data):
 def playerNamePacket(context, data):
 	pId = struct.unpack_from('I', data, 0xC)[0]
 	if pId not in players.playerList:
-		pName = data[0x14:0x56].decode('utf-16')
+		pName = data[0x14:0x56].decode('utf-16').rstrip("\0")
 		if verbose: print("[PlayerData] Found new player %s with player ID %i" % (pName, pId))
 		players.playerList[pId] = (pName,) # For now
 	return data

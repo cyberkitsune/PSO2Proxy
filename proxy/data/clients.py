@@ -19,7 +19,7 @@ class ClientData(object):
 		self.prefs = prefs
 
 def addClient(handle):
-	connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, handle.myUsername, handle)
+	connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, handle.myUsername.rstrip('\0'), handle)
 	print('[Clients] Registered client %s (ID:%i) in online clients' % (handle.myUsername, handle.playerId))
 	if config.isPlayerBanned(handle.playerId):
 		print('[Bans] Player %s (ID:%i) is banned!' % (handle.myUsername, handle.playerId))
