@@ -64,6 +64,8 @@ class BlockLine(Thread):
 	def run(self):
 		print("[BlockLine] Thread for port %i started." % self.port)
 		while self.active:
+			if not self.active:
+				break
 			if self.lB >= 60 and self.bCount > 0:
 				self.bCount = 0
 				self.lB = 0
