@@ -1,11 +1,15 @@
 import plugins, packetFactory, json, os
 import data.clients, data.players
 
-gcUserPrefs = {}
+
 ircMode = False
 ircNick = "PSO2IRCBot"
 ircServer = ("irc.badnik.net", 6667)
 ircChannel = "#pso2proxygchat"
+
+# Do not edit below this line
+
+gcUserPrefs = {}
 
 if ircMode:
 	from twisted.words.protocols import irc
