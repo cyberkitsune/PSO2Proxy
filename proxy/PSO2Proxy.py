@@ -233,6 +233,8 @@ class ServerConsole(basic.LineReceiver):
 			command = line.split(' ')[0]
 			if command in commandList:
 				commandList[command](self, line)
+			if command in pManager.commands:
+				pManager.commands[command](self, line)
 		except:
 			e = traceback.format_exc()
 			print("[ShipProxy] Error Occured: %s" % e)
@@ -296,6 +298,7 @@ def main():
 	for f in pManager.onStart:
 		f()
 	reactor.run()
+	ships.manager.killBline()
 
 if __name__ == "__main__":
 	main()
