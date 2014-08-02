@@ -120,7 +120,7 @@ if enabled:
 
 	def incr_loginCount(con, playerId):
 		cur = con.cursor()
-		cur.execute("update users set logincount=logincount+1 where id = ?"(playerId,))
+		cur.execute("update users set logincount=logincount+1 where id = ?", (playerId,))
 
 	def create_packet(con, pType, subType, logger):
 		cur = con.cursor()
