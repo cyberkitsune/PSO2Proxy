@@ -22,6 +22,7 @@ class BlockScrapingManager(object):
 		for port, addr in shipList.iteritems():
 			self.lines[port] = BlockLine(addr, port)
 			self.lines[port].start()
+			self.shuttingDown = False
 		
 
 	def getInLine(self, shipIp, shipPort, dstIp):
@@ -31,6 +32,8 @@ class BlockScrapingManager(object):
 		print("[BlockLine] Request #%i got in line." % identifier)
 		while identifier not in line.results:
 			time.sleep(1)
+			if self.shuttingDown:
+				return None
 		prize = line.results[identifier]
 		print("[BlockLine] Request #%i got their prize." % identifier)
 		del line.results[identifier]
@@ -39,6 +42,7 @@ class BlockScrapingManager(object):
 	def killBline(self):
 		for line in self.lines:
 			self.lines[line].active = False
+			self.shuttingDown = True
 	
 
 
@@ -76,7 +80,7 @@ class BlockLine(Thread):
 				print("[BlockLine] [%i] Finished request #%i, taking a nap." % (self.port, currReq['identifier']))
 				self.bCount = self.bCount + 1
 				if self.bCount > 5:
-					time.sleep(30)
+					time.sleep(60)
 					self.bCount = 0
 			else:
 				time.sleep(.1)
