@@ -23,9 +23,11 @@ class BlockScrapingManager(object):
 	def getInLine(self, shipIp, shipPort, dstIp):
 		identifier = self.bline.getNextIdentifier()
 		self.bline.requests.append({'identifier': identifier, 'shipIp': shipIp, 'shipPort': shipPort, 'dstIp': dstIp})
+		print("[BlockLine] Request #%i got in line." % identifier)
 		while identifier not in self.bline.results:
 			time.sleep(1)
 		prize = self.bline.results[identifier]
+		print("[BlockLine] Request #%i got their prize." % identifier)
 		del self.bline.results[identifier]
 		return prize
 	
