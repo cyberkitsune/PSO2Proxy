@@ -77,9 +77,10 @@ class BlockLine(Thread):
 				except:
 					pass
 				self.results[currReq['identifier']] = data
-				print("[BlockLine] [%i] Finished request #%i, taking a nap." % (self.port, currReq['identifier']))
+				print("[BlockLine] [%i] Finished request #%i!" % (self.port, currReq['identifier']))
 				self.bCount = self.bCount + 1
 				if self.bCount > 5:
+					print("[BlockLine] [%i] Burst complete, waiting 1min. (%i left in line.)" % (self.port, len(self.requests)))
 					time.sleep(60)
 					self.bCount = 0
 			else:
