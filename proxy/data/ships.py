@@ -38,6 +38,7 @@ class BlockScrapingManager(object):
 
 class BlockLine(Thread):
 	def __init__(self):
+		super(BlockLine, self).__init__()
 		self.requests = []
 		self.results = {}
 		self.identifier = 0
