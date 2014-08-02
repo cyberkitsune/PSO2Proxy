@@ -36,11 +36,11 @@ if ircMode:
 						client.getHandle().sendCryptoPacket(packetFactory.TeamChatPacket(0x0, "[GIRC-%s]" % user.split("!")[0], msg).build())
 
 		def action(self, user, channel, msg):
-		if channel == self.factory.channel:
-			print("[GlobalChat] [IRC] * %s %s" % (user, msg))
-			for client in data.clients.connectedClients.values():
-				if client.getPrefs()['globalChat'] and client.getHandle() is not None:
-					client.getHandle().sendCryptoPacket(packetFactory.TeamChatPacket(0x0, "[GIRC-%s]" % user.split("!")[0], "* %s" % msg).build())
+			if channel == self.factory.channel:
+				print("[GlobalChat] [IRC] * %s %s" % (user, msg))
+				for client in data.clients.connectedClients.values():
+					if client.getPrefs()['globalChat'] and client.getHandle() is not None:
+						client.getHandle().sendCryptoPacket(packetFactory.TeamChatPacket(0x0, "[GIRC-%s]" % user.split("!")[0], "* %s" % msg).build())
 
 		def sendGmessage(self, user, message):
 			self.msg(self.factory.channel, "[G] <%s> %s" % (user, message))
