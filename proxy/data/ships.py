@@ -57,7 +57,7 @@ class BlockLine(Thread):
 				time.sleep(1)
 		print("[BlockLine] Thread ended.")
 
-	def getNextIdentifier():
+	def getNextIdentifier(self):
 		self.identifier = self.identifier + 1
 		return self.identifier
 		
