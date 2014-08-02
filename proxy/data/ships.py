@@ -15,8 +15,6 @@ shipList = {
 	12000 : "210.189.208.136",
 }
 
-manager = BlockScrapingManager()
-
 class BlockScrapingManager(object):
 	def __init__(self):
 		self.bline = BlockLine()
@@ -75,6 +73,8 @@ def scrapeBlockPacket(shipIp, shipPort, dstIp):
 	o1, o2, o3, o4 = dstIp.split(".")
 	struct.pack_into('BBBB', data, 0x64, int(o1), int(o2), int(o3), int(o4))
 	return str(data)
+
+manager = BlockScrapingManager()
 
 def scrapeShipPacket(shipIp, shipPort, dstIp):
 	o1, o2, o3, o4 = dstIp.split(".")
