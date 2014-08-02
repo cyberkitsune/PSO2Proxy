@@ -40,8 +40,8 @@ class BlockLine(Thread):
 
 	def run(self):
 		while True:
-			if len(requests) > 0:
-				currReq = requests.pop(0)
+			if len(self.requests) > 0:
+				currReq = self.requests.pop(0)
 				print("[BlockLine] Starting on request #%i" % currReq['identifier'])
 				data = scrapeBlockPacket(currReq['shipIp'], currReq['shipPort'], currReq['dstIp'])
 				self.results[currReq['identifier']] = data
