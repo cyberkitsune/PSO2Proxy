@@ -71,7 +71,7 @@ class BlockLine(Thread):
 				time.sleep(4)
 			else:
 				time.sleep(.1)
-		print("[BlockLine] Thread for port %i ended." % selfport)
+		print("[BlockLine] Thread for port %i ended." % self.port)
 
 	def getNextIdentifier(self):
 		self.identifier = self.identifier + 1
