@@ -36,11 +36,12 @@ class BlockScrapingManager(object):
 	
 
 
-class BlockLine(Thread):	
-	requests = []
-	results = {}
-	identifier = 0
-	active = True
+class BlockLine(Thread):
+	def __init__(self):
+		self.requests = []
+		self.results = {}
+		self.identifier = 0
+		self.active = True
 
 	def run(self):
 		print("[BlockLine] Thread started.")
@@ -57,7 +58,7 @@ class BlockLine(Thread):
 		print("[BlockLine] Thread ended.")
 
 	def getNextIdentifier():
-		self.identifier =+ 1
+		self.identifier = self.identifier + 1
 		return self.identifier
 		
 
