@@ -55,7 +55,7 @@ class BlockLine(Thread):
 				print("[BlockLine] Finished request #%i, taking a nap." % currReq['identifier'])
 				time.sleep(4)
 			else:
-				time.sleep(1)
+				time.sleep(.1)
 		print("[BlockLine] Thread ended.")
 
 	def getNextIdentifier(self):
