@@ -30,7 +30,7 @@ if ircMode:
 
 		def privmsg(self, user, channel, msg):
 			if channel == self.factory.channel:
-				print("[GlobalChat] [IRC] <%s> %s" % (user, msg))
+				print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], msg))
 				for client in data.clients.connectedClients.values():
 					if client.getPrefs()['globalChat'] and client.getHandle() is not None:
 						client.getHandle().sendCryptoPacket(packetFactory.TeamChatPacket(0x0, "[GIRC-%s]" % user.split("!")[0], msg).build())
