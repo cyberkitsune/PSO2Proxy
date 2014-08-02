@@ -33,7 +33,7 @@ if ircMode:
 				print("[GlobalChat] [IRC] <%s> %s" % (user, msg))
 				for client in data.clients.connectedClients.values():
 					if client.getPrefs()['globalChat'] and client.getHandle() is not None:
-						client.getHandle().sendCryptoPacket(packetFactory.TeamChatPacket(0x0, "[G-IRC]<%s>" % user.split("!")[0], msg).build())
+						client.getHandle().sendCryptoPacket(packetFactory.TeamChatPacket(0x0, "[GIRC-%s]" % user.split("!")[0], msg).build())
 
 		def sendGmessage(self, user, message):
 			self.msg(self.factory.channel, "[G] <%s> <%s>" % (user, message))
@@ -128,8 +128,8 @@ def chat(context, params):
 		global ircBot
 		if ircBot is not None:
 			import unicodedata
-			ircBot.sendGmessage(data.players.playerList[context.playerId][0], unicodedata.normalize('NFKD', params[3:]).encode('ascii','ignore'))
+			ircBot.sendGmessage(unicodedata.normalize('NFKD', data.players.playerList[context.playerId][0]).encode('ascii','ignore'), unicodedata.normalize('NFKD', params[3:]).encode('ascii','ignore'))
 	for client in data.clients.connectedClients.values():
 		if client.getPrefs()['globalChat'] and client.getHandle() is not None:
-			client.getHandle().sendCryptoPacket(packetFactory.TeamChatPacket(context.playerId, "[G]<%s>" % data.players.playerList[context.playerId][0], params[3:]).build())
+			client.getHandle().sendCryptoPacket(packetFactory.TeamChatPacket(context.playerId, "[G-%s]" % data.players.playerList[context.playerId][0], params[3:]).build())
 
