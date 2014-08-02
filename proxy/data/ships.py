@@ -49,7 +49,8 @@ class BlockLine(Thread):
 				time.sleep(4)
 
 	def getNextIdentifier():
-		return self.identifier += 1
+		self.identifier =+ 1
+		return self.identifier
 		
 
 
