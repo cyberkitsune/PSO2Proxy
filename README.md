@@ -8,6 +8,12 @@ Feel free to contact us on [IRC](irc://irc.badnik.net/pso2proxypublic): irc.badn
 ## Installing
 PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyCrypto](https://www.dlitz.net/software/pycrypto/). Please install these from their respective websites.
 
+If you have a Debian based system, you can install via apt-get
+
+---
+    apt-get install python-twisted python-crypto openssl
+---
+
 If you have a git commandline client, setuptools and pip installed, you can install it like this:
 
 ```
