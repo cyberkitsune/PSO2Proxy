@@ -2,7 +2,7 @@ import plugins, packetFactory, json, os
 import data.clients, data.players
 
 gcUserPrefs = {}
-ircMode = True
+ircMode = False
 
 if ircMode:
 	from twisted.words.protocols import irc
