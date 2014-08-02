@@ -65,7 +65,7 @@ class BlockLine(Thread):
 		print("[BlockLine] Thread for port %i started." % self.port)
 		while self.active:
 			if not self.active:
-				break
+				return
 			if self.lB >= 60 and self.bCount > 0:
 				self.bCount = 0
 				self.lB = 0
@@ -83,7 +83,10 @@ class BlockLine(Thread):
 				self.bCount = self.bCount + 1
 				if self.bCount > 5:
 					print("[BlockLine] [%i] Burst complete, waiting 1min. (%i left in line.)" % (self.port, len(self.requests)))
-					time.sleep(60)
+					for x in xrange(1,60):
+						time.sleep(1)
+						if not self.active:
+							return
 					self.bCount = 0
 			else:
 				time.sleep(.1)
