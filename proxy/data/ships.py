@@ -70,8 +70,8 @@ class BlockLine(Thread):
 				self.results[currReq['identifier']] = data
 				print("[BlockLine] [%i] Finished request #%i, taking a nap." % (self.port, currReq['identifier']))
 				self.bCount = self.bCount + 1
-				if self.bCount > 5:
-					time.sleep(15)
+				if self.bCount > 6:
+					time.sleep(30)
 					self.bCount = 0
 			else:
 				time.sleep(.1)
