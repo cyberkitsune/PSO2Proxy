@@ -49,6 +49,7 @@ class BlockLine(Thread):
 		self.port = port
 		print("[Line] Created line for port %i" % port)
 
+		self.bCount = 0
 		self.requests = []
 		self.results = {}
 		self.identifier = 0
@@ -68,7 +69,10 @@ class BlockLine(Thread):
 					pass
 				self.results[currReq['identifier']] = data
 				print("[BlockLine] [%i] Finished request #%i, taking a nap." % (self.port, currReq['identifier']))
-				time.sleep(4)
+				self.bCount = self.bCount + 1
+				if self.bCount > 5:
+					time.sleep(15)
+					self.bCount = 0
 			else:
 				time.sleep(.1)
 		print("[BlockLine] Thread for port %i ended." % self.port)
