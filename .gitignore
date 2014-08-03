@@ -9,6 +9,8 @@
 *.sdf
 *.xml
 *.iml
+.idea/*
+proxy/config/cfg/*.config.json
 tools/PSO2KeyTools/Dumper
 tools/PSO2KeyTools/Debug
 tools/PSO2KeyTools/Release

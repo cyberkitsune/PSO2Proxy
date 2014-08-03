@@ -1,15 +1,19 @@
-import json, os.path
+import json
+import os.path
 
 banList = []
 
-configKeys = {'packetLogging': False, 'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 0, 'noisy': False,
-              'webapi': False}
+defaultConfigKeys = {'packetLogging': False, 'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 0, 'noisy': False,
+              'webapi': False, 'admins': []}
+
+configKeys = {}
 
 blockNames = {}
 
 
 def load_config():
     global configKeys
+    global defaultConfigKeys
     global blockNames
     if not os.path.exists('cfg/pso2proxy.config.json'):
         try:
@@ -21,17 +25,27 @@ def load_config():
     new_config = f.read()
     f.close()
     configKeys = json.loads(new_config)
+    configKeys = verify_config_keys(configKeys)
     print("[ShipProxy] Config loaded!")
-    if os.path.exists('cfg/blocknames.config.json'):
-        b = open('cfg/blocknames.config.json', 'r')
+    if os.path.exists('cfg/blocknames.resource.json'):
+        b = open('cfg/blocknames.resource.json', 'r')
         block_json = b.read()
         blockNames = json.loads(block_json)
         print('[ShipProxy] Block names loaded!')
 
 
+def verify_config_keys(config_dict):
+    global defaultConfigKeys
+    for key, value in defaultConfigKeys.iteritems():
+        if key not in config_dict:
+            config_dict[key] = value
+            print("[Config] Adding default option for config key %s as it did not exist before." % key)
+    return config_dict
+
+
 def make_default_config():
     global configKeys
-    json_encoded = json.dumps(configKeys, indent=1)
+    json_encoded = json.dumps(defaultConfigKeys, indent=1)
     f = open('cfg/pso2proxy.config.json', 'w')
     f.write(json_encoded)
     f.close()
@@ -85,3 +99,4 @@ bindIp = configKeys['bindIp']
 blockNameMode = configKeys['blockNameMode']
 noisy = configKeys['noisy']
 webapi_enabled = configKeys['webapi']
+admins = configKeys['admins']
