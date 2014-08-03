@@ -7,6 +7,8 @@
 *.dgb
 *.pyc
 *.sdf
+*.xml
+*.iml
 tools/PSO2KeyTools/Dumper
 tools/PSO2KeyTools/Debug
 tools/PSO2KeyTools/Release
