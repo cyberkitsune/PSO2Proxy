@@ -12,7 +12,7 @@ import json
 
 import plugins
 
-jsonConfig = {'enabled': False, 'profiling': True, 'dbConfig': {'host': '', 'port': '', 'db': 'redpill', 'user': '', 'passwd': ''}, 'tarOut': None}
+jsonConfig = {'enabled': False, 'profiling': True, 'dbConfig': {'host': '', 'port': 3306, 'db': 'redpill', 'user': '', 'passwd': ''}, 'tarOut': None}
 
 if not os.path.exists("cfg/redpill.config.json"):
     f = open("cfg/redpill.config.json", 'w')
@@ -97,8 +97,8 @@ if enabled:
     def get_connection():
         global jsonConfig
         db_settings = jsonConfig['dbConfig']
-        connection = pymysql.connect(host=db_settings['host'].encode('ascii'), port=db_settings['port'], db=db_settings['db'].encode('ascii'),
-                                     user=db_settings['user'].encode('ascii'), passwd=db_settings['passwd'].encode('ascii'), cursorclass=pymysql.cursors.DictCursor)
+        connection = pymysql.connect(host=db_settings['host'], port=db_settings['port'], db=db_settings['db'],
+                                     user=db_settings['user'], passwd=db_settings['passwd'], cursorclass=pymysql.cursors.DictCursor)
         return connection
 
     def get_userid(con, username):
@@ -108,7 +108,7 @@ if enabled:
         if out is None:
             return None
         else:
-            return out[0]
+            return out['id']
 
     def create_session(con, userid, timestamp):
         cur = con.cursor()
@@ -123,7 +123,7 @@ if enabled:
         if out is None:
             return None
         else:
-            return out[0]
+            return out['id']
 
     def add_session_data(con, session_id, packet_id, sent_from, order):
         cur = con.cursor()
@@ -137,7 +137,7 @@ if enabled:
         if out is None:
             return None
         else:
-            return out[0]
+            return out['id']
 
     def increment_packet_count(con, packet_id):
         cur = con.cursor()
