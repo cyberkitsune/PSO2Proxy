@@ -3,7 +3,7 @@ from Crypto.PublicKey import RSA
 
 
 class PSO2RC4(object):
-    """docstring for PSO2RC4Decryptor"""
+    """docstring for PSO2RC4Decrypter"""
 
     def __init__(self, key):
         self.rc4key = key
@@ -20,10 +20,10 @@ class PSO2RC4(object):
 class PSO2RSADecrypt(object):
     """docstring for PSO2RSADecrypt"""
 
-    def __init__(self, privkey):
-        keyData = open(privkey).read();
-        self.key = RSA.importKey(keyData);
-        print("[CryptoUtils] loaded RSA decryptor from privkey '%s'." % (privkey,))
+    def __init__(self, private_key):
+        key_data = open(private_key).read()
+        self.key = RSA.importKey(key_data)
+        print("[CryptoUtils] loaded RSA decrypter from private_key '%s'." % (private_key,))
 
     def decrypt(self, data):
         cipher = PKCS1_v1_5.new(self.key)
@@ -34,9 +34,9 @@ class PSO2RSAEncrypt(object):
     """docstring for PSO2RSAEncrypt"""
 
     def __init__(self, pubkey):
-        keyData = open(pubkey).read();
-        self.key = RSA.importKey(keyData);
-        print("[CryptoUtils] loaded RSA decryptor from pubkey '%s'." % (pubkey,))
+        key_data = open(pubkey).read()
+        self.key = RSA.importKey(key_data)
+        print("[CryptoUtils] loaded RSA decrypter from pubkey '%s'." % (pubkey,))
 
     def encrypt(self, data):
         cipher = PKCS1_v1_5.new(self.key)

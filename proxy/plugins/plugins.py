@@ -5,10 +5,10 @@ onConnection = []
 onConnectionLoss = []
 
 
-class packetHook(object):
-    def __init__(self, pktType, pktSubtype):
-        self.pktType = pktType
-        self.pktSubtype = pktSubtype
+class PacketHook(object):
+    def __init__(self, packet_type, packet_subtype):
+        self.pktType = packet_type
+        self.pktSubtype = packet_subtype
 
     def __call__(self, f):
         global packetFunctions
@@ -17,7 +17,7 @@ class packetHook(object):
         packetFunctions[(self.pktType, self.pktSubtype)].append(f)
 
 
-class commandHook(object):
+class CommandHook(object):
     """docstring for commandHook"""
 
     def __init__(self, command):
@@ -28,19 +28,19 @@ class commandHook(object):
         commands[self.command] = f
 
 
-def onStartHook(f):
+def on_start_hook(f):
     global onStart
     onStart.append(f)
     return f
 
 
-def onConnectionHook(f):
+def on_connection_hook(f):
     global onConnection
     onConnection.append(f)
     return f
 
 
-def onConnectionLossHook(f):
+def on_connection_lost_hook(f):
     global onConnectionLoss
     onConnectionLoss.append(f)
     return f

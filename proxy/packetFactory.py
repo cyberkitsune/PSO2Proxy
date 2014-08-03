@@ -1,8 +1,8 @@
 import io, struct
 
 
-def encodeStringUtf16(string, xorVal, subVal):
-    prefix = ((len(string) + 1) + subVal) ^ xorVal
+def encode_string_utf16(string, xor_value, sub_value):
+    prefix = ((len(string) + 1) + sub_value) ^ xor_value
 
     data = string.encode('utf-16le') + '\0\0'
     if (len(data) % 4) == 2:
@@ -14,9 +14,9 @@ def encodeStringUtf16(string, xorVal, subVal):
 class Packet(object):
     """docstring for PacketFactory"""
 
-    def __init__(self, pId, subId, flag1, flag2, data):
-        self.pId = pId
-        self.subId = subId
+    def __init__(self, packet_type, packet_subtype, flag1, flag2, data):
+        self.pId = packet_type
+        self.subId = packet_subtype
         self.flag1 = flag1
         self.flag2 = flag2
         self.data = data
@@ -25,18 +25,18 @@ class Packet(object):
         buf = bytearray()
         buf += struct.pack('i', (len(self.data) + 0x8))
         buf += struct.pack('BBBB', self.pId, self.subId, self.flag1, self.flag2)
-        buf += (self.data)
+        buf += self.data
         return str(buf)
 
 
 class PlayerHeader(object):
     """docstring for PlayerHeader"""
 
-    def __init__(self, playerId=0x0, _4=0x0, _8=0x4, _A=0x0):
-        self.playerId = playerId
+    def __init__(self, player_id=0x0, _4=0x0, _8=0x4, _a=0x0):
+        self.playerId = player_id
         self._4 = _4
         self._8 = _8
-        self._A = _A
+        self._A = _a
 
     def build(self):
         buf = bytearray()
@@ -45,8 +45,8 @@ class PlayerHeader(object):
 
 
 class ChatPacket(object):
-    def __init__(self, senderId, message):
-        self.senderId = senderId
+    def __init__(self, sender_id, message):
+        self.senderId = sender_id
         self.message = message
 
     def build(self):
@@ -55,7 +55,7 @@ class ChatPacket(object):
         buf += struct.pack('xx')  # TODO: FIXME
         buf += struct.pack('<H', 0)  # TODO: FIXME
         # Magical xor man
-        buf += encodeStringUtf16(self.message, 0x9d3f, 0x44)
+        buf += encode_string_utf16(self.message, 0x9d3f, 0x44)
         # buf += struct.pack('xx') #pad!
         return Packet(0x7, 0x0, 0x44, 0x0, buf).build()
 
@@ -68,7 +68,7 @@ class GoldGlobalMessagePacket(object):
 
     def build(self):
         buf = bytearray()
-        buf += encodeStringUtf16(self.message, 0x78f7, 0xa2)
+        buf += encode_string_utf16(self.message, 0x78f7, 0xa2)
         buf += struct.pack('4x')
         return Packet(0x19, 0x01, 0x4, 0x0, buf).build()
 
@@ -76,16 +76,16 @@ class GoldGlobalMessagePacket(object):
 class TeamChatPacket(object):
     """docstring for TeamChatPacket"""
 
-    def __init__(self, senderId, senderName, message):
-        self.senderId = senderId
-        self.senderName = senderName
+    def __init__(self, sender_id, sender_name, message):
+        self.senderId = sender_id
+        self.senderName = sender_name
         self.message = message
 
     def build(self):
         buf = bytearray()
         buf += PlayerHeader(self.senderId).build()
         buf += struct.pack('<I', 0x2)
-        buf += encodeStringUtf16(self.senderName, 0x7ED7, 0x41)
-        buf += encodeStringUtf16(self.senderName, 0x7ED7, 0x41)
-        buf += encodeStringUtf16(self.message, 0x7ED7, 0x41)
+        buf += encode_string_utf16(self.senderName, 0x7ED7, 0x41)
+        buf += encode_string_utf16(self.senderName, 0x7ED7, 0x41)
+        buf += encode_string_utf16(self.message, 0x7ED7, 0x41)
         return Packet(0x7, 0x11, 0x4, 0x00, buf).build()

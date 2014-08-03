@@ -6,47 +6,47 @@ connectedClients = {}
 class ClientData(object):
     """docstring for ClientData"""
 
-    def __init__(self, ipAddress, segaId, handle):
-        self.ipAddress = ipAddress
-        self.segaId = segaId
+    def __init__(self, ip_address, segaid, handle):
+        self.ipAddress = ip_address
+        self.segaId = segaid
         self.handle = handle
-        self.prefs = {}
+        self.preferences = {}
 
-    def getHandle(self):
+    def get_handle(self):
         return self.handle
 
-    def setHandle(self, handle):
+    def set_handle(self, handle):
         self.handle = handle
 
-    def getPrefs(self):
-        return self.prefs
+    def get_preferences(self):
+        return self.preferences
 
-    def setPrefs(self, prefs):
-        self.prefs = prefs
+    def set_preferences(self, preferences):
+        self.preferences = preferences
 
 
-def addClient(handle):
+def add_client(handle):
     connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, handle.myUsername.rstrip('\0'),
                                                    handle)
     print('[Clients] Registered client %s (ID:%i) in online clients' % (handle.myUsername, handle.playerId))
-    if config.isPlayerBanned(handle.playerId):
+    if config.is_player_id_banned(handle.playerId):
         print('[Bans] Player %s (ID:%i) is banned!' % (handle.myUsername, handle.playerId))
         handle.transport.loseConnection()
 
 
-def removeClient(handle):
+def remove_client(handle):
     print("[Clients] Removing client %s (ID:%i) from online clients" % (handle.myUsername, handle.playerId))
     del connectedClients[handle.playerId]
 
 
-def populateData(handle):
-    cData = connectedClients[handle.playerId]
-    cData.handle = handle
-    handle.myUsername = cData.segaId
-    handle.peer.myUsername = cData.segaId
+def populate_data(handle):
+    client_data = connectedClients[handle.playerId]
+    client_data.handle = handle
+    handle.myUsername = client_data.segaId
+    handle.peer.myUsername = client_data.segaId
     if handle.transport.getHost().port in blocks.blockList:
-        bName = blocks.blockList[handle.transport.getHost().port][1]
+        block_name = blocks.blockList[handle.transport.getHost().port][1]
     else:
-        bName = None
-    print("[ShipProxy] %s has successfully changed blocks to %s!" % (handle.myUsername, bName))
+        block_name = None
+    print("[ShipProxy] %s has successfully changed blocks to %s!" % (handle.myUsername, block_name))
     handle.loaded = True

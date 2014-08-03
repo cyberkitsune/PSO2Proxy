@@ -8,7 +8,7 @@ configKeys = {'packetLogging': False, 'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0"
 blockNames = {}
 
 
-def loadConfig():
+def load_config():
     global configKeys
     global blockNames
     if not os.path.exists('cfg/pso2proxy.config.json'):
@@ -16,28 +16,28 @@ def loadConfig():
             os.makedirs('cfg/')
         except:
             pass
-        makeDefaultConfig()
+        make_default_config()
     f = open('cfg/pso2proxy.config.json', 'r')
-    newcfg = f.read()
+    new_config = f.read()
     f.close()
-    configKeys = json.loads(newcfg)
+    configKeys = json.loads(new_config)
     print("[ShipProxy] Config loaded!")
     if os.path.exists('cfg/blocknames.config.json'):
         b = open('cfg/blocknames.config.json', 'r')
-        bStr = b.read()
-        blockNames = json.loads(bStr)
+        block_json = b.read()
+        blockNames = json.loads(block_json)
         print('[ShipProxy] Block names loaded!')
 
 
-def makeDefaultConfig():
+def make_default_config():
     global configKeys
-    jsonEnc = json.dumps(configKeys, indent=1)
+    json_encoded = json.dumps(configKeys, indent=1)
     f = open('cfg/pso2proxy.config.json', 'w')
-    f.write(jsonEnc)
+    f.write(json_encoded)
     f.close()
 
 
-def loadBans():
+def load_bans():
     global banList
     if not os.path.exists('cfg/pso2proxy.bans.json'):
         f = open('cfg/pso2proxy.bans.json', 'w')
@@ -50,7 +50,7 @@ def loadBans():
     print("[Bans] %i bans loaded!" % len(bans))
 
 
-def saveBans():
+def save_bans():
     global banList
     f = open('cfg/pso2proxy.bans.json', 'w')
     f.write(json.dumps(banList))
@@ -58,30 +58,30 @@ def saveBans():
     print("[Bans] %i bans saved!" % len(banList))
 
 
-def isIdBanned(segaId):
+def is_segaid_banned(segaid):
     global banList
     for ban in banList:
         if 'segaId' in ban:
-            if ban['segaId'] == segaId:
+            if ban['segaId'] == segaid:
                 return True
     return False
 
 
-def isPlayerBanned(playerId):
+def is_player_id_banned(player_id):
     global banList
     for ban in banList:
         if 'playerId' in ban:
-            if int(ban['playerId']) == playerId:
+            if int(ban['playerId']) == player_id:
                 return True
     return False
 
 
-loadConfig()
-loadBans()
+load_config()
+load_bans()
 
 packetLogging = configKeys['packetLogging']
-myIpAddr = configKeys['myIpAddr']
+myIpAddress = configKeys['myIpAddr']
 bindIp = configKeys['bindIp']
 blockNameMode = configKeys['blockNameMode']
 noisy = configKeys['noisy']
-webapi = configKeys['webapi']
+webapi_enabled = configKeys['webapi']
