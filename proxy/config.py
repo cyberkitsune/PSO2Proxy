@@ -28,7 +28,7 @@ def load_config():
     configKeys = verify_config_keys(configKeys)
     print("[ShipProxy] Config loaded!")
     f = open('cfg/pso2proxy.config.json', 'w')
-    f.write(json.dumps(configKeys))
+    f.write(json.dumps(configKeys, indent=1))
     f.close()
     if os.path.exists('cfg/blocknames.resource.json'):
         b = open('cfg/blocknames.resource.json', 'r')
