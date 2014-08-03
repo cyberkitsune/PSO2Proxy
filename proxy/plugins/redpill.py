@@ -13,6 +13,12 @@ import json
 import plugins
 
 jsonConfig = {'enabled': False, 'profiling': True, 'dbConfig': {'host': '', 'port': '', 'db': 'redpill', 'user': '', 'passwd': ''}, 'tarOut': None}
+
+
+def ascii_encode_dict(data):
+    ascii_encode = lambda x: x.encode('ascii')
+    return dict(map(ascii_encode, pair) for pair in data.items())
+
 if not os.path.exists("cfg/redpill.config.json"):
     f = open("cfg/redpill.config.json", 'w')
     f.write(json.dumps(jsonConfig, indent=1))
@@ -20,7 +26,7 @@ if not os.path.exists("cfg/redpill.config.json"):
     print("[Redpill] Redpill config generated!")
 else:
     f = open("cfg/redpill.config.json", 'r')
-    jsonConfig = json.loads(f.read())
+    jsonConfig = json.loads(f.read(), object_hook=ascii_encode_dict)
     f.close()
     print("[Redpill] Redpill config loaded!")
 
