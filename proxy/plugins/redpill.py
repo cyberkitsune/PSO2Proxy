@@ -12,7 +12,7 @@ import json
 
 import plugins
 
-jsonConfig = {'enabled': False, 'profiling': True, 'dbConfig': {'host': '', 'port': '', 'db': 'redpill', 'user': '', 'passwd': ''}}
+jsonConfig = {'enabled': False, 'profiling': True, 'dbConfig': {'host': '', 'port': '', 'db': 'redpill', 'user': '', 'passwd': ''}, 'tarOut': None}
 if not os.path.exists("cfg/redpill.config.json"):
     f = open("cfg/redpill.config.json")
     f.write(json.dumps(jsonConfig))
@@ -81,6 +81,10 @@ if enabled:
             tar.add("packets/%s/%i/" % (sid, timestamp), arcname="%i" % timestamp)
             tar.close()
             shutil.rmtree("packets/%s/%i/" % (sid, timestamp))
+            if jsonConfig['tarOut'] is not None:
+                if not os.path.exists("%s/%s/" % (jsonConfig['tarOut'], sid)):
+                    os.makedirs("%s/%s/" % (jsonConfig['tarOut'], sid))
+                shutil.move("packets/%s/%i.tar.gz" % (sid, timestamp), "%s/%s/%i.tar.gz" % (jsonConfig['tarOut'], sid, timestamp))
             print("[Redpill] Archived as %i.tar.gz and deleted base folder." % timestamp)
         if profiling:
             profile.disable()
