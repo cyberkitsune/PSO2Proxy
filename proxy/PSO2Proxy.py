@@ -106,10 +106,17 @@ class ShipProxy(protocol.Protocol):
                     packet_data = str(packet_data)
                 else:
                     packet_data = packet
+
+                if self.psoClient:
+                    packet_sender = "C"
+                else:
+                    packet_sender = "S"
+
                 if self.myUsername is not None:
+
                     path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (
                         self.myUsername, self.connTimestamp, self.packetCount, packet_type[0], packet_type[1],
-                        self.transport.getPeer().host)
+                        packet_sender)
                     try:
                         os.makedirs(os.path.dirname(path))
                     except exceptions.OSError:
@@ -118,7 +125,8 @@ class ShipProxy(protocol.Protocol):
                         f.write(packet_data)
                 else:
                     self.orphans.append(
-                        {'data': packet_data, 'count': self.packetCount, 'type': packet_type[0], "sub": packet_type[1]})
+                        {'data': packet_data, 'count': self.packetCount, 'type': packet_type[0], "sub": packet_type[1],
+                         'sender': packet_sender})
 
             try:
                 packet_handler = packets.packetList[packet_type]
@@ -152,8 +160,7 @@ class ShipProxy(protocol.Protocol):
                         orphan_packet = self.orphans.pop()
                         path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (
                             self.myUsername, self.connTimestamp, orphan_packet['count'], orphan_packet['type'],
-                            orphan_packet['sub'],
-                            self.transport.getPeer().host)
+                            orphan_packet['sub'], orphan_packet['sender'])
                         try:
                             os.makedirs(os.path.dirname(path))
                         except exceptions.OSError:
