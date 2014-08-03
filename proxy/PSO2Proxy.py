@@ -23,6 +23,7 @@ import plugins.plugins as plugin_manager
 from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
 from config import packetLogging as logPackets
 from config import myIpAddress as myIp
+from config import  bindIp
 from config import noisy as verbose
 
 
@@ -265,7 +266,6 @@ class ServerConsole(basic.LineReceiver):
 
 
 def main():
-    global interface_ip
     if not os.path.exists("log/"):
         os.makedirs("log/")
     log_file = logfile.LogFile.fromFullPath('log/serverlog.log')
@@ -281,8 +281,10 @@ def main():
             "(Not LAN address if you're on a LAN!) ")
         print("After you fix this, please restart PSO2Proxy.")
         sys.exit(0)
-    if interface_ip == "0.0.0.0":
+    if bindIp == "0.0.0.0":
         interface_ip = myIp
+    else:
+        interface_ip = bindIp
 
     if not os.path.isfile("keys/myKey.pem"):
         print("==== ERROR 002 ====")
