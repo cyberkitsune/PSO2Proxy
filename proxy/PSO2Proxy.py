@@ -244,7 +244,7 @@ class ProxyFactory(protocol.Factory):
 
 class ServerConsole(basic.LineReceiver):
     def __init__(self):
-        pass
+        self.delimiter = os.linesep
 
     def connectionMade(self):
         self.transport.write('>>> ')
@@ -255,9 +255,11 @@ class ServerConsole(basic.LineReceiver):
             if command in commandList:
                 f = commandList[command]
                 f(self, line)
-            if command in plugin_manager.commands:
+            elif command in plugin_manager.commands:
                 plugin_f = plugin_manager.commands[command]
                 plugin_f(self, line)
+            else:
+                print("[Command] Command %s not found!" % command)
         except:
             e = traceback.format_exc()
             print("[ShipProxy] Error Occurred: %s" % e)
