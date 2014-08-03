@@ -14,11 +14,6 @@ import plugins
 
 jsonConfig = {'enabled': False, 'profiling': True, 'dbConfig': {'host': '', 'port': '', 'db': 'redpill', 'user': '', 'passwd': ''}, 'tarOut': None}
 
-
-def ascii_encode_dict(data):
-    ascii_encode = lambda x: x.encode('ascii')
-    return dict(map(ascii_encode, pair) for pair in data.items())
-
 if not os.path.exists("cfg/redpill.config.json"):
     f = open("cfg/redpill.config.json", 'w')
     f.write(json.dumps(jsonConfig, indent=1))
@@ -26,7 +21,7 @@ if not os.path.exists("cfg/redpill.config.json"):
     print("[Redpill] Redpill config generated!")
 else:
     f = open("cfg/redpill.config.json", 'r')
-    jsonConfig = json.loads(f.read(), object_hook=ascii_encode_dict)
+    jsonConfig = json.loads(f.read())
     f.close()
     print("[Redpill] Redpill config loaded!")
 
@@ -102,8 +97,8 @@ if enabled:
     def get_connection():
         global jsonConfig
         db_settings = jsonConfig['dbConfig']
-        connection = pymysql.connect(host=db_settings['host'], port=db_settings['port'], db=db_settings['db'],
-                                     user=db_settings['user'], passwd=db_settings['passwd'], cursorclass=pymysql.cursors.DictCursor)
+        connection = pymysql.connect(host=db_settings['host'].encode('ascii'), port=db_settings['port'], db=db_settings['db'].encode('ascii'),
+                                     user=db_settings['user'].encode('ascii'), passwd=db_settings['passwd'].encode('ascii'), cursorclass=pymysql.cursors.DictCursor)
         return connection
 
     def get_userid(con, username):
