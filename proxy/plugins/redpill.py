@@ -14,12 +14,12 @@ import plugins
 
 jsonConfig = {'enabled': False, 'profiling': True, 'dbConfig': {'host': '', 'port': '', 'db': 'redpill', 'user': '', 'passwd': ''}, 'tarOut': None}
 if not os.path.exists("cfg/redpill.config.json"):
-    f = open("cfg/redpill.config.json")
+    f = open("cfg/redpill.config.json", 'w')
     f.write(json.dumps(jsonConfig))
     f.close()
     print("[Redpill] Redpill config generated!")
 else:
-    f = open("cfg/redpill.config.json")
+    f = open("cfg/redpill.config.json", 'r')
     jsonConfig = json.loads(f.read())
     f.close()
     print("[Redpill] Redpill config loaded!")
