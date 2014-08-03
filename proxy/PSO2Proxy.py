@@ -17,13 +17,12 @@ from twisted.internet.endpoints import TCP4ServerEndpoint
 from commands import commandList
 import packets
 import data.blocks as blocks
-import data.ships as ships
 import data.clients as clients
 import plugins.plugins as plugin_manager
 from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
 from config import packetLogging as logPackets
 from config import myIpAddress as myIp
-from config import  bindIp
+from config import bindIp
 from config import noisy as verbose
 
 
@@ -325,7 +324,6 @@ def main():
         f()
     reactor.suggestThreadPoolSize(15)
     reactor.run()
-    ships.manager.close_lines()
 
 
 if __name__ == "__main__":

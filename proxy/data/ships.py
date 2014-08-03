@@ -22,90 +22,24 @@ shipList = {
     12000: "210.189.208.136",
 }
 
-
-class BlockScrapingManager(object):
-    def __init__(self):
-        global shipList
-        self.lines = {}
-        for port, address in shipList.iteritems():
-            self.lines[port] = BlockLine(address, port)
-            self.lines[port].start()
-            self.shuttingDown = False
-
-    def get_in_line(self, ship_ip, ship_port, destination_ip):
-        line = self.lines[ship_port]
-        identifier = line.get_next_identifier()
-        line.requests.append({'identifier': identifier, 'shipIp': ship_ip, 'shipPort': ship_port, 'dstIp': destination_ip})
-        print("[BlockLine] Request #%i got in line." % identifier)
-        while identifier not in line.results:
-            time.sleep(1)
-            if self.shuttingDown:
-                line.requests.remove({'identifier': identifier, 'shipIp': ship_ip, 'shipPort': ship_port, 'dstIp': destination_ip})
-                return None
-        prize = line.results[identifier]
-        print("[BlockLine] Request #%i got their prize." % identifier)
-        del line.results[identifier]
-        return prize
-
-    def close_lines(self):
-        for line in self.lines:
-            self.lines[line].active = False
-            self.shuttingDown = True
+cachedBlocks = {}
 
 
-class BlockLine(Thread):
-    def __init__(self, address, port):
-        super(BlockLine, self).__init__()
-        self.address = address
-        self.port = port
-        print("[Line] Created line for port %i" % port)
+def get_first_block(ship_port, destination_ip):
+    if ship_port not in shipList:
+        return None
 
-        self.bCount = 0
-        self.lB = 0
-        self.requests = []
-        self.results = {}
-        self.identifier = 0
-        self.active = True
+    if ship_port not in cachedBlocks:
+        cachedBlocks[ship_port] = {'time_scraped': time.time(), 'data': scrape_block_packet(shipList[ship_port], ship_port, destination_ip)}
+        print("[BlockCache] Cached new block for ship %i, Holding onto it for a minute..." % ship_port)
+        return cachedBlocks[ship_port]['data']
 
-    def run(self):
-        print("[BlockLine] Thread for port %i started." % self.port)
-        while self.active:
-            if not self.active:
-                return
-            if self.lB >= 60 and self.bCount > 0:
-                self.bCount = 0
-                self.lB = 0
-                print("[BlockLine] [%i] Re-enabled burst mode early." % self.port)
-            if len(self.requests) > 0:
-                current_request = self.requests.pop(0)
-                # print("[BlockLine] [%i] Starting on request #%i" % (self.port, currReq['identifier']))
-                data = None
-                try:
-                    data = scrape_block_packet(current_request['shipIp'], current_request['shipPort'], current_request['dstIp'])
-                except:
-                    pass
-                self.results[current_request['identifier']] = data
-                print("[BlockLine] [%i] Finished request #%i!" % (self.port, current_request['identifier']))
-                self.bCount += 1
-                if self.bCount > 5:
-                    print("[BlockLine] [%i] Burst complete, waiting 1min. (%i left in line.)" % (
-                        self.port, len(self.requests)))
-                    for x in xrange(1, 60):
-                        time.sleep(1)
-                        if not self.active:
-                            return
-                    self.bCount = 0
-            else:
-                time.sleep(.1)
-                if self.bCount > 0:
-                    self.lB += .1
-
-        print("[BlockLine] Thread for port %i ended." % self.port)
-
-    def get_next_identifier(self):
-        self.identifier += 1
-        return self.identifier
-
+    last_time = cachedBlocks[ship_port]['time_scraped']
+    current_time = time.time()
+    if current_time > last_time + 60:
+        cachedBlocks[ship_port] = {'time_scraped': time.time(), 'data': scrape_block_packet(shipList[ship_port], ship_port, destination_ip)}
+        print("[BlockCache] Cached new block for ship %i, Holding onto it for a minute..." % ship_port)
+    return cachedBlocks[ship_port]['data']
 
 def scrape_block_packet(ship_ip, ship_port, destination_ip):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -127,9 +61,6 @@ def scrape_block_packet(ship_ip, ship_port, destination_ip):
     o1, o2, o3, o4 = destination_ip.split(".")
     struct.pack_into('BBBB', data, 0x64, int(o1), int(o2), int(o3), int(o4))
     return str(data)
-
-
-manager = BlockScrapingManager()
 
 
 def scrape_ship_packet(ship_ip, ship_port, destination_ip):

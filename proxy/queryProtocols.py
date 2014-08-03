@@ -9,16 +9,8 @@ class BlockScraper(protocol.Protocol):
 
     def connectionMade(self):
         port = self.transport.getHost().port
-        print('[BlockQuery] %s:%i wants to load-balance on port %i!' % (
-            self.transport.getPeer().host, self.transport.getPeer().port, port))
-        if port in ships.shipList:
-            d = threads.deferToThread(ships.manager.get_in_line, ships.shipList[port], port, myIpAddress)
-            d.addCallback(self.got_ship)
-        else:
-            self.transport.loseConnection()
-
-    def got_ship(self, data):
-        self.transport.write(data)
+        print('[BlockQuery] %s:%i wants to load-balance on port %i!' % (self.transport.getPeer().host, self.transport.getPeer().port, port))
+        self.transport.write(ships.get_first_block(port, myIpAddress))
         self.transport.loseConnection()
 
 
