@@ -322,7 +322,6 @@ def main():
         __import__(plug)
     for f in plugin_manager.onStart:
         f()
-    reactor.suggestThreadPoolSize(15)
     reactor.run()
 
 

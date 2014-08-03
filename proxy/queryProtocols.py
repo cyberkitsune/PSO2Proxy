@@ -1,4 +1,4 @@
-from twisted.internet import protocol, reactor, threads
+from twisted.internet import protocol
 import data.ships as ships
 from config import myIpAddress
 

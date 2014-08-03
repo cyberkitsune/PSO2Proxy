@@ -41,6 +41,7 @@ def get_first_block(ship_port, destination_ip):
         print("[BlockCache] Cached new block for ship %i, Holding onto it for a minute..." % ship_port)
     return cachedBlocks[ship_port]['data']
 
+
 def scrape_block_packet(ship_ip, ship_port, destination_ip):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     log.msg("[BlockQuery] Scraping %s:%i for a initial block..." % (ship_ip, ship_port))
