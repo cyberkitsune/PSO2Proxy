@@ -33,7 +33,7 @@ if enabled:
     def redpill_init():
         print("[Redpill] Redpill initialized.")
 
-    @plugins.packetHook(0x11, 0x0)
+    @plugins.PacketHook(0x11, 0x0)
     def login_packet_hook(context, packet):
         username = packet[0x8:0x48].decode('utf-8')
         username = username.rstrip('\0')
