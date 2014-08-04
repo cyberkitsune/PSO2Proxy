@@ -391,6 +391,5 @@ def exit_proxy(sender, params):
             if client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
                     packetFactory.SystemMessagePacket("PSO2Proxy is exiting.\nIf you are on the public proxy and not a private one, check @pso2proxystatus on Twitter for more information.", 0x2).build())
-                client.get_handle().transport.loseConnection()
         print("[ShipProxy] Exiting...")
         reactor.callFromThread(reactor.stop)
