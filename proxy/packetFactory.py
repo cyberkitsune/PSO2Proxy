@@ -54,9 +54,7 @@ class ChatPacket(object):
         buf = bytearray()
         buf += PlayerHeader(self.senderId).build()
         buf += struct.pack('<I', self.channel)
-        # Magical xor man
         buf += encode_string_utf16(self.message, 0x9d3f, 0x44)
-        # buf += struct.pack('xx') #pad!
         return Packet(0x7, 0x0, 0x44, 0x0, buf).build()
 
 
