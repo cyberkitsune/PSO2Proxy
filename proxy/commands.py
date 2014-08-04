@@ -26,7 +26,7 @@ def help_command(sender, params):
     if not isinstance(sender, basic.LineReceiver):
         string = "=== PSO2Proxy Client Commands ===<br>"
         user_command_count = 0
-        for command, cData in commandList:
+        for command, cData in commandList.iteritems():
             if cData[1] is not None:
                 user_command_count += 1
                 string += "%s - %s<br>" % (command, cData[1])
