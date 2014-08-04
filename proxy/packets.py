@@ -42,7 +42,7 @@ def login_packet(context, data):
     context.peer.myUsername = username
     if config.is_segaid_banned(username):
         print("[Bans] %s is banned! Disconnecting..." % username)
-        context.sendCryptoPacket(packetFactory.SystemMessagePacket("You are banned from connecting to this PSO2Proxy.", 0x1).build())
+        context.send_crypto_packet(packetFactory.SystemMessagePacket("You are banned from connecting to this PSO2Proxy.", 0x1).build())
         context.transport.loseConnection()
         context.peer.transport.loseConnection()
         return None
