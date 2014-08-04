@@ -61,7 +61,7 @@ class ChatPacket(object):
 class GoldGlobalMessagePacket(object):
     """Golden Global Message Packet"""
 
-    def __init__(self, message, message_type):
+    def __init__(self, message, message_type=0x0):
         self.message = message
         self.message_type = message_type
 
