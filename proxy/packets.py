@@ -145,10 +145,10 @@ def chat_packet(context, data):
         if len(message) > 2 and message[0] == '|':
             command = (message.split(' ')[0])[1:]  # Get the first word (the command) and strip the '!''
             if command in commands.commandList:
-                f = commands.commandList[command]
+                f = commands.commandList[command][0]
                 f(context, message)  # Lazy...
             elif command in packet_manager.commands:
-                f = packet_manager.commands[command]
+                f = packet_manager.commands[command][0]
                 f(context, message)
             else:
                 context.send_crypto_packet(

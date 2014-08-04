@@ -12,24 +12,31 @@ commandList = {}
 
 
 class CommandHandler(object):
-    def __init__(self, command_name):
+    def __init__(self, command_name, help_text=None):
         self.commandName = command_name
+        self.help_text = help_text
 
     def __call__(self, f):
         global commandList
-        commandList[self.commandName] = f
+        commandList[self.commandName] = [f, self.help_text]
 
 
-@CommandHandler("help")
+@CommandHandler("help", "Displays this help page.")
 def help_command(sender, params):
     if not isinstance(sender, basic.LineReceiver):
-        string = '[Command] %s, how may I help you?' % sender.transport.getPeer().host
-        sender.send_crypto_packet(packetFactory.ChatPacket(sender.playerId, string).build())
+        string = "=== PSO2Proxy Client Commands ===<br>"
+        user_command_count = 0
+        for command, cData in commandList:
+            if cData[1] is not None:
+                user_command_count += 1
+                string += "%s - %s<br>" % (command, cData[1])
+        string += "<br>%i commands in total." % user_command_count
+        sender.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
     else:
         sender.transport.write("[Command] Hello Console! Valid commands: %s\n" % ', '.join(commandList.keys()))
 
 
-@CommandHandler("count")
+@CommandHandler("count", "Returns the current player count in system chat.")
 def count(sender, params):
     if not isinstance(sender, basic.LineReceiver):
         string = '[Command] There are %s users currently connected to your proxy.' % len(data.clients.connectedClients)
