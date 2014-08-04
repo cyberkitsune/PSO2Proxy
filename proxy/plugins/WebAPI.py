@@ -1,13 +1,50 @@
-import data.clients, data.players, data.blocks
+import json
+import calendar
+import datetime
+import os
+
 from twisted.web.resource import Resource
+from twisted.web import server
 from twisted.internet import reactor
 from twisted.internet.endpoints import TCP4ServerEndpoint
+
+import data.clients
+import data.players
+import data.blocks
 from config import webapi_enabled
 from config import bindIp as interfaceIp
-import json, calendar, datetime, plugins
+from config import myIpAddress as hostName
+from config import serverName as serverName
+import plugins
+
 
 upStart = calendar.timegm(datetime.datetime.utcnow().utctimetuple())
 peakPlayers = 0
+
+
+class JSONConfig(Resource):
+    isLeaf = True
+
+    # noinspection PyPep8Naming
+    @staticmethod
+    def render_GET(request):
+        request.setHeader("content-type", "application/json")
+        config_json = {'version': 1, "name": serverName, "publickeyurl": "http://%s:8080/publickey.blob", "host": hostName}
+        return json.dumps(config_json)
+
+
+class PublicKey(Resource):
+    isLeaf = True
+
+    # noinspection PyPep8Naming
+    @staticmethod
+    def render_GET(request):
+        request.setHeader("content-type", "application/json")
+        if os.path.exists("keys/publickey.blob"):
+            f = open("keys/publickey.blob", 'rb')
+            pubkey_data = f.read()
+            f.close()
+            return pubkey_data
 
 
 class WebAPI(Resource):
@@ -21,12 +58,26 @@ class WebAPI(Resource):
         request.setHeader("content-type", "application/json")
         return json.dumps(current_data)
 
+    def getChild(self, path, request):
+        if path == '':
+            return self
+        elif path == '/config.json':
+            return JSONConfig()
+        elif path == '/publickey.blob':
+            return PublicKey()
+        return Resource.getChild(self, path, request)
+
 
 @plugins.on_start_hook
 def setup_web_api():
     if webapi_enabled:
         from twisted.web import server
-
+        if not os.path.exists("keys/publickey.blob"):
+            print("[WebAPI] === Error ===")
+            print("[WebAPI] Your public key is not in keys/publickey.blob !!")
+            print("[WebAPI] As a result, webapi will be disabled !!")
+            print("[WebAPI] Please fix this and restart the proxy.")
+            return
         web_endpoint = TCP4ServerEndpoint(reactor, 8080, interface=interfaceIp)
         web_endpoint.listen(server.Site(WebAPI()))
 

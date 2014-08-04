@@ -4,7 +4,7 @@ import os.path
 banList = []
 
 defaultConfigKeys = {'packetLogging': False, 'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 0,
-                     'noisy': False,
+                     'noisy': False, 'serverName': "Unnamed Server",
                      'webapi': False, 'admins': []}
 
 configKeys = {}
@@ -119,3 +119,4 @@ blockNameMode = configKeys['blockNameMode']
 noisy = configKeys['noisy']
 webapi_enabled = configKeys['webapi']
 admins = configKeys['admins']
+serverName = configKeys['serverName']
