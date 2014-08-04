@@ -1,4 +1,6 @@
-import blocks, config
+import blocks
+import config
+import packetFactory
 
 connectedClients = {}
 
@@ -31,7 +33,9 @@ def add_client(handle):
     print('[Clients] Registered client %s (ID:%i) in online clients' % (handle.myUsername, handle.playerId))
     if config.is_player_id_banned(handle.playerId):
         print('[Bans] Player %s (ID:%i) is banned!' % (handle.myUsername, handle.playerId))
+        handle.sendCryptoPacket(packetFactory.SystemMessagePacket("You are banned from connecting to this PSO2Proxy.", 0x1).build())
         handle.transport.loseConnection()
+    handle.sendCryptoPacket(packetFactory.SystemMessagePacket("Welcome to PSO2Proxy! There are currently %i clients connected. Use |help for help!", 0x3).build())
 
 
 def remove_client(handle):
