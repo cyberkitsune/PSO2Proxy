@@ -207,10 +207,25 @@ def kick(sender, params):
             print("[Command] Invalid usage! Proper usage: >>> kick <playerId>")
             return
         if int(args[1]) in data.clients.connectedClients:
+            data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("You have been kicked from the proxy from the console.", 0x2).build())
             data.clients.connectedClients[int(args[1])].get_handle().transport.loseConnection()
             print("[Command] Kicked %s." % args[1])
         else:
             print("[Command] I couldn't find %s!" % args[1])
+    else:
+        if not config.is_admin(sender.myUsername):
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.", 0x3).build())
+            return
+        args = params.split(' ')
+        if len(args) < 2:
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage! Proper usage: |kick <playerId>", 0x3).build())
+            return
+        if int(args[1]) in data.clients.connectedClients:
+            data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("You have been kicked from the proxy by %s." % sender.myUsername, 0x2).build())
+            data.clients.connectedClients[int(args[1])].get_handle().transport.loseConnection()
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {grn}Kicked %s." % args[1], 0x3).build())
+        else:
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}I couldn't find %s!" % args[1], 0x3).build())
 
 
 @CommandHandler("clients",
