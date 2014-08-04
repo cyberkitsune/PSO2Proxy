@@ -35,7 +35,7 @@ def add_client(handle):
         print('[Bans] Player %s (ID:%i) is banned!' % (handle.myUsername, handle.playerId))
         handle.send_crypto_packet(packetFactory.SystemMessagePacket("You are banned from connecting to this PSO2Proxy.", 0x1).build())
         handle.transport.loseConnection()
-    handle.send_crypto_packet(packetFactory.SystemMessagePacket("{blu}Welcome to PSO2Proxy, %s! There are currently %i clients connected. Use |help for help!" % (handle.myUsername, len(connectedClients)), 0x3).build())
+    handle.send_crypto_packet(packetFactory.SystemMessagePacket("{yel}Welcome to PSO2Proxy, %s! There are currently %i clients connected. Use |help for help!" % (handle.myUsername, len(connectedClients)), 0x3).build())
 
 
 def remove_client(handle):
