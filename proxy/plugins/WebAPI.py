@@ -48,6 +48,7 @@ class PublicKey(Resource):
 
 
 class WebAPI(Resource):
+    isLeaf = True
 
     # noinspection PyPep8Naming
     @staticmethod
@@ -56,6 +57,11 @@ class WebAPI(Resource):
                     'playersCached': len(data.players.playerList), 'upSince': upStart, 'peakPlayers': peakPlayers}
         request.setHeader("content-type", "application/json")
         return json.dumps(current_data)
+
+    def getChild(self, name, request):
+        if name == '':
+            return self
+        return Resource.getChild(self, name, request)
 
 
 @plugins.on_start_hook
