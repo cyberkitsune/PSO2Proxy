@@ -48,7 +48,6 @@ class PublicKey(Resource):
 
 
 class WebAPI(Resource):
-    isLeaf = True
 
     # noinspection PyPep8Naming
     @staticmethod
