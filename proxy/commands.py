@@ -22,6 +22,63 @@ class CommandHandler(object):
         commandList[self.commandName] = [f, self.help_text]
 
 
+@CommandHandler("op", "Makes a player an admin. {red}Admins Only.{def}")
+def op_player(sender, params):
+    if not isinstance(sender, basic.LineReceiver):
+        if not config.is_admin(sender.myUsername):
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.", 0x3).build())
+            return
+        if len(params.split(" ")) < 2:
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}Not enough arguments. Usage: |op <segaid>", 0x3).build())
+            return
+        player = params.split(" ")[1]
+        if not config.is_admin(player):
+            config.configKeys['admins'].append(player)
+            config.save_config()
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {gre}%s added to admins successfully." % player, 0x3).build())
+        else:
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}%s is already an admin!" % player, 0x3).build())
+    else:
+        if len(params.split(" ")) < 2:
+            print("[ShipProxy] Not enough arguments. Usage: >>> op <segaid>")
+            return
+        player = params.split(" ")[1]
+        if not config.is_admin(player):
+            config.configKeys['admins'].append(player)
+            config.save_config()
+            print("[ShipProxy] %s is now an admin!" % player)
+        else:
+            print("[ShipProxy] %s is already an admin!" % player)
+
+@CommandHandler("deop", "Removes a player from the admin list. {red}Admins Only.{def}")
+def op_player(sender, params):
+    if not isinstance(sender, basic.LineReceiver):
+        if not config.is_admin(sender.myUsername):
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.", 0x3).build())
+            return
+        if len(params.split(" ")) < 2:
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}Not enough arguments. Usage: |deop <segaid>", 0x3).build())
+            return
+        player = params.split(" ")[1]
+        if config.is_admin(player):
+            config.configKeys['admins'].remove(player)
+            config.save_config()
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {gre}%s has been removed from admins successfully." % player, 0x3).build())
+        else:
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}%s is not an admin!" % player, 0x3).build())
+    else:
+        if len(params.split(" ")) < 2:
+            print("[ShipProxy] Not enough arguments. Usage: >>> deop <segaid>")
+            return
+        player = params.split(" ")[1]
+        if config.is_admin(player):
+            config.configKeys['admins'].remove(player)
+            config.save_config()
+            print("[ShipProxy] %s hes been removed from admins successfully!" % player)
+        else:
+            print("[ShipProxy] %s is not an admin!" % player)
+
+
 @CommandHandler("help", "Displays this help page.")
 def help_command(sender, params):
     if not isinstance(sender, basic.LineReceiver):

@@ -3,8 +3,9 @@ import os.path
 
 banList = []
 
-defaultConfigKeys = {'packetLogging': False, 'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 0, 'noisy': False,
-              'webapi': False, 'admins': []}
+defaultConfigKeys = {'packetLogging': False, 'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 0,
+                     'noisy': False,
+                     'webapi': False, 'admins': []}
 
 configKeys = {}
 
@@ -35,6 +36,21 @@ def load_config():
         block_json = b.read()
         blockNames = json.loads(block_json)
         print('[ShipProxy] Block names loaded!')
+
+
+def is_admin(sega_id):
+    global configKeys
+    if sega_id in configKeys['admins']:
+        return True
+    else:
+        return False
+
+
+def save_config():
+    f = open('cfg/pso2proxy.config.json', 'w')
+    f.write(json.dumps(configKeys, indent=1))
+    f.close()
+    print("[ShipProxy] Config saved!")
 
 
 def verify_config_keys(config_dict):
