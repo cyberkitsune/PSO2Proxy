@@ -170,6 +170,33 @@ def ban(sender, params):
         else:
             print("[Command] Invalid usage! Proper usage, >>> ban <segaid/pid> <value>")
             return
+    else:
+        if not config.is_admin(sender.myUsername):
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.", 0x3).build())
+            return
+        args = params.split(' ')
+        if len(args) < 3:
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage! Proper usage, |ban <segaid/pid> <value>", 0x3).build())
+            return
+        if args[1] == "segaid":
+            if config.is_segaid_banned(args[2]):
+                sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Command]{red} %s is already banned!" % args[2], 0x3).build())
+                return
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] %s has been banned." % args[2], 0x3).build())
+            config.banList.append({'segaId': args[2]})
+            config.save_bans()
+        elif args[1] == "pid":
+            if config.is_player_id_banned(args[2]):
+                sender.send_crypto_packet(packetFactory.SystemMessagePacket('[Command]{red} %s is already banned!' % args[2], 0x3).build())
+                return
+            config.banList.append({'playerId': args[2]})
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] %s has been banned." % args[2], 0x3).build())
+            config.save_bans()
+        else:
+            sender.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage! Proper usage, |ban <segaid/pid> <value>", 0x3).build())
+            return
+
+
 
 
 @CommandHandler("kick", "Kicks a client from the proxy. {red}Admins only.{def}")
