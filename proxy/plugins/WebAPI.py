@@ -58,15 +58,6 @@ class WebAPI(Resource):
         request.setHeader("content-type", "application/json")
         return json.dumps(current_data)
 
-    def getChild(self, path, request):
-        if path == '':
-            return self
-        elif path == '/config.json':
-            return JSONConfig()
-        elif path == '/publickey.blob':
-            return PublicKey()
-        return Resource.getChild(self, path, request)
-
 
 @plugins.on_start_hook
 def setup_web_api():
@@ -79,7 +70,10 @@ def setup_web_api():
             print("[WebAPI] Please fix this and restart the proxy.")
             return
         web_endpoint = TCP4ServerEndpoint(reactor, 8080, interface=interfaceIp)
-        web_endpoint.listen(server.Site(WebAPI()))
+        web_resource = WebAPI()
+        web_resource.putChild("config.json", JSONConfig())
+        web_resource.putChild("publickey.blob", PublicKey())
+        web_endpoint.listen(server.Site(web_resource))
 
 
 @plugins.on_connection_hook
