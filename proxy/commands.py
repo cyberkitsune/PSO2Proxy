@@ -1,6 +1,7 @@
 from twisted.protocols import basic
 from twisted.internet import reactor
 
+import plugins.plugins as pManager
 import packetFactory
 import config
 import data.clients
@@ -29,8 +30,12 @@ def help_command(sender, params):
         for command, cData in commandList.iteritems():
             if cData[1] is not None:
                 user_command_count += 1
-                string += "%s - %s\n" % (command, cData[1])
-        string += "\n%i commands in total." % user_command_count
+                string += "|%s - %s\n\n" % (command, cData[1])
+        for command, cData in pManager.commands.iteritems():
+            if cData[1] is not None:
+                user_command_count += 1
+                string += "|%s - %s\n\n" % (command, cData[1])
+        string += "=== %i commands in total. ===" % user_command_count
         sender.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
     else:
         sender.transport.write("[Command] Hello Console! Valid commands: %s\n" % ', '.join(commandList.keys()))
