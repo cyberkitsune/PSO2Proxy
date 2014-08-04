@@ -169,12 +169,12 @@ def chat(context, params):
 
                 ircBot.send_global_message(
                     "Console",
-                    unicodedata.normalize('NFKD', params[3:]).encode('ascii', 'ignore'))
+                    unicodedata.normalize('NFKD', params[2:]).encode('ascii', 'ignore'))
         for client in data.clients.connectedClients.values():
             if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
                     packetFactory.TeamChatPacket(0x1, "[GCONSOLE]",
-                                                 params[3:]).build())
+                                                 params[2:]).build())
         return
     if not data.clients.connectedClients[context.playerId].get_preferences()['globalChat']:
         context.send_crypto_packet(packetFactory.SystemMessagePacket(
