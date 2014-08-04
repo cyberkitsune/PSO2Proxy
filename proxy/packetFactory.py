@@ -61,13 +61,14 @@ class ChatPacket(object):
 class GoldGlobalMessagePacket(object):
     """Golden Global Message Packet"""
 
-    def __init__(self, message):
+    def __init__(self, message, message_type):
         self.message = message
+        self.message_type = message_type
 
     def build(self):
         buf = bytearray()
         buf += encode_string_utf16(self.message, 0x78f7, 0xa2)
-        buf += struct.pack('4x')
+        buf += struct.pack('<I', self.message_type)
         return Packet(0x19, 0x01, 0x4, 0x0, buf).build()
 
 
