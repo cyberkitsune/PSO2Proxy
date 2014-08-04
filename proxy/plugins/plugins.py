@@ -20,12 +20,13 @@ class PacketHook(object):
 class CommandHook(object):
     """docstring for commandHook"""
 
-    def __init__(self, command):
+    def __init__(self, command, help_text=None):
         self.command = command
+        self.help_text = help_text
 
     def __call__(self, f):
         global commands
-        commands[self.command] = f
+        commands[self.command] = [f, self.help_text]
 
 
 def on_start_hook(f):

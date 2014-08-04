@@ -45,31 +45,30 @@ class PlayerHeader(object):
 
 
 class ChatPacket(object):
-    def __init__(self, sender_id, message):
+    def __init__(self, sender_id, message, channel=0x1):
         self.senderId = sender_id
         self.message = message
+        self.channel = channel
 
     def build(self):
         buf = bytearray()
         buf += PlayerHeader(self.senderId).build()
-        buf += struct.pack('xx')  # TODO: FIXME
-        buf += struct.pack('<H', 0)  # TODO: FIXME
-        # Magical xor man
+        buf += struct.pack('<I', self.channel)
         buf += encode_string_utf16(self.message, 0x9d3f, 0x44)
-        # buf += struct.pack('xx') #pad!
         return Packet(0x7, 0x0, 0x44, 0x0, buf).build()
 
 
-class GoldGlobalMessagePacket(object):
+class SystemMessagePacket(object):
     """Golden Global Message Packet"""
 
-    def __init__(self, message):
+    def __init__(self, message, message_type=0x0):
         self.message = message
+        self.message_type = message_type
 
     def build(self):
         buf = bytearray()
         buf += encode_string_utf16(self.message, 0x78f7, 0xa2)
-        buf += struct.pack('4x')
+        buf += struct.pack('<I', self.message_type)
         return Packet(0x19, 0x01, 0x4, 0x0, buf).build()
 
 

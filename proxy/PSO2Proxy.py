@@ -260,10 +260,10 @@ class ServerConsole(basic.LineReceiver):
         try:
             command = line.split(' ')[0]
             if command in commandList:
-                f = commandList[command]
+                f = commandList[command][0]
                 f(self, line)
             elif command in plugin_manager.commands:
-                plugin_f = plugin_manager.commands[command]
+                plugin_f = plugin_manager.commands[command][0]
                 plugin_f(self, line)
             else:
                 print("[Command] Command %s not found!" % command)

@@ -5,6 +5,7 @@ import plugins
 import packetFactory
 import data.clients
 import data.players
+from twisted.protocols import basic
 
 
 ircMode = False
@@ -24,9 +25,18 @@ if ircMode:
 
     # noinspection PyUnresolvedReferences
     class GChatIRC(irc.IRCClient):
+        currentPid = 0
+        userIds = {}
+
         def __init__(self):
             global ircNick
             self.nickname = ircNick
+
+        def get_user_id(self, user):
+            if user not in self.userIds:
+                self.userIds[user] = self.currentPid
+                self.currentPid += 1
+            return self.userIds[user]
 
         def connectionMade(self):
             irc.IRCClient.connectionMade(self)
@@ -48,7 +58,8 @@ if ircMode:
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
-                            packetFactory.TeamChatPacket(0x0, "[GIRC-%s]" % user.split("!")[0], msg).build())
+                            packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]), "[GIRC-%s]" % user.split("!")[0], msg).build())
+
 
         def action(self, user, channel, msg):
             if channel == self.factory.channel:
@@ -56,7 +67,7 @@ if ircMode:
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
-                            packetFactory.TeamChatPacket(0x0, "[GIRC-%s]" % user.split("!")[0], "* %s" % msg).build())
+                            packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]), "[GIRC-%s]" % user.split("!")[0], "* %s" % msg).build())
 
         def send_global_message(self, user, message):
             self.msg(self.factory.channel, "[G] <%s> %s" % (user, message))
@@ -113,9 +124,13 @@ def check_config(user):
                 globalchat_user_preferences[user.playerId]['toggle'] = True
                 savePrefs()
             if client_preferences['globalChat']:
-                user.send_crypto_packet(packetFactory.ChatPacket(user.playerId, "[Proxy] {red}Global chat is enabled, use |g <Message> to chat and |goff to disable it.").build())
+                user.send_crypto_packet(packetFactory.SystemMessagePacket(
+                    "[Proxy] {red}Global chat is enabled, use |g <Message> to chat and |goff to disable it.",
+                    0x3).build())
             else:
-                user.send_crypto_packet(packetFactory.ChatPacket(user.playerId, "[Proxy] {red}Global chat is disabled, use |gon to enable it and use |g <Message> to chat.").build())
+                user.send_crypto_packet(packetFactory.SystemMessagePacket(
+                    "[Proxy] {red}Global chat is disabled, use |gon to enable it and use |g <Message> to chat.",
+                    0x3).build())
         data.clients.connectedClients[user.playerId].set_preferences(client_preferences)
 
 
@@ -127,25 +142,25 @@ def savePrefs():
 
 
 # noinspection PyUnresolvedReferences
-@plugins.CommandHook("gon")
+@plugins.CommandHook("gon", "Enable global chat.")
 def enable(context, params):
     global globalchat_user_preferences
     preferences = data.clients.connectedClients[context.playerId].get_preferences()
     preferences['globalChat'] = True
     context.send_crypto_packet(
-        packetFactory.ChatPacket(context.playerId, "[GlobalChat] Global chat enabled for you.").build())
+        packetFactory.SystemMessagePacket("[GlobalChat] Global chat enabled for you.", 0x3).build())
     data.clients.connectedClients[context.playerId].set_preferences(preferences)
     globalchat_user_preferences[context.playerId]['toggle'] = True
     savePrefs()
 
 
 # noinspection PyUnresolvedReferences
-@plugins.CommandHook("goff")
+@plugins.CommandHook("goff", "Disable global chat.")
 def disable(context, params):
     preferences = data.clients.connectedClients[context.playerId].get_preferences()
     preferences['globalChat'] = False
     context.send_crypto_packet(
-        packetFactory.ChatPacket(context.playerId, "[GlobalChat] Global chat disabled for you.").build())
+        packetFactory.SystemMessagePacket("[GlobalChat] Global chat disabled for you.", 0x3).build())
     data.clients.connectedClients[context.playerId].set_preferences(preferences)
     data.clients.connectedClients[context.playerId].set_preferences(preferences)
     globalchat_user_preferences[context.playerId]['toggle'] = False
@@ -153,12 +168,27 @@ def disable(context, params):
 
 
 # noinspection PyUnresolvedReferences
-@plugins.CommandHook("g")
+@plugins.CommandHook("g", "Chat in global chat.")
 def chat(context, params):
     global ircMode
+    if isinstance(context, basic.LineReceiver):
+        if ircMode:
+            global ircBot
+            if ircBot is not None:
+                import unicodedata
+
+                ircBot.send_global_message(
+                    "Console",
+                    unicodedata.normalize('NFKD', params[2:]).encode('ascii', 'ignore'))
+        for client in data.clients.connectedClients.values():
+            if client.get_preferences()['globalChat'] and client.get_handle() is not None:
+                client.get_handle().send_crypto_packet(
+                    packetFactory.TeamChatPacket(0x1, "[GCONSOLE]",
+                                                 params[2:]).build())
+        return
     if not data.clients.connectedClients[context.playerId].get_preferences()['globalChat']:
-        context.send_crypto_packet(packetFactory.ChatPacket(context.playerId,
-                                                            "[GlobalChat] You do not have global chat enabled, and can not send a global message.").build())
+        context.send_crypto_packet(packetFactory.SystemMessagePacket(
+            "[GlobalChat] You do not have global chat enabled, and can not send a global message.", 0x3).build())
         return
     print("[GlobalChat] <%s> %s" % (data.players.playerList[context.playerId][0], params[3:]))
     if ircMode:
