@@ -39,7 +39,7 @@ class PublicKey(Resource):
     # noinspection PyPep8Naming
     @staticmethod
     def render_GET(request):
-        request.setHeader("content-type", "application/json")
+        request.setHeader("content-type", "application/octet-stream")
         if os.path.exists("keys/publickey.blob"):
             f = open("keys/publickey.blob", 'rb')
             pubkey_data = f.read()
