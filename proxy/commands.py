@@ -115,18 +115,18 @@ def list_clients(sender, params):
             client_host, client_segaid, client_player_id, client_player_name, client_block))
 
 
-@CommandHandler("globalmsg")
+@CommandHandler("globalsysmsg")
 def global_message(sender, params):
     if isinstance(sender, basic.LineReceiver):
         if len(params.split(' ', 2)) < 3:
-            print("[ShipProxy] That message is not long enough!")
+            print("[ShipProxy] Incorrect usage. Usage: >>> globalsysmsg  <message_type> <Message>")
             return
         mode = int(params.split(' ', 2)[1])
         message = params.split(' ', 2)[2]
         for client in data.clients.connectedClients.values():
             if client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
-                    packetFactory.GoldGlobalMessagePacket("[Proxy Global Message] %s" % message, mode).build())
+                    packetFactory.SystemMessagePacket("[Proxy Global Message] %s" % message, mode).build())
         print("[ShipProxy] Sent global message!")
 
 

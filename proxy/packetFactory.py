@@ -58,7 +58,7 @@ class ChatPacket(object):
         return Packet(0x7, 0x0, 0x44, 0x0, buf).build()
 
 
-class GoldGlobalMessagePacket(object):
+class SystemMessagePacket(object):
     """Golden Global Message Packet"""
 
     def __init__(self, message, message_type=0x0):
