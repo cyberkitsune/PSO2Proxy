@@ -29,7 +29,7 @@ class JSONConfig(Resource):
     @staticmethod
     def render_GET(request):
         request.setHeader("content-type", "application/json")
-        config_json = {'version': 1, "name": serverName, "publickeyurl": "http://%s:8080/publickey.blob", "host": hostName}
+        config_json = {'version': 1, "name": serverName, "publickeyurl": "http://%s:8080/publickey.blob" % hostName, "host": hostName}
         return json.dumps(config_json)
 
 
