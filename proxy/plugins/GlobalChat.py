@@ -25,9 +25,17 @@ if ircMode:
 
     # noinspection PyUnresolvedReferences
     class GChatIRC(irc.IRCClient):
+        currentPid = 0
+
         def __init__(self):
             global ircNick
             self.nickname = ircNick
+
+        def increment_player_id(self):
+            if self.currentPid >= 10:
+                self.currentPid = 0
+            else:
+                self.currentPid += 1
 
         def connectionMade(self):
             irc.IRCClient.connectionMade(self)
@@ -49,7 +57,8 @@ if ircMode:
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
-                            packetFactory.TeamChatPacket(0x0, "[GIRC-%s]" % user.split("!")[0], msg).build())
+                            packetFactory.TeamChatPacket(self.currentPid, "[GIRC-%s]" % user.split("!")[0], msg).build())
+                self.increment_player_id()
 
         def action(self, user, channel, msg):
             if channel == self.factory.channel:
@@ -57,7 +66,8 @@ if ircMode:
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
-                            packetFactory.TeamChatPacket(0x0, "[GIRC-%s]" % user.split("!")[0], "* %s" % msg).build())
+                            packetFactory.TeamChatPacket(self.currentPid, "[GIRC-%s]" % user.split("!")[0], "* %s" % msg).build())
+                self.increment_player_id()
 
         def send_global_message(self, user, message):
             self.msg(self.factory.channel, "[G] <%s> %s" % (user, message))
