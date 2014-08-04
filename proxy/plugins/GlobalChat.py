@@ -26,16 +26,17 @@ if ircMode:
     # noinspection PyUnresolvedReferences
     class GChatIRC(irc.IRCClient):
         currentPid = 0
+        userIds = {}
 
         def __init__(self):
             global ircNick
             self.nickname = ircNick
 
-        def increment_player_id(self):
-            if self.currentPid >= 10:
-                self.currentPid = 0
-            else:
+        def get_user_id(self, user):
+            if user not in self.userIds:
+                self.userIds[user] = self.currentPid
                 self.currentPid += 1
+            return self.userIds[user]
 
         def connectionMade(self):
             irc.IRCClient.connectionMade(self)
@@ -57,8 +58,8 @@ if ircMode:
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
-                            packetFactory.TeamChatPacket(self.currentPid, "[GIRC-%s]" % user.split("!")[0], msg).build())
-                self.increment_player_id()
+                            packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]), "[GIRC-%s]" % user.split("!")[0], msg).build())
+
 
         def action(self, user, channel, msg):
             if channel == self.factory.channel:
@@ -66,8 +67,7 @@ if ircMode:
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
-                            packetFactory.TeamChatPacket(self.currentPid, "[GIRC-%s]" % user.split("!")[0], "* %s" % msg).build())
-                self.increment_player_id()
+                            packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]), "[GIRC-%s]" % user.split("!")[0], "* %s" % msg).build())
 
         def send_global_message(self, user, message):
             self.msg(self.factory.channel, "[G] <%s> %s" % (user, message))
