@@ -158,9 +158,7 @@ def chat(context, params):
             if ircBot is not None:
                 import unicodedata
 
-                ircBot.send_global_message(
-                    "Console",
-                    unicodedata.normalize('NFKD', params[2:]).encode('ascii', 'ignore'))
+                ircBot.send_global_message("Console", params[:2].encode('utf-8'))
         for client in data.clients.connectedClients.values():
             if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
@@ -178,8 +176,7 @@ def chat(context, params):
             import unicodedata
 
             ircBot.send_global_message(
-                unicodedata.normalize('NFKD', data.players.playerList[context.playerId][0]).encode('ascii', 'ignore'),
-                unicodedata.normalize('NFKD', params[3:]).encode('ascii', 'ignore'))
+                data.players.playerList[context.playerId][0].encode('utf-8'), params[3:].encode('utf-8'))
     for client in data.clients.connectedClients.values():
         if client.get_preferences()['globalChat'] and client.get_handle() is not None:
             client.get_handle().send_crypto_packet(
