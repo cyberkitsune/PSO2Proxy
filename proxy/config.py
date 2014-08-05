@@ -43,7 +43,7 @@ class JSONConfig(object):
                 self._config_values[key] = value
                 print("[Config] Added new default %s for config %s" % (key, self.filename))
         if self.strict_mode:
-            for key in self.default_keys.keys():
+            for key in self._config_values.keys():
                 if key not in self.default_keys:
                     del self._config_values[key]
                     print("[Config] Deleted invlid key %s for config %s" % (key, self.filename))
