@@ -33,7 +33,9 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if not config.is_admin(player):
-            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins').append(player)))
+            current_admins = config.globalConfig.get_key('admins')
+            current_admins.append(player)
+            config.globalConfig.set_key('admins', current_admins)
             sender.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Proxy] {gre}%s added to admins successfully." % player,
                                                   0x3).build())
@@ -46,7 +48,9 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if not config.is_admin(player):
-            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins').append(player)))
+            current_admins = config.globalConfig.get_key('admins')
+            current_admins.append(player)
+            config.globalConfig.set_key('admins', current_admins)
             print("[ShipProxy] %s is now an admin!" % player)
         else:
             print("[ShipProxy] %s is already an admin!" % player)
@@ -62,7 +66,9 @@ def deop_player(sender, params):
             return
         player = params.split(" ")[1]
         if config.is_admin(player):
-            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins').remove(player)))
+            current_admins = config.globalConfig.get_key('admins')
+            current_admins.remove(player)
+            config.globalConfig.set_key('admins', current_admins)
             sender.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Proxy] {gre}%s has been removed from admins successfully." % player,
                                                   0x3).build())
@@ -75,7 +81,9 @@ def deop_player(sender, params):
             return
         player = params.split(" ")[1]
         if config.is_admin(player):
-            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins').remove(player)))
+            current_admins = config.globalConfig.get_key('admins')
+            current_admins.remove(player)
+            config.globalConfig.set_key('admins', current_admins)
             print("[ShipProxy] %s hes been removed from admins successfully!" % player)
         else:
             print("[ShipProxy] %s is not an admin!" % player)
