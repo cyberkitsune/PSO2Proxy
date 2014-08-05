@@ -105,10 +105,10 @@ def check_config(user):
         client_preferences = data.clients.connectedClients[user.playerId].get_preferences()
         if 'globalChat' not in client_preferences:
             if chatPreferences.key_exists(user.playerId):
-                client_preferences['globalChat'] = chatPreferences.getKey(user.playerId)['toggle']
+                client_preferences['globalChat'] = chatPreferences.get_key(user.playerId)['toggle']
             else:
                 client_preferences['globalChat'] = True
-                chatPreferences.setKey(user.playerId, {'toggle': True})
+                chatPreferences.set_key(user.playerId, {'toggle': True})
             if client_preferences['globalChat']:
                 user.send_crypto_packet(packetFactory.SystemMessagePacket(
                     "[Proxy] {red}Global chat is enabled, use |g <Message> to chat and |goff to disable it.",
@@ -129,9 +129,9 @@ def enable(context, params):
     context.send_crypto_packet(
         packetFactory.SystemMessagePacket("[GlobalChat] Global chat enabled for you.", 0x3).build())
     data.clients.connectedClients[context.playerId].set_preferences(preferences)
-    new_preferences = chatPreferences.getKey(context.playerId)
+    new_preferences = chatPreferences.get_key(context.playerId)
     new_preferences['toggle'] = True
-    chatPreferences.setKey(context.playerId, new_preferences)
+    chatPreferences.set_key(context.playerId, new_preferences)
     savePrefs()
 
 
@@ -143,9 +143,9 @@ def disable(context, params):
     context.send_crypto_packet(
         packetFactory.SystemMessagePacket("[GlobalChat] Global chat disabled for you.", 0x3).build())
     data.clients.connectedClients[context.playerId].set_preferences(preferences)
-    new_preferences = chatPreferences.getKey(context.playerId)
+    new_preferences = chatPreferences.get_key(context.playerId)
     new_preferences['toggle'] = False
-    chatPreferences.setKey(context.playerId, new_preferences)
+    chatPreferences.set_key(context.playerId, new_preferences)
 
 
 # noinspection PyUnresolvedReferences
