@@ -162,7 +162,7 @@ def chat_packet(context, data):
                 f(context, message)
             else:
                 context.send_crypto_packet(
-                    packetFactory.ChatPacket(context.playerId, "[Proxy] %s is not a command!" % command).build())
+                    packetFactory.SystemMessagePacket("[Proxy] {red}%s is not a command!" % command, 0x3).build())
             return None
         return data
     if player_id in players.playerList:
