@@ -280,7 +280,7 @@ def main():
         print("==== ERROR 001 ====")
         print("You have NOT configured the IP address for PSO2Proxy!")
         print(
-            "Please edit cfg/pso2proxy.config.json and change myIpAddr to your IP public IP address "
+            "Please edit cfg/pso2proxy.config.yml and change myIpAddr to your IP public IP address "
             "(Not LAN address if you're on a LAN!) ")
         print("After you fix this, please restart PSO2Proxy.")
         sys.exit(0)
