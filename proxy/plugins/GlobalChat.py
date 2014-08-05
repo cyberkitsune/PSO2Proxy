@@ -66,7 +66,7 @@ if ircMode:
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
                             packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]),
-                                                         "[GIRC-%s]" % user.split("!")[0], "* %s" % msg).build())
+                                                         "[GIRC-%s]" % user.split("!")[0], "* %s" % msg.decode('utf-8')).build())
 
         def send_global_message(self, user, message):
             self.msg(self.factory.channel, "[G] <%s> %s" % (user, message))
