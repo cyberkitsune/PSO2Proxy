@@ -9,7 +9,7 @@ import data.clients as clients
 import packetFactory
 from PSOCryptoUtils import PSO2RSADecrypt, PSO2RC4, PSO2RSAEncrypt
 import commands
-import plugins.plugins as packet_manager
+import plugins.plugins as plugin_manager
 from config import myIpAddress as ipAddress
 from config import blockNameMode as bNameMode
 from config import noisy as verbose
@@ -42,7 +42,8 @@ def login_packet(context, data):
     context.peer.myUsername = username
     if config.is_segaid_banned(username):
         print("[Bans] %s is banned! Disconnecting..." % username)
-        context.send_crypto_packet(packetFactory.SystemMessagePacket("You are banned from connecting to this PSO2Proxy.", 0x1).build())
+        context.send_crypto_packet(
+            packetFactory.SystemMessagePacket("You are banned from connecting to this PSO2Proxy.", 0x1).build())
         context.transport.loseConnection()
         context.peer.transport.loseConnection()
         return None
@@ -146,10 +147,18 @@ def chat_packet(context, data):
         if len(message) > 2 and message[0] == '|':
             command = (message.split(' ')[0])[1:]  # Get the first word (the command) and strip the '!''
             if command in commands.commandList:
+                if command.commandList[command][2] and not config.is_admin(context.myUsername):
+                    context.send_crypto_packet(packetFactory.SystemMessagePacket(
+                        "[Proxy] {red}You do not have permission to run this command.", 0x3).build())
+                    return
                 f = commands.commandList[command][0]
                 f(context, message)  # Lazy...
-            elif command in packet_manager.commands:
-                f = packet_manager.commands[command][0]
+            elif command in plugin_manager.commands:
+                if plugin_manager.commands[command][2] and not config.is_admin(context.myUsername):
+                    context.send_crypto_packet(packetFactory.SystemMessagePacket(
+                        "[Proxy] {red}You do not have permission to run this command.", 0x3).build())
+                    return
+                f = plugin_manager.commands[command][0]
                 f(context, message)
             else:
                 context.send_crypto_packet(
