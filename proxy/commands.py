@@ -33,7 +33,7 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if not config.is_admin(player):
-            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins')).append(player))
+            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins').append(player)))
             sender.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Proxy] {gre}%s added to admins successfully." % player,
                                                   0x3).build())
@@ -46,14 +46,14 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if not config.is_admin(player):
-            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins')).append(player))
+            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins').append(player)))
             print("[ShipProxy] %s is now an admin!" % player)
         else:
             print("[ShipProxy] %s is already an admin!" % player)
 
 
 @CommandHandler("deop", "Removes a player from the admin list. Admins Only.", True)
-def op_player(sender, params):
+def deop_player(sender, params):
     if not isinstance(sender, basic.LineReceiver):
         if len(params.split(" ")) < 2:
             sender.send_crypto_packet(
@@ -62,7 +62,7 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if config.is_admin(player):
-            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins')).remove(player))
+            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins').remove(player)))
             sender.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Proxy] {gre}%s has been removed from admins successfully." % player,
                                                   0x3).build())
@@ -75,7 +75,7 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if config.is_admin(player):
-            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins')).remove(player))
+            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins').remove(player)))
             print("[ShipProxy] %s hes been removed from admins successfully!" % player)
         else:
             print("[ShipProxy] %s is not an admin!" % player)
