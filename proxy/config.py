@@ -48,7 +48,7 @@ class JSONConfig(object):
                     del self._config_values[key]
                     print("[Config] Deleted invlid key %s for config %s" % (key, self.filename))
                 else:
-                    if isinstance(self._config_values[key], None):
+                    if self._config_values[key] is None:
                         self._config_values[key] = self.default_keys[key]
                         print("[Config] Resetting invalid key type for %s in config %s." % (key, self.filename))
         self._save_config()
