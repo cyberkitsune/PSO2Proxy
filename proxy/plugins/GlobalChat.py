@@ -5,7 +5,7 @@ import data.players
 from twisted.protocols import basic
 from config import YAMLConfig
 
-ircSettings = YAMLConfig("cfg/gchat-irc.config.yaml",
+ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
                          {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': ""}, True)
 
 ircMode = ircSettings.get_key('enabled')

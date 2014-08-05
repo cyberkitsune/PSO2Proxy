@@ -16,7 +16,7 @@ from config import YAMLConfig as ConfigModel
 import plugins
 
 
-web_api_config = ConfigModel("cfg/webapi.config.json", {"enabled": True, "ServerName": "Unnamed Server"}, True)
+web_api_config = ConfigModel("cfg/webapi.config.yml", {"enabled": True, "ServerName": "Unnamed Server"}, True)
 
 upStart = calendar.timegm(datetime.datetime.utcnow().utctimetuple())
 peakPlayers = 0

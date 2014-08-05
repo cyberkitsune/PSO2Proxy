@@ -75,7 +75,7 @@ class YAMLConfig(object):
 
 banList = []
 
-globalConfig = YAMLConfig("cfg/pso2proxy.config.json",
+globalConfig = YAMLConfig("cfg/pso2proxy.config.yml",
                           {'packetLogging': False, 'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 0,
                            'noisy': False, 'admins': [], 'enabledShips': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}, True)
 
