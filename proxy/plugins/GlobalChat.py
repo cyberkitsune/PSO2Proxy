@@ -1,21 +1,19 @@
-import json
-import os
-
 import plugins
 import packetFactory
 import data.clients
 import data.players
 from twisted.protocols import basic
+from config import JSONConfig
 
+ircSettings = JSONConfig("cfg/gchat-irc.config.json",
+                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': ""}, True)
 
-ircMode = False
-ircNick = "PSO2IRCBot"
-ircServer = ("irc.badnik.net", 6667)
-ircChannel = "#pso2proxygchat"
+ircMode = ircSettings.get_key('enabled')
+ircNick = ircSettings.get_key('nick')
+ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
+ircChannel = ircSettings.get_key('channel')
 
-# Do not edit below this line
-
-globalchat_user_preferences = {}
+chatPreferences = JSONConfig("cfg/gchat.prefs.json")
 
 if ircMode:
     from twisted.words.protocols import irc
@@ -58,8 +56,8 @@ if ircMode:
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
-                            packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]), "[GIRC-%s]" % user.split("!")[0], msg).build())
-
+                            packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]),
+                                                         "[GIRC-%s]" % user.split("!")[0], msg).build())
 
         def action(self, user, channel, msg):
             if channel == self.factory.channel:
@@ -67,7 +65,8 @@ if ircMode:
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
-                            packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]), "[GIRC-%s]" % user.split("!")[0], "* %s" % msg).build())
+                            packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]),
+                                                         "[GIRC-%s]" % user.split("!")[0], "* %s" % msg).build())
 
         def send_global_message(self, user, message):
             self.msg(self.factory.channel, "[G] <%s> %s" % (user, message))
@@ -89,19 +88,8 @@ if ircMode:
 
 @plugins.on_start_hook
 def create_preferences():
-    global globalchat_user_preferences
+    global chatPreferences
     global ircMode
-    if not os.path.exists("cfg/gchat.prefs.json"):
-        f = open('cfg/gchat.prefs.json', 'w')
-        f.write(json.dumps(globalchat_user_preferences))
-        f.close()
-        print("[GlobalChat] Created user preferences.")
-    else:
-        f = open('cfg/gchat.prefs.json', 'r')
-        preferences = f.read()
-        f.close()
-        globalchat_user_preferences = json.loads(preferences)
-        print('[GlobalChat] Loaded %i users preferences.' % len(globalchat_user_preferences))
     if ircMode:
         global ircChannel
         global ircServer
@@ -112,17 +100,15 @@ def create_preferences():
 # noinspection PyUnresolvedReferences
 @plugins.on_connection_hook
 def check_config(user):
-    global globalchat_user_preferences
+    global chatPreferences
     if user.playerId in data.clients.connectedClients:
         client_preferences = data.clients.connectedClients[user.playerId].get_preferences()
         if 'globalChat' not in client_preferences:
-            if user.playerId in globalchat_user_preferences:
-                client_preferences['globalChat'] = globalchat_user_preferences[user.playerId]['toggle']
+            if chatPreferences.keyExists(user.playerId):
+                client_preferences['globalChat'] = chatPreferences.getKey(user.playerId)['toggle']
             else:
                 client_preferences['globalChat'] = True
-                globalchat_user_preferences[user.playerId] = {}
-                globalchat_user_preferences[user.playerId]['toggle'] = True
-                savePrefs()
+                chatPreferences.setKey(user.playerId, {'toggle': True})
             if client_preferences['globalChat']:
                 user.send_crypto_packet(packetFactory.SystemMessagePacket(
                     "[Proxy] {red}Global chat is enabled, use |g <Message> to chat and |goff to disable it.",
@@ -134,23 +120,18 @@ def check_config(user):
         data.clients.connectedClients[user.playerId].set_preferences(client_preferences)
 
 
-def savePrefs():
-    f = open('cfg/gchat.prefs.json', 'w')
-    f.write(json.dumps(globalchat_user_preferences))
-    f.close()
-    print("[GlobalChat] Saved user prefrences.")
-
-
 # noinspection PyUnresolvedReferences
 @plugins.CommandHook("gon", "Enable global chat.")
 def enable(context, params):
-    global globalchat_user_preferences
+    global chatPreferences
     preferences = data.clients.connectedClients[context.playerId].get_preferences()
     preferences['globalChat'] = True
     context.send_crypto_packet(
         packetFactory.SystemMessagePacket("[GlobalChat] Global chat enabled for you.", 0x3).build())
     data.clients.connectedClients[context.playerId].set_preferences(preferences)
-    globalchat_user_preferences[context.playerId]['toggle'] = True
+    new_preferences = chatPreferences.getKey(context.playerId)
+    new_preferences['toggle'] = True
+    chatPreferences.setKey(context.playerId, new_preferences)
     savePrefs()
 
 
@@ -162,9 +143,9 @@ def disable(context, params):
     context.send_crypto_packet(
         packetFactory.SystemMessagePacket("[GlobalChat] Global chat disabled for you.", 0x3).build())
     data.clients.connectedClients[context.playerId].set_preferences(preferences)
-    data.clients.connectedClients[context.playerId].set_preferences(preferences)
-    globalchat_user_preferences[context.playerId]['toggle'] = False
-    savePrefs()
+    new_preferences = chatPreferences.getKey(context.playerId)
+    new_preferences['toggle'] = False
+    chatPreferences.setKey(context.playerId, new_preferences)
 
 
 # noinspection PyUnresolvedReferences

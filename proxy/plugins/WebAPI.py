@@ -4,19 +4,19 @@ import datetime
 import os
 
 from twisted.web.resource import Resource
-from twisted.web import server
 from twisted.internet import reactor
 from twisted.internet.endpoints import TCP4ServerEndpoint
 
 import data.clients
 import data.players
 import data.blocks
-from config import webapi_enabled
 from config import bindIp as interfaceIp
 from config import myIpAddress as hostName
-from config import serverName as serverName
+from config import JSONConfig as ConfigModel
 import plugins
 
+
+web_api_config = ConfigModel("cfg/webapi.config.json", {"enabled": True, "ServerName": "Unnamed Server"}, True)
 
 upStart = calendar.timegm(datetime.datetime.utcnow().utctimetuple())
 peakPlayers = 0
@@ -29,7 +29,7 @@ class JSONConfig(Resource):
     @staticmethod
     def render_GET(request):
         request.setHeader("content-type", "application/json")
-        config_json = {'version': 1, "name": serverName, "publickeyurl": "http://%s:8080/publickey.blob" % hostName, "host": hostName}
+        config_json = {'version': 1, "name": web_api_config.get_key('ServerName'), "publickeyurl": "http://%s:8080/publickey.blob" % hostName, "host": hostName}
         return json.dumps(config_json)
 
 
@@ -65,7 +65,7 @@ class WebAPI(Resource):
 
 @plugins.on_start_hook
 def setup_web_api():
-    if webapi_enabled:
+    if web_api_config.get_key("enabled"):
         from twisted.web import server
         if not os.path.exists("keys/publickey.blob"):
             print("[WebAPI] === Error ===")

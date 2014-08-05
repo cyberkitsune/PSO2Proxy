@@ -1,7 +1,7 @@
 from twisted.protocols import basic
 from twisted.internet import reactor
 
-import plugins.plugins as pManager
+import plugins.plugins as plugin_manager
 import packetFactory
 import config
 import data.clients
@@ -37,8 +37,7 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if not config.is_admin(player):
-            config.configKeys['admins'].append(player)
-            config.save_config()
+            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins')).append(player))
             sender.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Proxy] {gre}%s added to admins successfully." % player,
                                                   0x3).build())
@@ -51,8 +50,7 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if not config.is_admin(player):
-            config.configKeys['admins'].append(player)
-            config.save_config()
+            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins')).append(player))
             print("[ShipProxy] %s is now an admin!" % player)
         else:
             print("[ShipProxy] %s is already an admin!" % player)
@@ -73,8 +71,7 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if config.is_admin(player):
-            config.configKeys['admins'].remove(player)
-            config.save_config()
+            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins')).remove(player))
             sender.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Proxy] {gre}%s has been removed from admins successfully." % player,
                                                   0x3).build())
@@ -87,8 +84,7 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if config.is_admin(player):
-            config.configKeys['admins'].remove(player)
-            config.save_config()
+            config.globalConfig.set_key('admins', (config.globalConfig.get_key('admins')).remove(player))
             print("[ShipProxy] %s hes been removed from admins successfully!" % player)
         else:
             print("[ShipProxy] %s is not an admin!" % player)
@@ -103,7 +99,7 @@ def help_command(sender, params):
             if cData[1] is not None:
                 user_command_count += 1
                 string += "|%s - %s\n\n" % (command, cData[1])
-        for command, cData in pManager.commands.iteritems():
+        for command, cData in plugin_manager.commands.iteritems():
             if cData[1] is not None:
                 user_command_count += 1
                 string += "|%s - %s\n\n" % (command, cData[1])
