@@ -22,7 +22,7 @@ class CommandHandler(object):
         commandList[self.commandName] = [f, self.help_text]
 
 
-@CommandHandler("op", "Makes a player an admin. {red}Admins Only.{def}")
+@CommandHandler("op", "Makes a player an admin. Admins Only.")
 def op_player(sender, params):
     if not isinstance(sender, basic.LineReceiver):
         if not config.is_admin(sender.myUsername):
@@ -56,7 +56,7 @@ def op_player(sender, params):
             print("[ShipProxy] %s is already an admin!" % player)
 
 
-@CommandHandler("deop", "Removes a player from the admin list. {red}Admins Only.{def}")
+@CommandHandler("deop", "Removes a player from the admin list. Admins Only.")
 def op_player(sender, params):
     if not isinstance(sender, basic.LineReceiver):
         if not config.is_admin(sender.myUsername):
@@ -124,7 +124,7 @@ def reload_bans(sender, params):
         config.load_bans()
 
 
-@CommandHandler("listbans", "Prints the ban list. {red]Admins only.{def}")
+@CommandHandler("listbans", "Prints the ban list. Admins only.")
 def list_bans(sender, params):
     if isinstance(sender, basic.LineReceiver):
         for ban in config.banList:
@@ -146,7 +146,7 @@ def list_bans(sender, params):
         sender.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
 
 
-@CommandHandler("ban", "Bans somebody from the proxy. {red}Admins only.{def}")
+@CommandHandler("ban", "Bans somebody from the proxy. Admins only.")
 def ban(sender, params):
     if isinstance(sender, basic.LineReceiver):
         args = params.split(' ')
@@ -203,7 +203,7 @@ def ban(sender, params):
             return
 
 
-@CommandHandler("unban", "Unbans somebody from the proxy. {red}Admins only.{def}")
+@CommandHandler("unban", "Unbans somebody from the proxy. Admins only.")
 def ban(sender, params):
     if isinstance(sender, basic.LineReceiver):
         args = params.split(' ')
@@ -259,7 +259,7 @@ def ban(sender, params):
                 "[Command] {red}Invalid usage! Proper usage, |unban <segaid/pid> <value>", 0x3).build())
             return
 
-@CommandHandler("kick", "Kicks a client from the proxy. {red}Admins only.{def}")
+@CommandHandler("kick", "Kicks a client from the proxy. Admins only.")
 def kick(sender, params):
     if isinstance(sender, basic.LineReceiver):
         args = params.split(' ')
@@ -298,7 +298,7 @@ def kick(sender, params):
 
 
 @CommandHandler("clients",
-                "Lists all clients, SEGA IDs, and IP Addresses connected to the proxy. {red}Admins only.{def}")
+                "Lists all clients, SEGA IDs, and IP Addresses connected to the proxy. Admins only.")
 def list_clients(sender, params):
     if isinstance(sender, basic.LineReceiver):
         print("[ClientList] === Connected Clients (%i total) ===" % len(data.clients.connectedClients))
@@ -350,7 +350,7 @@ def list_clients(sender, params):
         sender.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
 
 
-@CommandHandler("globalmsg", "Sends a global message to everyone on the server. {red}Admins only.{def}")
+@CommandHandler("globalmsg", "Sends a global message to everyone on the server. Admins only.")
 def global_message(sender, params):
     if isinstance(sender, basic.LineReceiver):
         if len(params.split(' ', 2)) < 3:
