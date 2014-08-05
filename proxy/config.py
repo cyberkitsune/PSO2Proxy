@@ -47,6 +47,10 @@ class JSONConfig(object):
                 if key not in self.default_keys:
                     del self._config_values[key]
                     print("[Config] Deleted invlid key %s for config %s" % (key, self.filename))
+                else:
+                    if not isinstance(self._config_values[key], type(self.default_keys[key])):
+                        self._config_values[key] = self.default_keys[key]
+                        print("[Config] Resetting invalid key type for %s in config %s." % (key, self.filename))
         self._save_config()
 
     def get_key(self, key):
