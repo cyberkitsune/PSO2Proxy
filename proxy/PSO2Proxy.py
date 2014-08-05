@@ -8,6 +8,7 @@ import os
 import exceptions
 import sys
 import traceback
+import config
 
 from twisted.internet import protocol, reactor, stdio
 from twisted.protocols import basic
@@ -20,10 +21,10 @@ import data.blocks as blocks
 import data.clients as clients
 import plugins.plugins as plugin_manager
 from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
-from config import packetLogging as logPackets
+from config import packetLogging as logPackets  # Do this better
 from config import myIpAddress as myIp
 from config import bindIp
-from config import noisy as verbose
+from config import noisy as verbose  # // Do this better
 
 
 class ShipProxy(protocol.Protocol):
@@ -302,7 +303,7 @@ def main():
         print("After you fix this, please restart PSO2Proxy.")
         sys.exit(0)
 
-    for shipNum in xrange(0, 10):
+    for shipNum in config.globalConfig.get_key('enabledShips'):
         query_endpoint = TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=interface_ip)
         query_endpoint.listen(BlockScraperFactory())
         ship_endpoint = TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=interface_ip)
