@@ -16,7 +16,7 @@ from config import YAMLConfig as ConfigModel
 import plugins
 
 
-web_api_config = ConfigModel("cfg/webapi.config.yml", {"enabled": True, "ServerName": "Unnamed Server"}, True)
+web_api_config = ConfigModel("cfg/webapi.config.yml", {"port": 8080, "ServerName": "Unnamed Server"}, True)
 
 upStart = calendar.timegm(datetime.datetime.utcnow().utctimetuple())
 peakPlayers = 0
@@ -65,19 +65,18 @@ class WebAPI(Resource):
 
 @plugins.on_start_hook
 def setup_web_api():
-    if web_api_config.get_key("enabled"):
-        from twisted.web import server
-        if not os.path.exists("keys/publickey.blob"):
-            print("[WebAPI] === Error ===")
-            print("[WebAPI] Your public key is not in keys/publickey.blob !!")
-            print("[WebAPI] As a result, webapi will be disabled !!")
-            print("[WebAPI] Please fix this and restart the proxy.")
-            return
-        web_endpoint = TCP4ServerEndpoint(reactor, 8080, interface=interfaceIp)
-        web_resource = WebAPI()
-        web_resource.putChild("config.json", JSONConfig())
-        web_resource.putChild("publickey.blob", PublicKey())
-        web_endpoint.listen(server.Site(web_resource))
+    from twisted.web import server
+    if not os.path.exists("keys/publickey.blob"):
+        print("[WebAPI] === Error ===")
+        print("[WebAPI] Your public key is not in keys/publickey.blob !!")
+        print("[WebAPI] As a result, webapi will be disabled !!")
+        print("[WebAPI] Please fix this and restart the proxy.")
+        return
+    web_endpoint = TCP4ServerEndpoint(reactor, web_api_config.get_key('port'), interface=interfaceIp)
+    web_resource = WebAPI()
+    web_resource.putChild("config.json", JSONConfig())
+    web_resource.putChild("publickey.blob", PublicKey())
+    web_endpoint.listen(server.Site(web_resource))
 
 
 @plugins.on_connection_hook
