@@ -327,7 +327,7 @@ def global_message(sender, params):
         for client in data.clients.connectedClients.values():
             if client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
-                    packetFactory.SystemMessagePacket("{ora}[Proxy Global Message]{def} %s" % message, mode).build())
+                    packetFactory.SystemMessagePacket("[Proxy Global Message] %s" % message, mode).build())
         print("[ShipProxy] Sent global message!")
     else:
         if len(params.split(' ', 2)) < 3:
@@ -338,7 +338,7 @@ def global_message(sender, params):
         for client in data.clients.connectedClients.values():
             if client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
-                    packetFactory.SystemMessagePacket("{ora}[Proxy Global Message]{def} %s" % message, mode).build())
+                    packetFactory.SystemMessagePacket("[Proxy Global Message] %s" % message, mode).build())
 
 
 @CommandHandler("exit")
