@@ -303,11 +303,13 @@ def main():
         print("After you fix this, please restart PSO2Proxy.")
         sys.exit(0)
 
+    for shipNum in range(0, 10):  # PSO2 Checks all ships round robin, so sadly for max compatibility we have to open these no matter what ships are enabled...
+        ship_endpoint = TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=interface_ip)
+        ship_endpoint.listen(ShipAdvertiserFactory())
+
     for shipNum in config.globalConfig.get_key('enabledShips'):
         query_endpoint = TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=interface_ip)
         query_endpoint.listen(BlockScraperFactory())
-        ship_endpoint = TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=interface_ip)
-        ship_endpoint.listen(ShipAdvertiserFactory())
         print("[ShipProxy] Bound port %i for ship %i query server!" % ((12000 + (100 * shipNum)), shipNum))
         bound = 0
         for blockNum in xrange(1, 99):
