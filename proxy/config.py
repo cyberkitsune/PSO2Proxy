@@ -28,7 +28,7 @@ class JSONConfig(object):
 
     def _make_default_config(self):
         try:
-            os.makedirs(self.filename)
+            os.makedirs(os.path.dirname(self.filename))
         except:
             pass
         f = open(self.filename, "w")
