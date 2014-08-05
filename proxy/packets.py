@@ -147,7 +147,7 @@ def chat_packet(context, data):
         if len(message) > 2 and message[0] == '|':
             command = (message.split(' ')[0])[1:]  # Get the first word (the command) and strip the '!''
             if command in commands.commandList:
-                if command.commandList[command][2] and not config.is_admin(context.myUsername):
+                if commands.commandList[command][2] and not config.is_admin(context.myUsername):
                     context.send_crypto_packet(packetFactory.SystemMessagePacket(
                         "[Proxy] {red}You do not have permission to run this command.", 0x3).build())
                     return
