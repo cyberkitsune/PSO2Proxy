@@ -11,6 +11,7 @@
 *.iml
 .idea/*
 proxy/cfg/*.json
+proxy/cfg/*.yml
 tools/PSO2KeyTools/Dumper
 tools/PSO2KeyTools/Debug
 tools/PSO2KeyTools/Release
