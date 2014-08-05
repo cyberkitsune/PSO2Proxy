@@ -12,7 +12,7 @@ import data.players
 import data.blocks
 from config import bindIp as interfaceIp
 from config import myIpAddress as hostName
-from config import JSONConfig as ConfigModel
+from config import YAMLConfig as ConfigModel
 import plugins
 
 

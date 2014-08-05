@@ -1,8 +1,9 @@
+import yaml
 import json
 import os.path
 
 
-class JSONConfig(object):
+class YAMLConfig(object):
     _config_values = {}
 
     def __init__(self, filename, default_keys={}, strict_mode=False):
@@ -16,14 +17,14 @@ class JSONConfig(object):
             self._make_default_config()
         else:
             f = open(self.filename, 'r')
-            self._config_values = json.load(f)
+            self._config_values = yaml.load(f)
             f.close()
             self._validate_config()
         print("[Config] Config %s loaded!" % self.filename)
 
     def _save_config(self):
         f = open(self.filename, "w")
-        json.dump(self._config_values, f, indent=1)
+        yaml.dump(self._config_values, f, indent=1)
         f.close()
 
     def _make_default_config(self):
@@ -32,7 +33,7 @@ class JSONConfig(object):
         except:
             pass
         f = open(self.filename, "w")
-        json.dump(self.default_keys, f, indent=1)
+        yaml.dump(self.default_keys, f, indent=1)
         f.close()
         print("[Config] Default config for %s created." % self.filename)
         self._load_config()
@@ -74,7 +75,7 @@ class JSONConfig(object):
 
 banList = []
 
-globalConfig = JSONConfig("cfg/pso2proxy.config.json",
+globalConfig = YAMLConfig("cfg/pso2proxy.config.json",
                           {'packetLogging': False, 'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 0,
                            'noisy': False, 'admins': [], 'enabledShips': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}, True)
 

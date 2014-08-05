@@ -3,9 +3,9 @@ import packetFactory
 import data.clients
 import data.players
 from twisted.protocols import basic
-from config import JSONConfig
+from config import YAMLConfig
 
-ircSettings = JSONConfig("cfg/gchat-irc.config.json",
+ircSettings = YAMLConfig("cfg/gchat-irc.config.yaml",
                          {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': ""}, True)
 
 ircMode = ircSettings.get_key('enabled')
@@ -13,7 +13,7 @@ ircNick = ircSettings.get_key('nick')
 ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
 ircChannel = ircSettings.get_key('channel')
 
-chatPreferences = JSONConfig("cfg/gchat.prefs.json")
+chatPreferences = YAMLConfig("cfg/gchat.prefs.json")
 
 if ircMode:
     from twisted.words.protocols import irc
