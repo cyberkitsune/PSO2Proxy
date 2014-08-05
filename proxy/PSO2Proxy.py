@@ -252,14 +252,15 @@ class ServerConsole(basic.LineReceiver):
     def lineReceived(self, line):
         try:
             command = line.split(' ')[0]
-            if command in commandList:
-                f = commandList[command][0]
-                f(self, line)
-            elif command in plugin_manager.commands:
-                plugin_f = plugin_manager.commands[command][0]
-                plugin_f(self, line)
-            else:
-                print("[Command] Command %s not found!" % command)
+            if command != "":
+                if command in commandList:
+                    f = commandList[command][0]
+                    f(self, line)
+                elif command in plugin_manager.commands:
+                    plugin_f = plugin_manager.commands[command][0]
+                    plugin_f(self, line)
+                else:
+                    print("[Command] Command %s not found!" % command)
         except:
             e = traceback.format_exc()
             print("[ShipProxy] Error Occurred: %s" % e)
