@@ -89,6 +89,17 @@ def is_admin(sega_id):
         return False
 
 
+def load_block_names():
+    global blockNames
+    if os.path.exists("cfg/blocknames.resources.json") and globalConfig.get_key('blockNameMode') == 1:
+        f = open("cfg/blocknames.resources.json", 'r')
+        blockNames = json.load(f)
+        f.close()
+        print("[ShipProxy] %s Block names loaded!" % len(blockNames))
+
+load_block_names()
+
+
 def load_bans():
     global banList
     if not os.path.exists('cfg/pso2proxy.bans.json'):
