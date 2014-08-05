@@ -132,7 +132,6 @@ def enable(context, params):
     new_preferences = chatPreferences.get_key(context.playerId)
     new_preferences['toggle'] = True
     chatPreferences.set_key(context.playerId, new_preferences)
-    savePrefs()
 
 
 # noinspection PyUnresolvedReferences
