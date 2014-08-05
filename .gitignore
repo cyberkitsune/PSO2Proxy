@@ -10,10 +10,13 @@
 *.xml
 *.iml
 .idea/*
-proxy/config/cfg/*.config.json
+proxy/cfg/*.json
 tools/PSO2KeyTools/Dumper
 tools/PSO2KeyTools/Debug
 tools/PSO2KeyTools/Release
 tools/PSO2KeyTools/PSO2KeyInjector/Dumper
 tools/PSO2KeyTools/PSO2KeyInjector/Debug
 tools/PSO2KeyTools/PSO2KeyInjector/Release
+log/
+proxy/keys/*.blob
+proxy/keys/*.pem
