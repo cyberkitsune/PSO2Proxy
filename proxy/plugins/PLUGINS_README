@@ -1,0 +1,4 @@
+Put plugins you want to use in this folder
+Put plugins you don't want in disabled
+
+(Or symlink so updates work)

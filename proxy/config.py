@@ -1,73 +1,103 @@
+import yaml
 import json
 import os.path
 
+
+class YAMLConfig(object):
+    _config_values = {}
+
+    def __init__(self, filename, default_keys={}, strict_mode=False):
+        self.filename = filename
+        self.default_keys = default_keys
+        self.strict_mode = strict_mode
+        self._load_config()
+
+    def _load_config(self):
+        if not os.path.exists(self.filename):
+            self._make_default_config()
+        else:
+            f = open(self.filename, 'r')
+            self._config_values = yaml.load(f)
+            f.close()
+            self._validate_config()
+        print("[Config] Config %s loaded!" % self.filename)
+
+    def _save_config(self):
+        f = open(self.filename, "w")
+        yaml.dump(self._config_values, f, indent=1)
+        f.close()
+
+    def _make_default_config(self):
+        try:
+            os.makedirs(os.path.dirname(self.filename))
+        except:
+            pass
+        f = open(self.filename, "w")
+        yaml.dump(self.default_keys, f, indent=1)
+        f.close()
+        print("[Config] Default config for %s created." % self.filename)
+        self._load_config()
+
+    def _validate_config(self):
+        for key, value in self.default_keys.iteritems():
+            if key not in self._config_values:
+                self._config_values[key] = value
+                print("[Config] Added new default %s for config %s" % (key, self.filename))
+        if self.strict_mode:
+            for key in self._config_values.keys():
+                if key not in self.default_keys:
+                    del self._config_values[key]
+                    print("[Config] Deleted invlid key %s for config %s" % (key, self.filename))
+                else:
+                    if self._config_values[key] is None:
+                        self._config_values[key] = self.default_keys[key]
+                        print("[Config] Resetting invalid key type for %s in config %s." % (key, self.filename))
+        self._save_config()
+
+    def get_key(self, key):
+        if key not in self._config_values:
+            raise KeyError
+        if isinstance(self._config_values[key], unicode):
+            return self._config_values[key].encode('utf-8')
+        else:
+            return self._config_values[key]
+
+    def set_key(self, key, value):
+        self._config_values[key] = value
+        self._save_config()
+
+    def key_exists(self, key):
+        if key in self._config_values:
+            return True
+        else:
+            return False
+
+
 banList = []
 
-defaultConfigKeys = {'packetLogging': False, 'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 0,
-                     'noisy': False,
-                     'webapi': False, 'admins': []}
-
-configKeys = {}
+globalConfig = YAMLConfig("cfg/pso2proxy.config.yml",
+                          {'packetLogging': False, 'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 0,
+                           'noisy': False, 'admins': [], 'enabledShips': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}, True)
 
 blockNames = {}
 
 
-def load_config():
-    global configKeys
-    global defaultConfigKeys
-    global blockNames
-    if not os.path.exists('cfg/pso2proxy.config.json'):
-        try:
-            os.makedirs('cfg/')
-        except:
-            pass
-        make_default_config()
-    f = open('cfg/pso2proxy.config.json', 'r')
-    new_config = f.read()
-    f.close()
-    configKeys = json.loads(new_config)
-    configKeys = verify_config_keys(configKeys)
-    print("[ShipProxy] Config loaded!")
-    f = open('cfg/pso2proxy.config.json', 'w')
-    f.write(json.dumps(configKeys, indent=1))
-    f.close()
-    if os.path.exists('cfg/blocknames.resource.json'):
-        b = open('cfg/blocknames.resource.json', 'r')
-        block_json = b.read()
-        blockNames = json.loads(block_json)
-        print('[ShipProxy] Block names loaded!')
-
-
 def is_admin(sega_id):
-    global configKeys
-    if sega_id in configKeys['admins']:
+    if sega_id in globalConfig.get_key('admins'):
         return True
     else:
         return False
 
 
-def save_config():
-    f = open('cfg/pso2proxy.config.json', 'w')
-    f.write(json.dumps(configKeys, indent=1))
-    f.close()
-    print("[ShipProxy] Config saved!")
+def load_block_names():
+    global blockNames
+    if os.path.exists("cfg/blocknames.resources.json") and globalConfig.get_key('blockNameMode') == 1:
+        f = open("cfg/blocknames.resources.json", 'r')
+        blockNames = json.load(f)
+        f.close()
+        print("[ShipProxy] %s Block names loaded!" % len(blockNames))
 
-
-def verify_config_keys(config_dict):
-    global defaultConfigKeys
-    for key, value in defaultConfigKeys.iteritems():
-        if key not in config_dict:
-            config_dict[key] = value
-            print("[Config] Adding default option for config key %s as it did not exist before." % key)
-    return config_dict
-
-
-def make_default_config():
-    global configKeys
-    json_encoded = json.dumps(defaultConfigKeys, indent=1)
-    f = open('cfg/pso2proxy.config.json', 'w')
-    f.write(json_encoded)
-    f.close()
+load_block_names()
 
 
 def load_bans():
@@ -109,13 +139,11 @@ def is_player_id_banned(player_id):
     return False
 
 
-load_config()
 load_bans()
 
-packetLogging = configKeys['packetLogging']
-myIpAddress = configKeys['myIpAddr']
-bindIp = configKeys['bindIp']
-blockNameMode = configKeys['blockNameMode']
-noisy = configKeys['noisy']
-webapi_enabled = configKeys['webapi']
-admins = configKeys['admins']
+packetLogging = globalConfig.get_key('packetLogging')
+myIpAddress = globalConfig.get_key('myIpAddr')
+bindIp = globalConfig.get_key('bindIp')
+blockNameMode = globalConfig.get_key('blockNameMode')
+noisy = globalConfig.get_key('noisy')
+admins = globalConfig.get_key('admins')

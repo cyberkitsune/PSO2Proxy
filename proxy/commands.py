@@ -1,7 +1,7 @@
 from twisted.protocols import basic
 from twisted.internet import reactor
 
-import plugins.plugins as pManager
+import plugins.plugins as plugin_manager
 import packetFactory
 import config
 import data.clients
@@ -13,23 +13,19 @@ commandList = {}
 
 
 class CommandHandler(object):
-    def __init__(self, command_name, help_text=None):
+    def __init__(self, command_name, help_text=None, admin_conly=False):
         self.commandName = command_name
         self.help_text = help_text
+        self.admin_only = admin_conly
 
     def __call__(self, f):
         global commandList
-        commandList[self.commandName] = [f, self.help_text]
+        commandList[self.commandName] = [f, self.help_text, self.admin_only]
 
 
-@CommandHandler("op", "Makes a player an admin. {red}Admins Only.{def}")
+@CommandHandler("op", "Makes a player an admin. Admins Only.", True)
 def op_player(sender, params):
     if not isinstance(sender, basic.LineReceiver):
-        if not config.is_admin(sender.myUsername):
-            sender.send_crypto_packet(
-                packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.",
-                                                  0x3).build())
-            return
         if len(params.split(" ")) < 2:
             sender.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Proxy] {red}Not enough arguments. Usage: |op <segaid>",
@@ -37,8 +33,9 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if not config.is_admin(player):
-            config.configKeys['admins'].append(player)
-            config.save_config()
+            current_admins = config.globalConfig.get_key('admins')
+            current_admins.append(player)
+            config.globalConfig.set_key('admins', current_admins)
             sender.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Proxy] {gre}%s added to admins successfully." % player,
                                                   0x3).build())
@@ -51,21 +48,17 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if not config.is_admin(player):
-            config.configKeys['admins'].append(player)
-            config.save_config()
+            current_admins = config.globalConfig.get_key('admins')
+            current_admins.append(player)
+            config.globalConfig.set_key('admins', current_admins)
             print("[ShipProxy] %s is now an admin!" % player)
         else:
             print("[ShipProxy] %s is already an admin!" % player)
 
 
-@CommandHandler("deop", "Removes a player from the admin list. {red}Admins Only.{def}")
-def op_player(sender, params):
+@CommandHandler("deop", "Removes a player from the admin list. Admins Only.", True)
+def deop_player(sender, params):
     if not isinstance(sender, basic.LineReceiver):
-        if not config.is_admin(sender.myUsername):
-            sender.send_crypto_packet(
-                packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.",
-                                                  0x3).build())
-            return
         if len(params.split(" ")) < 2:
             sender.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Proxy] {red}Not enough arguments. Usage: |deop <segaid>",
@@ -73,8 +66,9 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if config.is_admin(player):
-            config.configKeys['admins'].remove(player)
-            config.save_config()
+            current_admins = config.globalConfig.get_key('admins')
+            current_admins.remove(player)
+            config.globalConfig.set_key('admins', current_admins)
             sender.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Proxy] {gre}%s has been removed from admins successfully." % player,
                                                   0x3).build())
@@ -87,8 +81,9 @@ def op_player(sender, params):
             return
         player = params.split(" ")[1]
         if config.is_admin(player):
-            config.configKeys['admins'].remove(player)
-            config.save_config()
+            current_admins = config.globalConfig.get_key('admins')
+            current_admins.remove(player)
+            config.globalConfig.set_key('admins', current_admins)
             print("[ShipProxy] %s hes been removed from admins successfully!" % player)
         else:
             print("[ShipProxy] %s is not an admin!" % player)
@@ -103,7 +98,7 @@ def help_command(sender, params):
             if cData[1] is not None:
                 user_command_count += 1
                 string += "|%s - %s\n\n" % (command, cData[1])
-        for command, cData in pManager.commands.iteritems():
+        for command, cData in plugin_manager.commands.iteritems():
             if cData[1] is not None:
                 user_command_count += 1
                 string += "|%s - %s\n\n" % (command, cData[1])
@@ -128,18 +123,13 @@ def reload_bans(sender, params):
         config.load_bans()
 
 
-@CommandHandler("listbans", "Prints the ban list. {red]Admins only.{def}")
+@CommandHandler("listbans", "Prints the ban list. Admins only.", True)
 def list_bans(sender, params):
     if isinstance(sender, basic.LineReceiver):
         for ban in config.banList:
             print('[Bans] %s is banned.' % str(ban))
         print('[Bans] %i bans total.' % len(config.banList))
     else:
-        if not config.is_admin(sender.myUsername):
-            sender.send_crypto_packet(
-                packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.",
-                                                  0x3).build())
-            return
         string = "=== Ban List ===\n"
         for ban in config.banList:
             if 'segaId' in ban:
@@ -150,7 +140,7 @@ def list_bans(sender, params):
         sender.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
 
 
-@CommandHandler("ban", "Bans somebody from the proxy. {red}Admins only.{def}")
+@CommandHandler("ban", "Bans somebody from the proxy. Admins only.", True)
 def ban(sender, params):
     if isinstance(sender, basic.LineReceiver):
         args = params.split(' ')
@@ -173,11 +163,6 @@ def ban(sender, params):
             print("[Command] Invalid usage! Proper usage, >>> ban <segaid/pid> <value>")
             return
     else:
-        if not config.is_admin(sender.myUsername):
-            sender.send_crypto_packet(
-                packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.",
-                                                  0x3).build())
-            return
         args = params.split(' ')
         if len(args) < 3:
             sender.send_crypto_packet(packetFactory.SystemMessagePacket(
@@ -207,7 +192,7 @@ def ban(sender, params):
             return
 
 
-@CommandHandler("unban", "Unbans somebody from the proxy. {red}Admins only.{def}")
+@CommandHandler("unban", "Unbans somebody from the proxy. Admins only.", True)
 def ban(sender, params):
     if isinstance(sender, basic.LineReceiver):
         args = params.split(' ')
@@ -230,11 +215,6 @@ def ban(sender, params):
             print("[Command] Invalid usage! Proper usage, >>> unban <segaid/pid> <value>")
             return
     else:
-        if not config.is_admin(sender.myUsername):
-            sender.send_crypto_packet(
-                packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.",
-                                                  0x3).build())
-            return
         args = params.split(' ')
         if len(args) < 3:
             sender.send_crypto_packet(packetFactory.SystemMessagePacket(
@@ -263,7 +243,7 @@ def ban(sender, params):
                 "[Command] {red}Invalid usage! Proper usage, |unban <segaid/pid> <value>", 0x3).build())
             return
 
-@CommandHandler("kick", "Kicks a client from the proxy. {red}Admins only.{def}")
+@CommandHandler("kick", "Kicks a client from the proxy. Admins only.", True)
 def kick(sender, params):
     if isinstance(sender, basic.LineReceiver):
         args = params.split(' ')
@@ -278,11 +258,6 @@ def kick(sender, params):
         else:
             print("[Command] I couldn't find %s!" % args[1])
     else:
-        if not config.is_admin(sender.myUsername):
-            sender.send_crypto_packet(
-                packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.",
-                                                  0x3).build())
-            return
         args = params.split(' ')
         if len(args) < 2:
             sender.send_crypto_packet(
@@ -302,7 +277,7 @@ def kick(sender, params):
 
 
 @CommandHandler("clients",
-                "Lists all clients, SEGA IDs, and IP Addresses connected to the proxy. {red}Admins only.{def}")
+                "Lists all clients, SEGA IDs, and IP Addresses connected to the proxy. Admins only.", True)
 def list_clients(sender, params):
     if isinstance(sender, basic.LineReceiver):
         print("[ClientList] === Connected Clients (%i total) ===" % len(data.clients.connectedClients))
@@ -326,11 +301,6 @@ def list_clients(sender, params):
             print("[ClientList] IP: %s SEGA ID: %s Player ID: %s Player Name: %s Block: %s" % (
                 client_host, client_segaid, client_player_id, client_player_name, client_block))
     else:
-        if not config.is_admin(sender.myUsername):
-            sender.send_crypto_packet(
-                packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.",
-                                                  0x3).build())
-            return
         string = "[ClientList] === Connected Clients (%i total) ===\n" % len(data.clients.connectedClients)
         for ip, client in data.clients.connectedClients.iteritems():
             client_handle = client.get_handle()
@@ -354,7 +324,7 @@ def list_clients(sender, params):
         sender.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
 
 
-@CommandHandler("globalmsg", "Sends a global message to everyone on the server. {red}Admins only.{def}")
+@CommandHandler("globalmsg", "Sends a global message to everyone on the server. Admins only.", True)
 def global_message(sender, params):
     if isinstance(sender, basic.LineReceiver):
         if len(params.split(' ', 2)) < 3:
@@ -365,14 +335,9 @@ def global_message(sender, params):
         for client in data.clients.connectedClients.values():
             if client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
-                    packetFactory.SystemMessagePacket("{ora}[Proxy Global Message]{def} %s" % message, mode).build())
+                    packetFactory.SystemMessagePacket("[Proxy Global Message] %s" % message, mode).build())
         print("[ShipProxy] Sent global message!")
     else:
-        if not config.is_admin(sender.myUsername):
-            sender.send_crypto_packet(
-                packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.",
-                                                  0x3).build())
-            return
         if len(params.split(' ', 2)) < 3:
             sender.send_crypto_packet(packetFactory.SystemMessagePacket("[ShipProxy] {red}Incorrect usage. Usage: |globalmsg  <message_type> <Message>", 0x3).build())
             return
@@ -381,15 +346,11 @@ def global_message(sender, params):
         for client in data.clients.connectedClients.values():
             if client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
-                    packetFactory.SystemMessagePacket("{ora}[Proxy Global Message]{def} %s" % message, mode).build())
+                    packetFactory.SystemMessagePacket("[Proxy Global Message] %s" % message, mode).build())
 
 
 @CommandHandler("exit")
 def exit_proxy(sender, params):
     if isinstance(sender, basic.LineReceiver):
-        for client in data.clients.connectedClients.values():
-            if client.get_handle() is not None:
-                client.get_handle().send_crypto_packet(
-                    packetFactory.SystemMessagePacket("PSO2Proxy is exiting.\nIf you are on the public proxy and not a private one, check @pso2proxystatus on Twitter for more information.", 0x1).build())
         print("[ShipProxy] Exiting...")
         reactor.callFromThread(reactor.stop)

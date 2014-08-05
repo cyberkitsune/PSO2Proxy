@@ -1,4 +1,4 @@
-import io, struct
+import struct
 
 
 def encode_string_utf16(string, xor_value, sub_value):

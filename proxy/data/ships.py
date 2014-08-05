@@ -2,7 +2,6 @@ import socket
 import io
 import struct
 import time
-from threading import Thread
 
 from twisted.python import log
 

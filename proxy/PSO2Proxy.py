@@ -8,6 +8,7 @@ import os
 import exceptions
 import sys
 import traceback
+import config
 
 from twisted.internet import protocol, reactor, stdio
 from twisted.protocols import basic
@@ -20,10 +21,10 @@ import data.blocks as blocks
 import data.clients as clients
 import plugins.plugins as plugin_manager
 from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
-from config import packetLogging as logPackets
+from config import packetLogging as logPackets  # Do this better
 from config import myIpAddress as myIp
 from config import bindIp
-from config import noisy as verbose
+from config import noisy as verbose  # // Do this better
 
 
 class ShipProxy(protocol.Protocol):
@@ -259,14 +260,15 @@ class ServerConsole(basic.LineReceiver):
     def lineReceived(self, line):
         try:
             command = line.split(' ')[0]
-            if command in commandList:
-                f = commandList[command][0]
-                f(self, line)
-            elif command in plugin_manager.commands:
-                plugin_f = plugin_manager.commands[command][0]
-                plugin_f(self, line)
-            else:
-                print("[Command] Command %s not found!" % command)
+            if command != "":
+                if command in commandList:
+                    f = commandList[command][0]
+                    f(self, line)
+                elif command in plugin_manager.commands:
+                    plugin_f = plugin_manager.commands[command][0]
+                    plugin_f(self, line)
+                else:
+                    print("[Command] Command %s not found!" % command)
         except:
             e = traceback.format_exc()
             print("[ShipProxy] Error Occurred: %s" % e)
@@ -285,7 +287,7 @@ def main():
         print("==== ERROR 001 ====")
         print("You have NOT configured the IP address for PSO2Proxy!")
         print(
-            "Please edit cfg/pso2proxy.config.json and change myIpAddr to your IP public IP address "
+            "Please edit cfg/pso2proxy.config.yml and change myIpAddr to your IP public IP address "
             "(Not LAN address if you're on a LAN!) ")
         print("After you fix this, please restart PSO2Proxy.")
         sys.exit(0)
@@ -308,7 +310,7 @@ def main():
         print("After you fix this, please restart PSO2Proxy.")
         sys.exit(0)
 
-    for shipNum in xrange(0, 10):
+    for shipNum in config.globalConfig.get_key('enabledShips'):
         query_endpoint = TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=interface_ip)
         query_endpoint.listen(BlockScraperFactory())
         ship_endpoint = TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=interface_ip)
