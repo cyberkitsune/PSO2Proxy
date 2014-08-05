@@ -144,8 +144,8 @@ def chat_packet(context, data):
         'utf-16')  # This is technically improper. Should use the xor byte to check string length (See packetReader)
     if player_id == 0:  # Probably the wrong way to check, but check if a PSO2 client sent this packet
         message = message.rstrip('\0')
-        if len(message) > 2 and message[0] == '|':
-            command = (message.split(' ')[0])[1:]  # Get the first word (the command) and strip the '!''
+        if len(message) > 2 and message.startswith(config.globalConfig.get_key('commandPrefix')):
+            command = (message.split(' ')[0])[len(config.globalConfig.get_key('commandPrefix')):]  # Get the first word (the command) and strip the prefix'
             if command in commands.commandList:
                 if commands.commandList[command][2] and not config.is_admin(context.myUsername):
                     context.send_crypto_packet(packetFactory.SystemMessagePacket(
@@ -161,8 +161,7 @@ def chat_packet(context, data):
                 f = plugin_manager.commands[command][0]
                 f(context, message)
             else:
-                context.send_crypto_packet(
-                    packetFactory.SystemMessagePacket("[Proxy] {red}%s is not a command!" % command, 0x3).build())
+                return data
             return None
         return data
     if player_id in players.playerList:
