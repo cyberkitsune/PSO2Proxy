@@ -52,7 +52,10 @@ class JSONConfig(object):
     def get_key(self, key):
         if key not in self._config_values:
             raise KeyError
-        return self._config_values[key]
+        if isinstance(self._config_values[key], unicode):
+            return self._config_values[key].encode('utf-8')
+        else:
+            return self._config_values[key]
 
     def set_key(self, key, value):
         self._config_values[key] = value
