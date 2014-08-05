@@ -104,7 +104,7 @@ def check_config(user):
     if user.playerId in data.clients.connectedClients:
         client_preferences = data.clients.connectedClients[user.playerId].get_preferences()
         if 'globalChat' not in client_preferences:
-            if chatPreferences.keyExists(user.playerId):
+            if chatPreferences.key_exists(user.playerId):
                 client_preferences['globalChat'] = chatPreferences.getKey(user.playerId)['toggle']
             else:
                 client_preferences['globalChat'] = True
