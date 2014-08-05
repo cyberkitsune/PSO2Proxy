@@ -35,6 +35,7 @@ class JSONConfig(object):
         json.dump(self.default_keys, f, indent=1)
         f.close()
         print("[Config] Default config for %s created." % self.filename)
+        self._load_config()
 
     def _validate_config(self):
         for key, value in self.default_keys.iteritems():
