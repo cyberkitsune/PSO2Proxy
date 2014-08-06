@@ -341,7 +341,7 @@ class GlobalMessage(Command):
     def call_from_client(self, client):
         message = None
         mode = 0x0
-        if len(self.args.split(' ', 2)) < 2:
+        if len(self.args.split(' ', 1)) < 2:
             try:
                 mode = int(client.split(' ', 2)[1])
             except ValueError:
