@@ -50,6 +50,7 @@ if ircMode:
             global ircBot
             for command in ircSettings.get_key('autoexec'):
                 self.sendLine(command)
+                print("[IRC-AUTO] >>> %s" % command)
             self.join(self.factory.channel)
             print("[GlobalChat] Joined %s" % self.factory.channel)
             ircBot = self
