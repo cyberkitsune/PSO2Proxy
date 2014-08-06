@@ -30,6 +30,7 @@ class ToggleTranslate(Command):
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Enabled Chat Translation.", 0x3).build())
             else:
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled Chat Translation.", 0x3).build())
+            data.clients.connectedClients[client.playerId].set_prefrences(user_prefs)
 
 
 @p.PacketHook(0x7, 0x0)
