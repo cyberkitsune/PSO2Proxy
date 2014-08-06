@@ -36,6 +36,11 @@ To configure the server, run it once to generate the pso2proxy.config.yml, then 
 ### Your private / public keypair
 You'll need to generate a RSA public and private keypair for your server and your proxy's clients for the proxy to work. You can use OpenSSL to do this.
 
+First, change into the keys folder.
+```
+    cd ~/PSO2Proxy/proxy/keys
+```
+
 Generate the private key:
 
 `openssl genpkey -out myKey.pem -algorithm rsa -pkeyopt rsa_keygen_bits:1024`
