@@ -1,7 +1,7 @@
 from twisted.internet import protocol
 import data.ships as ships
 from config import myIpAddress
-from plugins import onQueryConnection
+from plugins.plugins import onQueryConnection
 
 
 class BlockScraper(protocol.Protocol):
