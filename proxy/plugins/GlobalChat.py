@@ -8,7 +8,7 @@ import config
 from commands import Command
 
 ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
-                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': ""}, True)
+                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': "", 'autoexec': []}, True)
 
 ircMode = ircSettings.get_key('enabled')
 ircNick = ircSettings.get_key('nick')
@@ -41,6 +41,8 @@ if ircMode:
         def connectionMade(self):
             irc.IRCClient.connectionMade(self)
             print("[GlobalChat] IRC Connected!")
+            for command in ircSettings.get_key('autoexec'):
+                self.sendLine(command)
 
         def connectionLost(self, reason):
             irc.IRCClient.connectionLost(self, reason)
