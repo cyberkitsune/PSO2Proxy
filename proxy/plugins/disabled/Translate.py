@@ -49,7 +49,7 @@ def get_chat_packet(context, packet):
             return packet  # Command
         japanese = False
         for char in message:
-            char_script = script(char)
+            char_script = script(unicode(char))
             if char_script != 'Latin' and char_script != 'Common':
                 japanese = True
                 break
