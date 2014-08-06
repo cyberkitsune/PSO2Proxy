@@ -10,7 +10,7 @@ from commands import Command
 login_config = config.YAMLConfig("cfg/loginmessage.config.yml", {'message': "{{yel}}Welcome to PSO2Proxy build {proxy_ver} {client_name}! There are currently {client_count} clients connected. Use {command_prefix}help for help!", 'messageType': 0x3}, True)
 
 
-@plugins.on_connection_hook
+@plugins.on_initial_connect_hook
 def login_message(sender):
     message = login_config.get_key('message').format(client_name=sender.myUsername, client_count=len(data.clients.connectedClients), proxy_ver=config.proxy_ver, command_prefix=config.globalConfig.get_key('commandPrefix'))
     sender.send_crypto_packet(packetFactory.SystemMessagePacket(message, login_config.get_key('messageType')).build())

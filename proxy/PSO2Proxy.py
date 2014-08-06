@@ -142,7 +142,7 @@ class ShipProxy(protocol.Protocol):
                 if self.playerId not in clients.connectedClients:  # Inital add
                     clients.add_client(self)
                     self.loaded = True
-                    for f in plugin_manager.onConnection:
+                    for f in plugin_manager.onInitialConnection:
                         f(self)
                 elif not self.loaded:
                     clients.populate_data(self)
