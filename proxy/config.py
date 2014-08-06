@@ -82,7 +82,7 @@ globalConfig = YAMLConfig("cfg/pso2proxy.config.yml",
 
 blockNames = {}
 
-proxy_ver = subprocess.check_output(["git", "describe", "--always"])
+proxy_ver = subprocess.check_output(["git", "describe", "--always"]).rstrip("\n")
 
 
 def is_admin(sega_id):
