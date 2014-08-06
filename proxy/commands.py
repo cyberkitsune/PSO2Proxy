@@ -341,17 +341,17 @@ class GlobalMessage(Command):
     def call_from_client(self, client):
         message = None
         print(self.args)
-        if len(self.args.split(' ', 1)) < 2:
+        if len(self.args.split('  ', 1)) < 2:
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[ShipProxy] {red}Incorrect usage. Usage: |globalmsg  [message_type] <Message>", 0x3).build())
             return
         try:
-            mode = int(self.args.split(' ', 2)[1])
+            mode = int(self.args.split('  ', 2)[1])
         except ValueError:
             mode = 0x0
-            message = self.args.split(' ', 1)[1]
+            message = self.args.split('  ', 1)[1]
 
         if message is not None:
-            message = self.args.split(' ', 2)[2]
+            message = self.args.split('  ', 2)[2]
         for client in data.clients.connectedClients.values():
             if client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
