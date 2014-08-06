@@ -117,7 +117,7 @@ class HelpCommand(Command):
         client.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
 
     def call_from_console(self):
-        return "[Command] Hello Console! Valid commands: %s%s\n" % (', '.join(commandList.keys()), ', '.join(plugin_manager.commands.keys()))
+        return "[Command] Hello Console! Valid commands: %s, %s\n" % (', '.join(commandList.keys()), ', '.join(plugin_manager.commands.keys()))
 
 
 @CommandHandler("count", "Returns the current player count in system chat.")
