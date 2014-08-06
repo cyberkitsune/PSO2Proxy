@@ -5,7 +5,7 @@ from microsofttranslator import Translator
 from commands import Command
 from config import YAMLConfig
 
-import plugins.plugins as p
+import plugins as p
 
 translation_config = YAMLConfig("cfg/translator.config.yml", {'app_id': '', 'secret_key': ''}, True)
 translator = Translator(translation_config.get_key('app_id'), translation_config.get_key('secret_key'))
