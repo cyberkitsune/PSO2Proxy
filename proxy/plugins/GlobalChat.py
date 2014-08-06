@@ -62,6 +62,8 @@ if ircMode:
                         client.get_handle().send_crypto_packet(
                             packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]),
                                                          "[GIRC] %s" % user.split("!")[0], msg.decode('utf-8')).build())
+            else:
+                print("[IRC] <%s> %s" % (user, msg))
 
         def action(self, user, channel, msg):
             if channel == self.factory.channel:
@@ -123,6 +125,15 @@ def check_config(user):
                     "[Proxy] {red}Global chat is disabled, use %sgon to enable it and use %sg <Message> to chat." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
                     0x3).build())
         data.clients.connectedClients[user.playerId].set_preferences(client_preferences)
+
+
+@plugins.CommandHook("irccmd")
+class IRCCommand(Command):
+    def call_from_console(self):
+        global ircMode
+        global ircBot
+        if ircMode and ircBot is not None:
+            ircBot.sendLine(self.args.split(" ", 1)[1])
 
 
 @plugins.CommandHook("gon", "Enable global chat.")
