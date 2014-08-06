@@ -35,8 +35,8 @@ class ToggleTranslate(Command):
 
 @p.PacketHook(0x7, 0x0)
 def get_chat_packet(context, packet):
-    if context.playerId in data.clients.connectedClients:
-        user_prefs = data.clients.connectedClients[context.playerId].get_preferences()
+    if context.peer.psoClient and context.peer.playerId in data.clients.connectedClients:
+        user_prefs = data.clients.connectedClients[context.peer.playerId].get_preferences()
         if not user_prefs['translate_chat']:
             return packet
         player_id = struct.unpack_from("I", packet, 0x8)[0]
