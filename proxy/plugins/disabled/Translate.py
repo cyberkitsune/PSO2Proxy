@@ -11,7 +11,7 @@ translation_config = YAMLConfig("cfg/translator.config.yml", {'app_id': '', 'sec
 translator = Translator(translation_config.get_key('app_id'), translation_config.get_key('secret_key'))
 
 
-@p.on_connection_hook
+@p.on_initial_connect_hook
 def create_preferences(client):
     if client.playerId in data.clients.connectedClients:
         user_prefs = data.clients.connectedClients[client.playerId].get_preferences()
