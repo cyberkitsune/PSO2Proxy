@@ -176,7 +176,7 @@ class GChat(Command):
         if ircMode:
             global ircBot
             if ircBot is not None:
-                ircBot.send_global_message("Console", self.args[:2].encode('utf-8'))
+                ircBot.send_global_message(0, "Console", self.args[:2].encode('utf-8'))
         for client in data.clients.connectedClients.values():
             if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
