@@ -1,6 +1,7 @@
 from twisted.internet import protocol
 import data.ships as ships
 from config import myIpAddress
+from plugins import onQueryConnection
 
 
 class BlockScraper(protocol.Protocol):
@@ -27,6 +28,8 @@ class ShipAdvertiser(protocol.Protocol):
         pass
 
     def connectionMade(self):
+        for f in onQueryConnection:
+            f(self)
         print("[ShipStatus] Client connected " + str(self.transport.getPeer()) + "! Sending ship list packet...")
         self.transport.write(ships.scrape_ship_packet("210.189.208.1", 12199, myIpAddress))
         self.transport.loseConnection()

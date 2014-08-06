@@ -3,6 +3,7 @@ commands = {}
 onStart = []
 onConnection = []
 onConnectionLoss = []
+onQueryConnection = []
 
 
 class PacketHook(object):
@@ -33,6 +34,12 @@ class CommandHook(object):
 def on_start_hook(f):
     global onStart
     onStart.append(f)
+    return f
+
+
+def on_query_connection_hook(f):
+    global onQueryConnection
+    onQueryConnection.append(f)
     return f
 
 
