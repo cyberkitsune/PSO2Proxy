@@ -36,7 +36,7 @@ class WEBRcon(Resource):
                 return json.dumps({'success': False, 'reason': "Command not specified."})
             else:
                 try:
-                    if
+                    pass
                 except:
                     return json.dumps({'success': False, 'reason': "Error executing command"})
 
