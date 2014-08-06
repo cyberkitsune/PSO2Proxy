@@ -65,6 +65,9 @@ if ircMode:
             else:
                 print("[IRC] <%s> %s" % (user, msg))
 
+        def noticed(self, user, channel, message):
+            print("[IRC] [NOTICE] %s %s" % (user, message))
+
         def action(self, user, channel, msg):
             if channel == self.factory.channel:
                 print("[GlobalChat] [IRC] * %s %s" % (user, msg))
