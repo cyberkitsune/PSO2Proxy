@@ -41,11 +41,13 @@ def get_chat_packet(context, packet):
             return packet
         player_id = struct.unpack_from("I", packet, 0x8)[0]
         print(player_id)
-        if player_id == 0:  # We sent it
+        if player_id == 0 or context.peer.playerId:  # We sent it
             return packet
         channel_id = struct.unpack_from("I", packet, 0x14)[0]
         print(channel_id)
         message = packet[0x1C:].decode('utf-16')
+        if message.startswith("/"):
+            return packet  # Command
         print(message)
         new_msg = "%s *" % translator.translate(message, "en")
         print new_msg
