@@ -131,24 +131,11 @@ def check_config(user):
                 user.send_crypto_packet(packetFactory.SystemMessagePacket(
                     "[Proxy] {red}Global chat is enabled, use %sg <Message> to chat and %sgoff to disable it." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
                     0x3).build())
-                if ircMode:
-                    global ircBot
-                    ircBot.send_connected(data.players.playerList[user.playerId][0], data.clients.connectedClients[user.playerId].ship)
             else:
                 user.send_crypto_packet(packetFactory.SystemMessagePacket(
                     "[Proxy] {red}Global chat is disabled, use %sgon to enable it and use %sg <Message> to chat." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
                     0x3).build())
         data.clients.connectedClients[user.playerId].set_preferences(client_preferences)
-
-@plugins.on_client_remove_hook
-def notify_loss(user):
-    global ircMode
-    if ircMode and user.playerId in data.clients.connectedClients:
-        global ircBot
-        client_preferences = data.clients.connectedClients[user.playerId].get_preferences()
-        if 'globalChat' in client_preferences and client_preferences['globalChat']:
-            ircBot.send_left(data.players.playerList[user.playerId][0], data.clients.connectedClients[user.playerId].ship)
-
 
 
 @plugins.CommandHook("irc")
