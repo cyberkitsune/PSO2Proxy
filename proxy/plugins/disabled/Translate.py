@@ -44,4 +44,4 @@ def get_chat_packet(context, packet):
         return packet
     channel_id = struct.unpack_from("<I", packet, 0x14)
     message = packet[0x1C:].decode('utf-16le')
-    return packetFactory.ChatPacket(player_id, "%s *" % translator.translate(message, "en"), channel_id)
+    return packetFactory.ChatPacket(player_id, "%s *" % translator.translate(message, "en"), channel_id).build()
