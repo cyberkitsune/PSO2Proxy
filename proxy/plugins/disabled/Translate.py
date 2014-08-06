@@ -19,6 +19,7 @@ def create_preferences(client):
             user_prefs['translate_chat'] = False
             data.clients.connectedClients[client.playerId].set_prefrences(user_prefs)
 
+
 @p.CommandHook("translate", "Toggles proxy-end chat translation. (Powered by Bing Translate, Incoming only.)")
 class ToggleTranslate(Command):
     def call_from_client(self, client):
@@ -29,6 +30,7 @@ class ToggleTranslate(Command):
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Enabled Chat Translation.", 0x3).build())
             else:
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled Chat Translation.", 0x3).build())
+
 
 @p.PacketHook(0x7, 0x0)
 def get_chat_packet(context, packet):
