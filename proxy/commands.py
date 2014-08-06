@@ -348,7 +348,7 @@ class GlobalMessage(Command):
             mode = int(self.args.split(' ', 2)[0])
         except ValueError:
             mode = 0x0
-            message = self.args.split(' ', 1)[0]
+            message = self.args.split(' ', 0)[0]
 
         if message is not None:
             message = self.args.split(' ', 2)[1]
