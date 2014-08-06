@@ -3,7 +3,6 @@ import packetFactory
 import data.clients
 import data.players
 
-from twisted.protocols import basic
 from config import YAMLConfig
 import config
 from commands import Command
@@ -72,8 +71,8 @@ if ircMode:
                                                          "[GIRC] %s" % user.split("!")[0],
                                                          "* %s" % msg.decode('utf-8')).build())
 
-        def send_global_message(self, user, message):
-            self.msg(self.factory.channel, "[G] <%s> %s" % (user, message))
+        def send_global_message(self, ship, user, message):
+            self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, message))
 
     class GIRCFactory(protocol.ClientFactory):
         """docstring for ClassName"""
@@ -163,13 +162,13 @@ class GChat(Command):
         if ircMode:
             global ircBot
             if ircBot is not None:
-                ircBot.send_global_message(
+                ircBot.send_global_message(data.clients.connectedClients[client.playerId].ship,
                     data.players.playerList[client.playerId][0].encode('utf-8'), self.args[3:].encode('utf-8'))
         for client_data in data.clients.connectedClients.values():
             if client_data.get_preferences()['globalChat'] and client_data.get_handle() is not None:
                 client_data.get_handle().send_crypto_packet(
                     packetFactory.TeamChatPacket(client.playerId,
-                                                 "[G] %s" % data.players.playerList[client.playerId][0],
+                                                 "[G-%02i] %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0]),
                                                  self.args[3:]).build())
 
     def call_from_console(self):

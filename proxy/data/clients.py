@@ -2,13 +2,15 @@ import blocks
 import config
 import packetFactory
 
+from ships import get_ship_from_port
+
 connectedClients = {}
 
 
 class ClientData(object):
     """docstring for ClientData"""
 
-    def __init__(self, ip_address, segaid, handle):
+    def __init__(self, ip_address, segaid, ship, handle):
         self.ipAddress = ip_address
         self.segaId = segaid
         self.handle = handle
@@ -28,8 +30,7 @@ class ClientData(object):
 
 
 def add_client(handle):
-    connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, handle.myUsername.rstrip('\0'),
-                                                   handle)
+    connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, handle.myUsername.rstrip('\0'), get_ship_from_port(handle.transport.getHost().port), handle)
     print('[Clients] Registered client %s (ID:%i) in online clients' % (handle.myUsername, handle.playerId))
     if config.is_player_id_banned(handle.playerId):
         print('[Bans] Player %s (ID:%i) is banned!' % (handle.myUsername, handle.playerId))
