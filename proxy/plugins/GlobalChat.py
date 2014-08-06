@@ -41,8 +41,6 @@ if ircMode:
         def connectionMade(self):
             irc.IRCClient.connectionMade(self)
             print("[GlobalChat] IRC Connected!")
-            for command in ircSettings.get_key('autoexec'):
-                self.sendLine(command)
 
         def connectionLost(self, reason):
             irc.IRCClient.connectionLost(self, reason)
@@ -50,6 +48,8 @@ if ircMode:
 
         def signedOn(self):
             global ircBot
+            for command in ircSettings.get_key('autoexec'):
+                self.sendLine(command)
             self.join(self.factory.channel)
             print("[GlobalChat] Joined %s" % self.factory.channel)
             ircBot = self
