@@ -342,20 +342,13 @@ class GlobalMessage(Command):
         message = None
         print(self.args)
         if len(self.args.split(' ', 1)) < 2:
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[ShipProxy] {red}Incorrect usage. Usage: |globalmsg  [message_type] <Message>", 0x3).build())
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[ShipProxy] {red}Incorrect usage. Usage: |globalmsg  <Message>", 0x3).build())
             return
-        try:
-            mode = int(self.args.split(' ', 2)[1])
-        except ValueError:
-            mode = 0x0
-            message = self.args.split(' ', 0)[0]
-
-        if message is not None:
-            message = self.args.split(' ', 2)[1]
+        message = self.args.split(' ', 1)[1]
         for client in data.clients.connectedClients.values():
             if client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
-                    packetFactory.SystemMessagePacket("[Proxy Global Message] %s" % message, mode).build())
+                    packetFactory.SystemMessagePacket("[Proxy Global Message] %s" % message, 0x0).build())
 
     def call_from_console(self):
         message = None
