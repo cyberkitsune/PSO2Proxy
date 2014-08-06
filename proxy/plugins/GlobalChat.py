@@ -68,7 +68,8 @@ if ircMode:
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
                             packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]),
-                                                         "[GIRC] %s" % user.split("!")[0], "* %s" % msg.decode('utf-8')).build())
+                                                         "[GIRC] %s" % user.split("!")[0],
+                                                         "* %s" % msg.decode('utf-8')).build())
 
         def send_global_message(self, user, message):
             self.msg(self.factory.channel, "[G] <%s> %s" % (user, message))
@@ -163,23 +164,23 @@ class GChat(Command):
             if ircBot is not None:
                 ircBot.send_global_message(
                     data.players.playerList[client.playerId][0].encode('utf-8'), self.args[3:].encode('utf-8'))
-        for client in data.clients.connectedClients.values():
-            if client.get_preferences()['globalChat'] and client.get_handle() is not None:
-                client.get_handle().send_crypto_packet(
-                    packetFactory.TeamChatPacket(client.playerId, "[G] %s" % data.players.playerList[client.playerId][0], self.args[3:]).build())
+        for client_data in data.clients.connectedClients.values():
+            if client_data.get_preferences()['globalChat'] and client_data.get_handle() is not None:
+                client_data.get_handle().send_crypto_packet(
+                    packetFactory.TeamChatPacket(client.playerId,
+                                                 "[G] %s" % data.players.playerList[client.playerId][0],
+                                                 self.args[3:]).build())
 
     def call_from_console(self):
         global ircMode
         if ircMode:
             global ircBot
             if ircBot is not None:
-                import unicodedata
-
                 ircBot.send_global_message("Console", self.args[:2].encode('utf-8'))
         for client in data.clients.connectedClients.values():
             if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
                     packetFactory.TeamChatPacket(0x999, "[GCONSOLE]",
                                                  self.args[2:]).build())
-        return
+        return "[GlobalChat] <Console> %s" % self.args[2:]
 

@@ -10,16 +10,36 @@ from twisted.internet.endpoints import TCP4ServerEndpoint
 import data.clients
 import data.players
 import data.blocks
+from commands import commandList
+from plugins import commands as pluginCommands
 from config import bindIp as interfaceIp
 from config import myIpAddress as hostName
 from config import YAMLConfig as ConfigModel
 import plugins
 
 
-web_api_config = ConfigModel("cfg/webapi.config.yml", {"port": 8080, "ServerName": "Unnamed Server"}, True)
+web_api_config = ConfigModel("cfg/webapi.config.yml", {"port": 8080, "ServerName": "Unnamed Server", 'webRconEnabled': False, 'webRconKey': ''}, True)
 
 upStart = calendar.timegm(datetime.datetime.utcnow().utctimetuple())
 peakPlayers = 0
+
+
+class WEBRcon(Resource):
+    isLeaf = True
+
+    def render_GET(self, request):
+        request.setHeader('content-type', "application/json")
+        if 'key' not in request.args or request.args['key'] != web_api_config.get_key('webRconKey'):
+            return json.dumps({'success': False, 'reason': "Your RCON key is invalid!"})
+        else:
+            if 'command' not in request.args:
+                return json.dumps({'success': False, 'reason': "Command not specified."})
+            else:
+                try:
+                    if
+                except:
+                    return json.dumps({'success': False, 'reason': "Error executing command"})
+
 
 
 class JSONConfig(Resource):
