@@ -58,12 +58,12 @@ if ircMode:
 
         def privmsg(self, user, channel, msg):
             if channel == self.factory.channel:
-                print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], msg))
+                print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], irc.parseFormattedText(msg)))
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
                             packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]),
-                                                         "[GIRC] %s" % user.split("!")[0], replace_IRC_with_PSO2(msg).decode('utf-8')).build())
+                                                         "[GIRC] %s" % user.split("!")[0], replace_IRC_with_PSO2(irc.parseFormattedText(msg)).decode('utf-8')).build())
             else:
                 print("[IRC] <%s> %s" % (user, msg))
 
@@ -72,13 +72,13 @@ if ircMode:
 
         def action(self, user, channel, msg):
             if channel == self.factory.channel:
-                print("[GlobalChat] [IRC] * %s %s" % (user, msg))
+                print("[GlobalChat] [IRC] * %s %s" % (user, irc.parseFormattedText(msg)))
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
                             packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]),
                                                          "[GIRC] %s" % user.split("!")[0],
-                                                         "* %s" % replace_IRC_with_PSO2(msg).decode('utf-8')).build())
+                                                         "* %s" % replace_IRC_with_PSO2(irc.parseFormattedText(msg)).decode('utf-8')).build())
 
         def send_global_message(self, ship, user, message):
             self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, replace_PSO2_with_IRC(message)))
