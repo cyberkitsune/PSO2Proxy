@@ -58,7 +58,7 @@ if ircMode:
 
         def privmsg(self, user, channel, msg):
             if channel == self.factory.channel:
-                print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], irc.parseFormattedText(msg)))
+                print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], msg.encode('utf-8')))
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
@@ -72,7 +72,7 @@ if ircMode:
 
         def action(self, user, channel, msg):
             if channel == self.factory.channel:
-                print("[GlobalChat] [IRC] * %s %s" % (user, irc.parseFormattedText(msg)))
+                print("[GlobalChat] [IRC] * %s %s" % (user, msg.encode('utf-8')))
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
