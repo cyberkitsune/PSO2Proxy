@@ -340,6 +340,7 @@ class ListClients(Command):
 class GlobalMessage(Command):
     def call_from_client(self, client):
         message = None
+        print(self.args)
         if len(self.args.split(' ', 1)) < 2:
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[ShipProxy] {red}Incorrect usage. Usage: |globalmsg  [message_type] <Message>", 0x3).build())
             return
