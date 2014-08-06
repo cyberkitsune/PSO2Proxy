@@ -289,7 +289,7 @@ class Kick(Command):
 
 @CommandHandler("clients", "Lists all clients, SEGA IDs, and IP Addresses connected to the proxy. Admins only.", True)
 class ListClients(Command):
-    def call_from_client(self, client):
+    def call_from_client(self, pclient):
         string = "[ClientList] === Connected Clients (%i total) ===\n" % len(data.clients.connectedClients)
         for ip, client in data.clients.connectedClients.iteritems():
             client_handle = client.get_handle()
@@ -310,7 +310,7 @@ class ListClients(Command):
                 client_block = None
             string += "[ClientList] IP: %s SEGA ID: %s Player ID: %s Player Name: %s Block: %s\n" % (
                 client_host, client_segaid, client_player_id, client_player_name, client_block)
-        client.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
+        pclient.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
 
     def call_from_console(self):
         string = "[ClientList] === Connected Clients (%i total) ===\n" % len(data.clients.connectedClients)
