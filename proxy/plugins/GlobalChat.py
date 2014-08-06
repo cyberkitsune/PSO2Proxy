@@ -82,12 +82,6 @@ if ircMode:
         def send_global_message(self, ship, user, message):
             self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, message))
 
-        def send_connected(self, ship, user):
-            self.msg(self.factory.channel, "* %s connected to Ship %i" % (user, ship))
-
-        def send_left(self, ship, user):
-            self.msg(self.factory.channel, "* %s left Ship %i" % (user, ship))
-
     class GIRCFactory(protocol.ClientFactory):
         """docstring for ClassName"""
 
