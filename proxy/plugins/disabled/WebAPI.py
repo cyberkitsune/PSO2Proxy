@@ -105,7 +105,7 @@ def setup_web_api():
     web_resource = WebAPI()
     web_resource.putChild("config.json", JSONConfig())
     web_resource.putChild("publickey.blob", PublicKey())
-    if web_api_config.get_key(['webRconEnabled']):
+    if web_api_config.get_key('webRconEnabled'):
         web_resource.putChild("rcon", WEBRcon())
     web_endpoint.listen(server.Site(web_resource))
 
