@@ -43,6 +43,6 @@ def get_chat_packet(context, packet):
         if player_id == 0:  # We sent it
             return packet
         channel_id = struct.unpack_from("I", packet, 0x14)
-        message = packet[0x1C:].decode('utf-16le')
-        return packetFactory.ChatPacket(player_id, "%s *" % translator.translate(message, "en"), channel_id).build()
+        message = packet[0x1C:].decode('utf-16')
+        return packetFactory.ChatPacket(int(player_id), "%s *" % translator.translate(message, "en"), channel_id).build()
     return packet
