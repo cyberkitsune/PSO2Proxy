@@ -31,7 +31,7 @@ If you have a git commandline client, setuptools and pip installed, you can inst
 ```
 
 ## Configuring the Server
-To configure the server, run it once to generate the pso2proxy.config.json, then edit that. You need at least your Public IP address set and your adapter IP set if it's different from your public ip. If unsure, leave the bindIp `0.0.0.0`.
+To configure the server, run it once to generate the pso2proxy.config.yml, then edit that. You need at least your Public IP address set and your adapter IP set if it's different from your public ip. If unsure, leave the bindIp `0.0.0.0`.
 ## RSA Keys
 ### Your private / public keypair
 You'll need to generate a RSA public and private keypair for your server and your proxy's clients for the proxy to work. You can use OpenSSL to do this.
