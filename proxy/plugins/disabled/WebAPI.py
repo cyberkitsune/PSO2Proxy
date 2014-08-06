@@ -2,6 +2,7 @@ import json
 import calendar
 import datetime
 import os
+import traceback
 
 from twisted.web.resource import Resource
 from twisted.internet import reactor
@@ -47,7 +48,8 @@ class WEBRcon(Resource):
                     else:
                         json.dumps({'success': False, 'reason': "Command not found."})
                 except:
-                    return json.dumps({'success': False, 'reason': "Error executing command"})
+                    e = traceback.format_exc()
+                    return json.dumps({'success': False, 'reason': "Error executing command\n%s" % e})
 
 
 
