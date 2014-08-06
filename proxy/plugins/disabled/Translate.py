@@ -2,6 +2,7 @@ import data.clients
 import packetFactory
 import struct
 from microsofttranslator import Translator
+from unicodescript import script
 from commands import Command
 from config import YAMLConfig
 
@@ -40,15 +41,20 @@ def get_chat_packet(context, packet):
         if not user_prefs['translate_chat']:
             return packet
         player_id = struct.unpack_from("I", packet, 0x8)[0]
-        print(player_id)
         if player_id == 0 or context.peer.playerId:  # We sent it
             return packet
         channel_id = struct.unpack_from("I", packet, 0x14)[0]
-        print(channel_id)
         message = packet[0x1C:].decode('utf-16')
         if message.startswith("/"):
             return packet  # Command
-        print(message)
+        japanese = False
+        for char in message:
+            char_script = script(char)
+            if char_script != 'Latin' and char_script != 'Common':
+                japanese = True
+                break
+        if not japanese:
+            return packet
         new_msg = "%s *" % translator.translate(message, "en")
         print new_msg
         return packetFactory.ChatPacket(player_id, new_msg, channel_id).build()
