@@ -10,7 +10,7 @@ login_config = config.YAMLConfig("cfg/loginmessage.config.yml", {'message': "{{y
 
 @plugins.on_connection_hook
 def login_message(sender):
-    message = login_config.get_key('message').format(client_name=sender.myUserame, client_count=len(data.clients.connectedClients), command_prefix=config.globalConfig.get_key('commandPrefix'))
+    message = login_config.get_key('message').format(client_name=sender.myUsername, client_count=len(data.clients.connectedClients), command_prefix=config.globalConfig.get_key('commandPrefix'))
     sender.send_crypto_packet(packetFactory.SystemMessagePacket(message, login_config.get_key('messageType')).build())
 
 
