@@ -36,7 +36,16 @@ class WEBRcon(Resource):
                 return json.dumps({'success': False, 'reason': "Command not specified."})
             else:
                 try:
-                    pass
+                    if request.args['command'] in commandList:
+                        cmd_class = commandList[request.args['command']][0]
+                        result = cmd_class(request.args['params'] if 'params' in request.args else None).call_from_console()
+                        return json.dumps({'success': True, 'output': result})
+                    elif request.args['command'] in pluginCommands:
+                        cmd_class = pluginCommands[request.args['command']][0]
+                        result = cmd_class(request.args['params'] if 'params' in request.args else None).call_from_console()
+                        return json.dumps({'success': True, 'output': result})
+                    else:
+                        json.dumps({'success': False, 'reason': "Command not found."})
                 except:
                     return json.dumps({'success': False, 'reason': "Error executing command"})
 
