@@ -10,15 +10,21 @@ import plugins as p
 
 translation_config = YAMLConfig("cfg/translator.config.yml", {'app_id': '', 'secret_key': ''}, True)
 
+translatePrefrences = YAMLConfig("cfg/translator.prefs.yml")
 
 @p.on_initial_connect_hook
 def create_preferences(client):
     if client.playerId in data.clients.connectedClients:
         user_prefs = data.clients.connectedClients[client.playerId].get_preferences()
-        if 'translate_chat' not in user_prefs:
+        if translatePrefrences.key_exists(client.playerId):
+            prefs_key = translatePrefrences.get_key(client.playerId)
+            user_prefs['translate_chat'] = prefs_key['translate_chat']
+            user_prefs['translate_out'] = prefs_key['translate_out']
+        else:
             user_prefs['translate_chat'] = False
             user_prefs['translate_out'] = False
-            data.clients.connectedClients[client.playerId].set_preferences(user_prefs)
+            translatePrefrences.set_key(client.playerId, {'translate_chat': False, 'translate_out': False})
+        data.clients.connectedClients[client.playerId].set_preferences(user_prefs)
 
 
 @p.CommandHook("translate", "Toggles proxy-end chat translation. (Powered by Bing Translate, Incoming only.)")
@@ -32,6 +38,9 @@ class ToggleTranslate(Command):
             else:
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled incoming chat translation.", 0x3).build())
             data.clients.connectedClients[client.playerId].set_preferences(user_prefs)
+            cur_key = translatePrefrences.get_key(client.playerId)
+            cur_key['translate_chat'] = user_prefs['translate_chat']
+            translatePrefrences.set_key(client.playerId, cur_key)
 
 @p.CommandHook("jpout", "Toggles outbound chat translation to japanese. (Powered by Bing Translate, Outgoing only.)")
 class ToggleTranslate(Command):
@@ -44,6 +53,9 @@ class ToggleTranslate(Command):
             else:
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled outgoing chat translation.", 0x3).build())
             data.clients.connectedClients[client.playerId].set_preferences(user_prefs)
+            cur_key = translatePrefrences.get_key(client.playerId)
+            cur_key['translate_out'] = user_prefs['translate_out']
+            translatePrefrences.set_key(client.playerId, cur_key)
 
 
 @p.PacketHook(0x7, 0x0)
