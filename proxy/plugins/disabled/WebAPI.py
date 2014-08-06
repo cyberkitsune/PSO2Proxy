@@ -38,11 +38,11 @@ class WEBRcon(Resource):
                 try:
                     if request.args['command'][0] in commandList:
                         cmd_class = commandList[request.args['command'][0]][0]
-                        result = cmd_class(request.args['params'][0] if 'params' in request.args else None).call_from_console()
+                        result = cmd_class("%s %s" % (request.args['command'][0], request.args['params'][0] if 'params' in request.args else None)).call_from_console()
                         return json.dumps({'success': True, 'output': result})
                     elif request.args['command'][0] in pluginCommands:
                         cmd_class = pluginCommands[request.args['command'][0]][0]
-                        result = cmd_class(request.args['params'][0] if 'params' in request.args else None).call_from_console()
+                        result = cmd_class("%s %s" % (request.args['command'][0], request.args['params'][0] if 'params' in request.args else None)).call_from_console()
                         return json.dumps({'success': True, 'output': result})
                     else:
                         json.dumps({'success': False, 'reason': "Command not found."})
