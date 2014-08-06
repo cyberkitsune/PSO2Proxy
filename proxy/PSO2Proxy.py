@@ -256,10 +256,14 @@ class ServerConsole(basic.LineReceiver):
             if command != "":
                 if command in commandList:
                     f = commandList[command][0]
-                    print(f(line).call_from_console())
+                    out = f(line).call_from_console()
+                    if out is not None:
+                        print(out)
                 elif command in plugin_manager.commands:
                     plugin_f = plugin_manager.commands[command][0]
-                    print(plugin_f(line).call_from_console())
+                    out = plugin_f(line).call_from_console()
+                    if out is not None:
+                        print(out)
                 else:
                     print("[Command] Command %s not found!" % command)
         except:
