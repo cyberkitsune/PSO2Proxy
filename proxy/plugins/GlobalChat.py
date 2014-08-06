@@ -146,7 +146,7 @@ def notify_loss(user):
     if ircMode and user.playerId in data.clients.connectedClients:
         global ircBot
         client_preferences = data.clients.connectedClients[user.playerId].get_preferences()
-        if 'globalChat' not in client_preferences and client_preferences['globalChat']:
+        if 'globalChat' in client_preferences and client_preferences['globalChat']:
             ircBot.send_left(data.players.playerList[user.playerId][0], data.clients.connectedClients[user.playerId].ship)
 
 
