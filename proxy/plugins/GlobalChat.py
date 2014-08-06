@@ -127,7 +127,7 @@ def check_config(user):
         data.clients.connectedClients[user.playerId].set_preferences(client_preferences)
 
 
-@plugins.CommandHook("irccmd")
+@plugins.CommandHook("irc")
 class IRCCommand(Command):
     def call_from_console(self):
         global ircMode
