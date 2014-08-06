@@ -367,7 +367,7 @@ class GlobalMessage(Command):
             mode = 0x0
             message = self.args.split(' ', 1)[1]
 
-        if message is not None:
+        if message is None:
             message = self.args.split(' ', 2)[2]
         for client in data.clients.connectedClients.values():
             if client.get_handle() is not None:
