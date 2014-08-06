@@ -134,6 +134,7 @@ class IRCCommand(Command):
         global ircBot
         if ircMode and ircBot is not None:
             ircBot.sendLine(self.args.split(" ", 1)[1])
+            return "[IRC] >>> %s" % self.args.split(" ", 1)[1]
 
 
 @plugins.CommandHook("gon", "Enable global chat.")
