@@ -23,11 +23,11 @@ class CommandHook(object):
     def __init__(self, command, help_text=None, admin_only=False):
         self.command = command
         self.help_text = help_text
-        self.admin_only =admin_only
+        self.admin_only = admin_only
 
-    def __call__(self, f):
+    def __call__(self, command_class):
         global commands
-        commands[self.command] = [f, self.help_text, self.admin_only]
+        commands[self.command] = [command_class, self.help_text, self.admin_only]
 
 
 def on_start_hook(f):

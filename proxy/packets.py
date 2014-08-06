@@ -151,15 +151,15 @@ def chat_packet(context, data):
                     context.send_crypto_packet(packetFactory.SystemMessagePacket(
                         "[Proxy] {red}You do not have permission to run this command.", 0x3).build())
                     return
-                f = commands.commandList[command][0]
-                f(context, message)  # Lazy...
+                cmd_class = commands.commandList[command][0]
+                cmd_class(message).call_from_client(context)  # Lazy...
             elif command in plugin_manager.commands:
                 if plugin_manager.commands[command][2] and not config.is_admin(context.myUsername):
                     context.send_crypto_packet(packetFactory.SystemMessagePacket(
                         "[Proxy] {red}You do not have permission to run this command.", 0x3).build())
                     return
-                f = plugin_manager.commands[command][0]
-                f(context, message)
+                cmd_class = plugin_manager.commands[command][0]
+                cmd_class(message).call_from_client(context)
             else:
                 return data
             return None

@@ -2,8 +2,10 @@ import plugins
 import packetFactory
 import data.clients
 import data.players
+
 from twisted.protocols import basic
 from config import YAMLConfig
+from commands import Command
 
 ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
                          {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': ""}, True)
@@ -120,65 +122,65 @@ def check_config(user):
         data.clients.connectedClients[user.playerId].set_preferences(client_preferences)
 
 
-# noinspection PyUnresolvedReferences
 @plugins.CommandHook("gon", "Enable global chat.")
-def enable(context, params):
-    global chatPreferences
-    preferences = data.clients.connectedClients[context.playerId].get_preferences()
-    preferences['globalChat'] = True
-    context.send_crypto_packet(
-        packetFactory.SystemMessagePacket("[GlobalChat] Global chat enabled for you.", 0x3).build())
-    data.clients.connectedClients[context.playerId].set_preferences(preferences)
-    new_preferences = chatPreferences.get_key(context.playerId)
-    new_preferences['toggle'] = True
-    chatPreferences.set_key(context.playerId, new_preferences)
+class EnableGChat(Command):
+    def call_from_client(self, client):
+        global chatPreferences
+        preferences = data.clients.connectedClients[client.playerId].get_preferences()
+        preferences['globalChat'] = True
+        client.send_crypto_packet(
+            packetFactory.SystemMessagePacket("[GlobalChat] Global chat enabled for you.", 0x3).build())
+        data.clients.connectedClients[client.playerId].set_preferences(preferences)
+        new_preferences = chatPreferences.get_key(client.playerId)
+        new_preferences['toggle'] = True
+        chatPreferences.set_key(client.playerId, new_preferences)
 
 
-# noinspection PyUnresolvedReferences
 @plugins.CommandHook("goff", "Disable global chat.")
-def disable(context, params):
-    preferences = data.clients.connectedClients[context.playerId].get_preferences()
-    preferences['globalChat'] = False
-    context.send_crypto_packet(
-        packetFactory.SystemMessagePacket("[GlobalChat] Global chat disabled for you.", 0x3).build())
-    data.clients.connectedClients[context.playerId].set_preferences(preferences)
-    new_preferences = chatPreferences.get_key(context.playerId)
-    new_preferences['toggle'] = False
-    chatPreferences.set_key(context.playerId, new_preferences)
+class DisableGChat(Command):
+    def call_from_client(self, client):
+        preferences = data.clients.connectedClients[client.playerId].get_preferences()
+        preferences['globalChat'] = False
+        client.send_crypto_packet(
+            packetFactory.SystemMessagePacket("[GlobalChat] Global chat disabled for you.", 0x3).build())
+        data.clients.connectedClients[client.playerId].set_preferences(preferences)
+        new_preferences = chatPreferences.get_key(client.playerId)
+        new_preferences['toggle'] = False
+        chatPreferences.set_key(client.playerId, new_preferences)
 
 
-# noinspection PyUnresolvedReferences
 @plugins.CommandHook("g", "Chat in global chat.")
-def chat(context, params):
-    global ircMode
-    if isinstance(context, basic.LineReceiver):
+class GChat(Command):
+    def call_from_client(self, client):
+        global ircMode
+        if not data.clients.connectedClients[client.playerId].get_preferences()['globalChat']:
+            client.send_crypto_packet(packetFactory.SystemMessagePacket(
+                "[GlobalChat] You do not have global chat enabled, and can not send a global message.", 0x3).build())
+            return
+        print("[GlobalChat] <%s> %s" % (data.players.playerList[client.playerId][0], self.args[3:]))
+        if ircMode:
+            global ircBot
+            if ircBot is not None:
+                ircBot.send_global_message(
+                    data.players.playerList[client.playerId][0].encode('utf-8'), self.args[3:].encode('utf-8'))
+        for client in data.clients.connectedClients.values():
+            if client.get_preferences()['globalChat'] and client.get_handle() is not None:
+                client.get_handle().send_crypto_packet(
+                    packetFactory.TeamChatPacket(client.playerId, "[G] %s" % data.players.playerList[client.playerId][0],
+                                                self.args[3:]).build())
+
+    def call_from_console(self):
+        global ircMode
         if ircMode:
             global ircBot
             if ircBot is not None:
                 import unicodedata
 
-                ircBot.send_global_message("Console", params[:2].encode('utf-8'))
+                ircBot.send_global_message("Console", self.args[:2].encode('utf-8'))
         for client in data.clients.connectedClients.values():
             if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
-                    packetFactory.TeamChatPacket(0x1, "[GCONSOLE]",
-                                                 params[2:]).build())
+                    packetFactory.TeamChatPacket(0x999, "[GCONSOLE]",
+                                                 self.args[2:]).build())
         return
-    if not data.clients.connectedClients[context.playerId].get_preferences()['globalChat']:
-        context.send_crypto_packet(packetFactory.SystemMessagePacket(
-            "[GlobalChat] You do not have global chat enabled, and can not send a global message.", 0x3).build())
-        return
-    print("[GlobalChat] <%s> %s" % (data.players.playerList[context.playerId][0], params[3:]))
-    if ircMode:
-        global ircBot
-        if ircBot is not None:
-            import unicodedata
-
-            ircBot.send_global_message(
-                data.players.playerList[context.playerId][0].encode('utf-8'), params[3:].encode('utf-8'))
-    for client in data.clients.connectedClients.values():
-        if client.get_preferences()['globalChat'] and client.get_handle() is not None:
-            client.get_handle().send_crypto_packet(
-                packetFactory.TeamChatPacket(context.playerId, "[G] %s" % data.players.playerList[context.playerId][0],
-                                             params[3:]).build())
 
