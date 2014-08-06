@@ -340,17 +340,16 @@ class ListClients(Command):
 class GlobalMessage(Command):
     def call_from_client(self, client):
         message = None
-        mode = 0x0
         if len(self.args.split(' ', 1)) < 2:
-            try:
-                mode = int(client.split(' ', 2)[1])
-            except ValueError:
-                mode = 0x0
-                message = self.args.split(' ', 1)[1]
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[ShipProxy] {red}Incorrect usage. Usage: |globalmsg  <message_type> <Message>", 0x3).build())
+            return
 
-            if len(self.args.split(' ', 2)) < 3:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[ShipProxy] {red}Incorrect usage. Usage: |globalmsg  <message_type> <Message>", 0x3).build())
-                return
+        try:
+            mode = int(client.split(' ', 2)[1])
+        except ValueError:
+            mode = 0x0
+            message = self.args.split(' ', 1)[1]
+
         if message is not None:
             message = client.split(' ', 2)[2]
         for client in data.clients.connectedClients.values():
