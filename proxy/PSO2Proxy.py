@@ -277,7 +277,7 @@ def main():
         os.makedirs("log/")
     log_file = logfile.LogFile.fromFullPath('log/serverlog.log')
     log.addObserver(log.FileLogObserver(log_file).emit)
-    print("===== PSO2Proxy v0 GIT =====")
+    print("===== PSO2Proxy vGIT %s =====" % config.proxy_ver)
     time_string = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())
     print("[ServerStart] Trying to start server at %s" % time_string)
     if myIp == "0.0.0.0":

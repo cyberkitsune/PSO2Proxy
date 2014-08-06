@@ -1,3 +1,4 @@
+import subprocess
 import yaml
 import json
 import os.path
@@ -80,6 +81,8 @@ globalConfig = YAMLConfig("cfg/pso2proxy.config.yml",
                            'noisy': False, 'admins': [], 'enabledShips': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'commandPrefix': '!'}, True)
 
 blockNames = {}
+
+proxy_ver = subprocess.check_output(["git", "describe", "--always"])
 
 
 def is_admin(sega_id):
