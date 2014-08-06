@@ -147,19 +147,25 @@ def chat_packet(context, data):
         if len(message) > 2 and message.startswith(config.globalConfig.get_key('commandPrefix')):
             command = (message.split(' ')[0])[len(config.globalConfig.get_key('commandPrefix')):]  # Get the first word (the command) and strip the prefix'
             if command in commands.commandList:
-                if commands.commandList[command][2] and not config.is_admin(context.myUsername):
-                    context.send_crypto_packet(packetFactory.SystemMessagePacket(
-                        "[Proxy] {red}You do not have permission to run this command.", 0x3).build())
-                    return
-                cmd_class = commands.commandList[command][0]
-                cmd_class(message).call_from_client(context)  # Lazy...
+                try:
+                    if commands.commandList[command][2] and not config.is_admin(context.myUsername):
+                        context.send_crypto_packet(packetFactory.SystemMessagePacket(
+                            "[Proxy] {red}You do not have permission to run this command.", 0x3).build())
+                        return
+                    cmd_class = commands.commandList[command][0]
+                    cmd_class(message).call_from_client(context)  # Lazy...
+                except:
+                    context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}An error occured when trying to run this command.", 0x3).build())
             elif command in plugin_manager.commands:
-                if plugin_manager.commands[command][2] and not config.is_admin(context.myUsername):
-                    context.send_crypto_packet(packetFactory.SystemMessagePacket(
-                        "[Proxy] {red}You do not have permission to run this command.", 0x3).build())
-                    return
-                cmd_class = plugin_manager.commands[command][0]
-                cmd_class(message).call_from_client(context)
+                try:
+                    if plugin_manager.commands[command][2] and not config.is_admin(context.myUsername):
+                        context.send_crypto_packet(packetFactory.SystemMessagePacket(
+                            "[Proxy] {red}You do not have permission to run this command.", 0x3).build())
+                        return
+                    cmd_class = plugin_manager.commands[command][0]
+                    cmd_class(message).call_from_client(context)
+                except:
+                    context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}An error occured when trying to run this command.", 0x3).build())
             else:
                 return data
             return None
