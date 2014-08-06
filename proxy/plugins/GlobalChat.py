@@ -82,6 +82,12 @@ if ircMode:
         def send_global_message(self, ship, user, message):
             self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, message))
 
+        def send_connected(self, ship, user):
+            self.msg(self.factory.channel, "* %s connected to Ship %i" % (user, ship))
+
+        def send_left(self, ship, user):
+            self.msg(self.factory.channel, "* %s left Ship %i" % (user, ship))
+
     class GIRCFactory(protocol.ClientFactory):
         """docstring for ClassName"""
 
@@ -112,6 +118,7 @@ def create_preferences():
 @plugins.on_connection_hook
 def check_config(user):
     global chatPreferences
+    global ircMode
     if user.playerId in data.clients.connectedClients:
         client_preferences = data.clients.connectedClients[user.playerId].get_preferences()
         if 'globalChat' not in client_preferences:
@@ -124,11 +131,24 @@ def check_config(user):
                 user.send_crypto_packet(packetFactory.SystemMessagePacket(
                     "[Proxy] {red}Global chat is enabled, use %sg <Message> to chat and %sgoff to disable it." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
                     0x3).build())
+                if ircMode:
+                    global ircBot
+                    ircBot.send_connected(data.players.playerList[user.playerId][0], data.clients.connectedClients[user.playerId].ship)
             else:
                 user.send_crypto_packet(packetFactory.SystemMessagePacket(
                     "[Proxy] {red}Global chat is disabled, use %sgon to enable it and use %sg <Message> to chat." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
                     0x3).build())
         data.clients.connectedClients[user.playerId].set_preferences(client_preferences)
+
+@plugins.on_client_remove_hook
+def notify_loss(user):
+    global ircMode
+    if ircMode and user.playerId in data.clients.connectedClients:
+        global ircBot
+        client_preferences = data.clients.connectedClients[user.playerId].get_preferences()
+        if 'globalChat' not in client_preferences and client_preferences['globalChat']:
+            ircBot.send_left(data.players.playerList[user.playerId][0], data.clients.connectedClients[user.playerId].ship)
+
 
 
 @plugins.CommandHook("irc")

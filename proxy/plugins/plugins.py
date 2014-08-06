@@ -4,6 +4,7 @@ onStart = []
 onConnection = []
 onConnectionLoss = []
 onQueryConnection = []
+onClientRemove = []
 
 
 class PacketHook(object):
@@ -52,4 +53,10 @@ def on_connection_hook(f):
 def on_connection_lost_hook(f):
     global onConnectionLoss
     onConnectionLoss.append(f)
+    return f
+
+
+def on_client_remove_hook(f):
+    global onClientRemove
+    onClientRemove.append(f)
     return f

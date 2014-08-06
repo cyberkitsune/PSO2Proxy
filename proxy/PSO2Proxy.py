@@ -57,6 +57,8 @@ class ShipProxy(protocol.Protocol):
             self.peer.transport.loseConnection()
             self.peer = None
         if self.playerId is not None and not self.changingBlocks:
+            for f in plugin_manager.onClientRemove:
+                f(self)
             clients.remove_client(self)
         if self.playerId is not None and self.psoClient:
             for f in plugin_manager.onConnectionLoss:
