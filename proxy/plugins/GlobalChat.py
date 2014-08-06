@@ -109,7 +109,7 @@ def create_preferences():
 
 
 # noinspection PyUnresolvedReferences
-@plugins.on_connection_hook
+@plugins.on_initial_connect_hook
 def check_config(user):
     global chatPreferences
     global ircMode
