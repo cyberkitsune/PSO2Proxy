@@ -108,11 +108,11 @@ class HelpCommand(Command):
         for command, cData in commandList.iteritems():
             if cData[1] is not None:
                 user_command_count += 1
-                string += "|%s - %s\n\n" % (command, cData[1])
+                string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
         for command, cData in plugin_manager.commands.iteritems():
             if cData[1] is not None:
                 user_command_count += 1
-                string += "|%s - %s\n\n" % (command, cData[1])
+                string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
         string += "=== %i commands in total. ===" % user_command_count
         client.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
 

@@ -5,6 +5,7 @@ import data.players
 
 from twisted.protocols import basic
 from config import YAMLConfig
+import config
 from commands import Command
 
 ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
@@ -114,11 +115,11 @@ def check_config(user):
                 chatPreferences.set_key(user.playerId, {'toggle': True})
             if client_preferences['globalChat']:
                 user.send_crypto_packet(packetFactory.SystemMessagePacket(
-                    "[Proxy] {red}Global chat is enabled, use |g <Message> to chat and |goff to disable it.",
+                    "[Proxy] {red}Global chat is enabled, use %sg <Message> to chat and %sgoff to disable it." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
                     0x3).build())
             else:
                 user.send_crypto_packet(packetFactory.SystemMessagePacket(
-                    "[Proxy] {red}Global chat is disabled, use |gon to enable it and use |g <Message> to chat.",
+                    "[Proxy] {red}Global chat is disabled, use %sgon to enable it and use %sg <Message> to chat." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
                     0x3).build())
         data.clients.connectedClients[user.playerId].set_preferences(client_preferences)
 
