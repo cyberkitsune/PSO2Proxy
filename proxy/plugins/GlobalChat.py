@@ -166,8 +166,7 @@ class GChat(Command):
         for client in data.clients.connectedClients.values():
             if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
-                    packetFactory.TeamChatPacket(client.playerId, "[G] %s" % data.players.playerList[client.playerId][0],
-                                                self.args[3:]).build())
+                    packetFactory.TeamChatPacket(client.playerId, "[G] %s" % data.players.playerList[client.playerId][0], self.args[3:]).build())
 
     def call_from_console(self):
         global ircMode
