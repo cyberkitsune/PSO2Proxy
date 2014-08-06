@@ -29,20 +29,20 @@ class WEBRcon(Resource):
 
     def render_GET(self, request):
         request.setHeader('content-type', "application/json")
-        if 'key' not in request.args or request.args['key'] != web_api_config.get_key('webRconKey'):
+        if 'key' not in request.args or request.args['key'][0] != web_api_config.get_key('webRconKey'):
             return json.dumps({'success': False, 'reason': "Your RCON key is invalid!"})
         else:
             if 'command' not in request.args:
                 return json.dumps({'success': False, 'reason': "Command not specified."})
             else:
                 try:
-                    if request.args['command'] in commandList:
-                        cmd_class = commandList[request.args['command']][0]
-                        result = cmd_class(request.args['params'] if 'params' in request.args else None).call_from_console()
+                    if request.args['command'][0] in commandList:
+                        cmd_class = commandList[request.args['command'][0]][0]
+                        result = cmd_class(request.args['params'][0] if 'params' in request.args else None).call_from_console()
                         return json.dumps({'success': True, 'output': result})
-                    elif request.args['command'] in pluginCommands:
-                        cmd_class = pluginCommands[request.args['command']][0]
-                        result = cmd_class(request.args['params'] if 'params' in request.args else None).call_from_console()
+                    elif request.args['command'][0] in pluginCommands:
+                        cmd_class = pluginCommands[request.args['command'][0]][0]
+                        result = cmd_class(request.args['params'][0] if 'params' in request.args else None).call_from_console()
                         return json.dumps({'success': True, 'output': result})
                     else:
                         json.dumps({'success': False, 'reason': "Command not found."})
