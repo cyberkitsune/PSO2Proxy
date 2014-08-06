@@ -65,5 +65,5 @@ def on_client_remove_hook(f):
 
 def on_initial_connect_hook(f):
     global onInitialConnection
-    onInitialConnection.appenf(f)
+    onInitialConnection.append(f)
     return f
