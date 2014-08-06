@@ -366,3 +366,9 @@ class Exit(Command):
     def call_from_console(self):
         reactor.callFromThread(reactor.stop)
         return "[ShipProxy] Exiting..."
+
+@CommandHandler("reloadblocknames")
+class ReloadBlockNames(Command):
+    def call_from_console(self):
+        config.load_block_names()
+        return
