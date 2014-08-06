@@ -56,6 +56,5 @@ def get_chat_packet(context, packet):
         if not japanese:
             return packet
         new_msg = "%s (%s)" % (translator.translate(message, "en"), message.rstrip('\0'))
-        print new_msg
         return packetFactory.ChatPacket(player_id, new_msg, channel_id).build()
     return packet
