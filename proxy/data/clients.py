@@ -14,6 +14,7 @@ class ClientData(object):
         self.ipAddress = ip_address
         self.segaId = segaid
         self.handle = handle
+        self.ship = ship
         self.preferences = {}
 
     def get_handle(self):
