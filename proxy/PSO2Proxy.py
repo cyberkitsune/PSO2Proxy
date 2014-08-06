@@ -133,7 +133,8 @@ class ShipProxy(protocol.Protocol):
 
             if (packet_type[0], packet_type[1]) in plugin_manager.packetFunctions:
                 for f in plugin_manager.packetFunctions[(packet_type[0], packet_type[1])]:
-                    packet = f(self, packet)
+                    if packet is not None:
+                        packet = f(self, packet)
 
             if packet is None:
                 return
