@@ -39,10 +39,11 @@ def get_chat_packet(context, packet):
         user_prefs = data.clients.connectedClients[context.playerId].get_preferences()
         if not user_prefs['translate_chat']:
             return packet
-        player_id = struct.unpack_from("<I", buffer(packet), 0x8)
+        data = bytearray(packet)
+        player_id = struct.unpack_from("<I", data, 0x8)
         if player_id == 0:  # We sent it
             return packet
-        channel_id = struct.unpack_from("<I", buffer(packet), 0x14)
+        channel_id = struct.unpack_from("<I", data, 0x14)
         message = packet[0x1C:].decode('utf-16le')
         return packetFactory.ChatPacket(player_id, "%s *" % translator.translate(message, "en"), channel_id).build()
     return packet
