@@ -9,7 +9,6 @@ from config import YAMLConfig
 import plugins as p
 
 translation_config = YAMLConfig("cfg/translator.config.yml", {'app_id': '', 'secret_key': ''}, True)
-translator = Translator(translation_config.get_key('app_id'), translation_config.get_key('secret_key'))
 
 
 @p.on_initial_connect_hook
@@ -55,6 +54,7 @@ def get_chat_packet(context, packet):
                 break
         if not japanese:
             return packet
+        translator = Translator(translation_config.get_key('app_id'), translation_config.get_key('secret_key'))
         new_msg = "%s (%s)" % (translator.translate(message, "en"), message.rstrip('\0'))
         return packetFactory.ChatPacket(player_id, new_msg, channel_id).build()
     return packet
