@@ -16,7 +16,7 @@ ircNick = ircSettings.get_key('nick')
 ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
 ircChannel = ircSettings.get_key('channel')
 
-gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'messagePrefix': ''}, True)
+gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'prefix': ''}, True)
 
 if ircMode:
     from twisted.words.protocols import irc
