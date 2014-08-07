@@ -1,5 +1,6 @@
 packetFunctions = {}
 commands = {}
+rawPacketFunctions = []
 onStart = []
 onConnection = []
 onConnectionLoss = []
@@ -66,4 +67,9 @@ def on_client_remove_hook(f):
 def on_initial_connect_hook(f):
     global onInitialConnection
     onInitialConnection.append(f)
+    return f
+
+def raw_packet_hook(f):
+    global rawPacketFunctions
+    rawPacketFunctions.append(f)
     return f

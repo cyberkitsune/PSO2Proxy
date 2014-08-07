@@ -77,7 +77,7 @@ class YAMLConfig(object):
 banList = []
 
 globalConfig = YAMLConfig("cfg/pso2proxy.config.yml",
-                          {'packetLogging': False, 'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 1,
+                          {'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 1,
                            'noisy': False, 'admins': [], 'enabledShips': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'commandPrefix': '!'}, True)
 
 blockNames = {}
@@ -144,7 +144,6 @@ def is_player_id_banned(player_id):
 
 load_bans()
 
-packetLogging = globalConfig.get_key('packetLogging')
 myIpAddress = globalConfig.get_key('myIpAddr')
 bindIp = globalConfig.get_key('bindIp')
 blockNameMode = globalConfig.get_key('blockNameMode')
