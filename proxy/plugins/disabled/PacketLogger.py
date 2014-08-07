@@ -58,7 +58,7 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
     if context.playerId in data.clients.connectedClients and 'prefs' in context.extendedData:
         del context.extendedData['prefs']
         prefs = data.clients.connectedClients[context.playerId].preferences
-    if context.myUsername is not None and prefs['logPackets'] is not None and not prefs['prefs']['logPackets']:
+    if context.myUsername is not None and prefs['logPackets'] is not None and not prefs['logPackets']:
         if 'orphans' in context.extendedData:
             print("[PacketLogger] %s has opted out of packet logging. Deleting orphans..." % context.myUsername)
             del context.extendedData['orphans']
