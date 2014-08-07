@@ -31,7 +31,6 @@ else:
 
 profiling = jsonConfig['profiling']
 
-
 @plugins.on_start_hook
 def redpill_init():
     print("[Redpill] Redpill initialized.")
@@ -70,19 +69,19 @@ def login_packet_hook(context, packet):
     """
     :type context: ShipProxy
     """
+    global db_connection
     username = packet[0x8:0x48].decode('utf-8')
     username = username.rstrip('\0')
-    con = get_connection()
-    with con:
-        if get_userid(con, username) is None:
-            context.extendedData['redpill'] = False
-            context.peer.extendedData['redpill'] = False
-            print("[Redpill] %s is not in the whitelist database. Disabling functionality." % username)
-        else:
-            context.extendedData['redpill'] = True
-            context.peer.extendedData['redpill'] = True
-            enabledCache.append(username)
-            increment_login_count(con, get_userid(con, username))
+    con = db_connection
+    if get_userid(con, username) is None:
+        context.extendedData['redpill'] = False
+        context.peer.extendedData['redpill'] = False
+        print("[Redpill] %s is not in the whitelist database. Disabling functionality." % username)
+    else:
+        context.extendedData['redpill'] = True
+        context.peer.extendedData['redpill'] = True
+        enabledCache.append(username)
+        increment_login_count(con, get_userid(con, username))
     return packet
 
 
@@ -146,6 +145,7 @@ def archive_packets(client):
     """
     :type client: ShipProxy
     """
+    global db_connection
     if not client.changingBlocks and client.myUsername in enabledCache:
         print("[Redpill] Removing %s from the enabled cache." % client.myUsername)
         enabledCache.remove(client.myUsername)
@@ -163,31 +163,30 @@ def archive_packets(client):
         if profiling:
             profile = cProfile.Profile()
             profile.enable()
-        con = get_connection()
-        with con:
-            session_id = create_session(con, get_userid(con, sid), timestamp)
-            packets = glob.glob("packets/%s/%i/*.bin" % (sid, timestamp))
-            count = 0
-            for packet in packets:
-                order, packet_types, packet_sender, extension = packet.split(".")
-                order = order.split("/")[-1]
-                packet_type, packet_subtype = packet_types.split("-")
-                player_id = get_packet_id(con, int(packet_type, 16), int(packet_subtype, 16))
-                if player_id is None:
-                    player_id = create_packet(con, int(packet_type, 16), int(packet_subtype, 16), get_userid(con, sid))
-                add_session_data(con, session_id, player_id, packet_sender, order)
-                increment_packet_count(con, player_id)
-                count += 1
-            print("[Redpill] Checked in session %i for %s with %i packets" % (timestamp, sid, count))
-            tar = tarfile.open("packets/%s/%i.tar.gz" % (sid, timestamp), "w:gz")
-            tar.add("packets/%s/%i/" % (sid, timestamp), arcname="%i" % timestamp)
-            tar.close()
-            shutil.rmtree("packets/%s/%i/" % (sid, timestamp))
-            if jsonConfig['tarOut'] is not None:
-                if not os.path.exists("%s/%s/" % (jsonConfig['tarOut'], sid)):
-                    os.makedirs("%s/%s/" % (jsonConfig['tarOut'], sid))
-                shutil.move("packets/%s/%i.tar.gz" % (sid, timestamp), "%s/%s/%i.tar.gz" % (jsonConfig['tarOut'], sid, timestamp))
-            print("[Redpill] Archived as %i.tar.gz and deleted base folder." % timestamp)
+        con = db_connection
+        session_id = create_session(con, get_userid(con, sid), timestamp)
+        packets = glob.glob("packets/%s/%i/*.bin" % (sid, timestamp))
+        count = 0
+        for packet in packets:
+            order, packet_types, packet_sender, extension = packet.split(".")
+            order = order.split("/")[-1]
+            packet_type, packet_subtype = packet_types.split("-")
+            player_id = get_packet_id(con, int(packet_type, 16), int(packet_subtype, 16))
+            if player_id is None:
+                player_id = create_packet(con, int(packet_type, 16), int(packet_subtype, 16), get_userid(con, sid))
+            add_session_data(con, session_id, player_id, packet_sender, order)
+            increment_packet_count(con, player_id)
+            count += 1
+        print("[Redpill] Checked in session %i for %s with %i packets" % (timestamp, sid, count))
+        tar = tarfile.open("packets/%s/%i.tar.gz" % (sid, timestamp), "w:gz")
+        tar.add("packets/%s/%i/" % (sid, timestamp), arcname="%i" % timestamp)
+        tar.close()
+        shutil.rmtree("packets/%s/%i/" % (sid, timestamp))
+        if jsonConfig['tarOut'] is not None:
+            if not os.path.exists("%s/%s/" % (jsonConfig['tarOut'], sid)):
+                os.makedirs("%s/%s/" % (jsonConfig['tarOut'], sid))
+            shutil.move("packets/%s/%i.tar.gz" % (sid, timestamp), "%s/%s/%i.tar.gz" % (jsonConfig['tarOut'], sid, timestamp))
+        print("[Redpill] Archived as %i.tar.gz and deleted base folder." % timestamp)
         if profiling:
             profile.disable()
             s = StringIO.StringIO()
@@ -262,3 +261,5 @@ def create_packet(con, packet_type, packet_subtype, logger):
     cur.execute("insert into packets (type, subType, firstLoggedBy, count) values (%s, %s, %s, 0)",
                 (packet_type, packet_subtype, logger))
     return cur.lastrowid
+
+db_connection = get_connection()
