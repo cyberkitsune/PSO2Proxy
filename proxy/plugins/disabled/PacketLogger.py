@@ -66,10 +66,14 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
         packet_data = str(packet_data)
     else:
         packet_data = packet
+    if context.psoClient:
+        sender = "C"
+    else:
+        sender = "S"
     if context.myUsername is not None:
         path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (
             context.myUsername, context.connTimestamp, context.packetCount, packet_type, packet_subtype,
-            context.transport.getPeer().host)
+            sender)
         try:
             os.makedirs(os.path.dirname(path))
         except exceptions.OSError:
@@ -80,7 +84,7 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
         if 'orphans' not in context.extendedData:
             context.extendedData['orphans'] = []
         context.extendedData['orphans'].append(
-            {'data': packet_data, 'count': context.packetCount, 'type': packet_type, "sub": packet_subtype})
+            {'data': packet_data, 'count': context.packetCount, 'type': packet_type, "sub": packet_subtype, "sender": sender})
 
     if context.myUsername is not None and 'orphans' in context.extendedData and len(context.extendedData['orphans']) > 0:
         count = 0
@@ -88,8 +92,7 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
             orphan_packet = context.extendedData['orphans'].pop()
             path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (
                 context.myUsername, context.connTimestamp, orphan_packet['count'], orphan_packet['type'],
-                orphan_packet['sub'],
-                context.transport.getPeer().host)
+                orphan_packet['sub'], orphan_packet['sender'])
             try:
                 os.makedirs(os.path.dirname(path))
             except exceptions.OSError:
