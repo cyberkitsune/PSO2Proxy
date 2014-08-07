@@ -37,6 +37,7 @@ def redpill_init():
     print("[Redpill] Redpill initialized.")
 
 
+@plugins.on_initial_connect_hook
 def notify_user(client):
     """
     :type client: ShipProxy
