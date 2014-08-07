@@ -25,7 +25,7 @@ def notify_and_config(client):
     """
     :type client: ShipProxy
     """
-    if client.myUsername not in logging_config:
+    if not logging_config.key_exists(client.myUsername):
         logging_config[client.myUsername] = False
     if logging_config[client.playerId]:
         client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have opted-in to packet logging, Thank you! View your contributions on http://pso2proxy.cyberkitsune.net/redpill/ or use !optout to opt out", 0x3).build())
