@@ -113,7 +113,7 @@ def check_config(user):
     if user.playerId in data.clients.connectedClients:
         client_preferences = data.clients.connectedClients[user.playerId].preferences
         if not client_preferences.has_preference("globalChat"):
-            client_preferences['globalChat'] = True
+            client_preferences.set_preference("globalChat", True)
         if client_preferences.get_preference('globalChat'):
             user.send_crypto_packet(packetFactory.SystemMessagePacket(
                 "[Proxy] {red}Global chat is enabled, use %sg <Message> to chat and %sgoff to disable it." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
