@@ -53,7 +53,7 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
     """
     :type context: ShipProxy
     """
-    if context.playerId is not None and not logging_config.key_exists(context.myUsername):
+    if context.myUsername is not None and not logging_config.key_exists(context.myUsername):
         logging_config[context.myUsername] = False
     if context.myUsername is not None and not logging_config[context.myUsername]:
         if 'orphans' in context.extendedData:
