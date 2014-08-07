@@ -16,6 +16,8 @@ ircNick = ircSettings.get_key('nick')
 ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
 ircChannel = ircSettings.get_key('channel')
 
+gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'messagePrefix': ''}, True)
+
 if ircMode:
     from twisted.words.protocols import irc
     from twisted.internet import reactor, protocol
@@ -58,10 +60,12 @@ if ircMode:
             if channel == self.factory.channel:
                 print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8')))
                 for client in data.clients.connectedClients.values():
-                    if client.get_preferences()['globalChat'] and client.get_handle() is not None:
-                        client.get_handle().send_crypto_packet(
-                            packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]),
-                                                         "[GIRC] %s" % user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8')).build())
+                    if client.preferences.get_preference('globalChat') and client.get_handle() is not None:
+                        if gchatSettings['displayMode'] == 0:
+                            client.get_handle().send_crypto_packet(
+                                packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]), "[GIRC] %s" % user.split("!")[0], "%s%s" % (gchatSettings['prefix'], replace_irc_with_pso2(msg).decode('utf-8'))).build())
+                        else:
+                            client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> %s" % (user.split("!")[0], "%s%s" % (gchatSettings['prefix'], replace_irc_with_pso2(msg).decode('utf-8'))), 0x3).build())
             else:
                 print("[IRC] <%s> %s" % (user, msg))
 
@@ -72,11 +76,12 @@ if ircMode:
             if channel == self.factory.channel:
                 print("[GlobalChat] [IRC] * %s %s" % (user, replace_irc_with_pso2(msg).decode('utf-8')))
                 for client in data.clients.connectedClients.values():
-                    if client.get_preferences()['globalChat'] and client.get_handle() is not None:
-                        client.get_handle().send_crypto_packet(
-                            packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]),
-                                                         "[GIRC] %s" % user.split("!")[0],
-                                                         "* %s" % replace_irc_with_pso2(msg).decode('utf-8')).build())
+                    if client.preferences.get_preference('globalChat') and client.get_handle() is not None:
+                        if gchatSettings['displayMode'] == 0:
+                            client.get_handle().send_crypto_packet(
+                                packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]), "[GIRC] %s" % user.split("!")[0], "* %s%s" % (gchatSettings['prefix'], replace_irc_with_pso2(msg).decode('utf-8'))).build())
+                        else:
+                            client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> * %s" % (user.split("!")[0], "%s%s" % (gchatSettings['prefix'], replace_irc_with_pso2(msg).decode('utf-8'))), 0x3).build())
 
         def send_global_message(self, ship, user, message):
             self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, replace_pso2_with_irc(message)))
@@ -168,10 +173,10 @@ class GChat(Command):
                     data.players.playerList[client.playerId][0].encode('utf-8'), self.args[3:].encode('utf-8'))
         for client_data in data.clients.connectedClients.values():
             if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
-                client_data.get_handle().send_crypto_packet(
-                    packetFactory.TeamChatPacket(client.playerId,
-                                                 "[G-%02i] %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0]),
-                                                 self.args[3:]).build())
+                if gchatSettings['displayMode'] == 0:
+                    client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(client.playerId, "[G-%02i] %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0]), "%s%s" % (gchatSettings['prefix'], self.args[3:])).build())
+                else:
+                    client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0], "%s%s" % (gchatSettings['prefix'], self.args[3:])), 0x3).build())
 
     def call_from_console(self):
         global ircMode
@@ -181,8 +186,10 @@ class GChat(Command):
                 ircBot.send_global_message(0, "Console", self.args[:2].encode('utf-8'))
         for client in data.clients.connectedClients.values():
             if client.preferences.get_preference("globalChat") and client.get_handle() is not None:
-                client.get_handle().send_crypto_packet(
-                    packetFactory.TeamChatPacket(0x999, "[GCONSOLE]",
-                                                 self.args[2:]).build())
+                if gchatSettings['displayMode'] == 0:
+                    client.get_handle().send_crypto_packet(
+                        packetFactory.TeamChatPacket(0x999, "[GCONSOLE]", self.args[2:]).build())
+                else:
+                    client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GCONSOLE] %s%s" % (gchatSettings['prefix'], self.args[2:]), 0x3).build())
         return "[GlobalChat] <Console> %s" % self.args[2:]
 

@@ -21,6 +21,9 @@ class ClientData(object):
         self.preferences = ClientPreferences(segaid)
 
     def get_handle(self):
+        """
+        :rtype : ShipProxy
+        """
         return self.handle
 
     def set_handle(self, handle):
