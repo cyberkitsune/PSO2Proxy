@@ -91,7 +91,7 @@ def get_chat_packet(context, packet):
         if not japanese:
             return packet
         try:
-            new_msg = "%s (%s)" % (translator.translate(message, "en").rstrip('\0'), message.rstrip('\0'))
+            new_msg = "%s (%s)" % (translator.translate(message, "en", "ja").rstrip('\0'), message.rstrip('\0'))
             return packetFactory.ChatPacket(player_id, new_msg, channel_id).build()
         except:
             print("[Translator] Got an exception! Bailing out...")
