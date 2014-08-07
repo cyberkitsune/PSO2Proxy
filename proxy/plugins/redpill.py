@@ -11,10 +11,12 @@ import pstats
 import StringIO
 import json
 import struct
-
+import packetFactory
 import plugins
 
 jsonConfig = {'profiling': True, 'dbConfig': {'host': '', 'port': 3306, 'db': 'redpill', 'user': '', 'passwd': ''}, 'tarOut': None}
+
+enabledCache = []
 
 if not os.path.exists("cfg/redpill.config.json"):
     f = open("cfg/redpill.config.json", 'w')
@@ -35,6 +37,31 @@ def redpill_init():
     print("[Redpill] Redpill initialized.")
 
 
+def notify_user(client):
+    """
+    :type client: ShipProxy
+    """
+    if 'redpill' in client.extendedData and client.extendedData['redpill']:
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[Redpill] {red}You have chosen to opt-in to PacketDB. Your packets are being logged.", 0x3).build())
+
+
+@plugins.on_connection_hook
+def catch_block_change(client):
+    """
+    :type client: ShipProxy
+    """
+    if client.myUsername is not None:
+        if client.myUsername in enabledCache:
+            client.extendedData['redpill'] = True
+            client.peer.extendedData['redpill'] = True
+        else:
+            client.extendedData['redpill'] = False
+            client.peer.extendedData['redpill'] = False
+    else:
+        client.extendedData['redpill'] = False
+        client.peer.extendedData['redpill'] = False
+
+
 @plugins.PacketHook(0x11, 0x0)
 def login_packet_hook(context, packet):
     """
@@ -46,9 +73,12 @@ def login_packet_hook(context, packet):
     with con:
         if get_userid(con, username) is None:
             context.extendedData['redpill'] = False
+            context.peer.extendedData['redpill'] = False
             print("[Redpill] %s is not in the whitelist database. Disabling functionality." % username)
         else:
             context.extendedData['redpill'] = True
+            context.peer.extendedData['redpill'] = True
+            enabledCache.append(username)
             increment_login_count(con, get_userid(con, username))
     return packet
 
@@ -69,21 +99,25 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
         packet_data = str(packet_data)
     else:
         packet_data = packet
+    if context.psoClient:
+        sender = "C"
+    else:
+        sender = "S"
     if context.myUsername is not None:
         path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (
             context.myUsername, context.connTimestamp, context.packetCount, packet_type, packet_subtype,
-            context.transport.getPeer().host)
+            sender)
         try:
             os.makedirs(os.path.dirname(path))
         except exceptions.OSError:
             pass
-        with open(path, 'wb') as f:
-            f.write(packet_data)
+        with open(path, 'wb') as out_file:
+            out_file.write(packet_data)
     else:
         if 'orphans' not in context.extendedData:
             context.extendedData['orphans'] = []
         context.extendedData['orphans'].append(
-            {'data': packet_data, 'count': context.packetCount, 'type': packet_type, "sub": packet_subtype})
+            {'data': packet_data, 'count': context.packetCount, 'type': packet_type, "sub": packet_subtype, "sender": sender})
 
     if context.myUsername is not None and 'orphans' in context.extendedData and len(context.extendedData['orphans']) > 0 and 'redpill' in context.extendedData and context.extendedData['redpill']:
         count = 0
@@ -91,14 +125,13 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
             orphan_packet = context.extendedData['orphans'].pop()
             path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (
                 context.myUsername, context.connTimestamp, orphan_packet['count'], orphan_packet['type'],
-                orphan_packet['sub'],
-                context.transport.getPeer().host)
+                orphan_packet['sub'], orphan_packet['sender'])
             try:
                 os.makedirs(os.path.dirname(path))
             except exceptions.OSError:
                 pass
-            with open(path, 'wb') as f:
-                f.write(orphan_packet['data'])
+            with open(path, 'wb') as out_file:
+                out_file.write(orphan_packet['data'])
             count += 1
         print('[ShipProxy] Flushed %i orphan packets for %s.' % (count, context.myUsername))
 
@@ -130,7 +163,7 @@ def archive_packets(client):
             packets = glob.glob("packets/%s/%i/*.bin" % (sid, timestamp))
             count = 0
             for packet in packets:
-                order, packet_types, packet_sender, extention = packet.split(".")
+                order, packet_types, packet_sender, extension = packet.split(".")
                 order = order.split("/")[-1]
                 packet_type, packet_subtype = packet_types.split("-")
                 player_id = get_packet_id(con, int(packet_type, 16), int(packet_subtype, 16))
