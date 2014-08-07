@@ -1,15 +1,14 @@
 import data.clients
 import packetFactory
 import struct
-from microsofttranslator import Translator
+import goslate
 from unicodescript import script
 from commands import Command
 from config import YAMLConfig
 
 import plugins as p
 
-translation_config = YAMLConfig("cfg/translator.config.yml", {'app_id': '', 'secret_key': ''}, True)
-
+translator = goslate.Goslate()
 translatePrefrences = YAMLConfig("cfg/translator.prefs.yml")
 
 @p.on_initial_connect_hook
@@ -66,7 +65,6 @@ def get_chat_packet(context, packet):
             return
         channel_id = struct.unpack_from("I", packet, 0x14)[0]
         message = packet[0x1C:].decode('utf-16').rstrip("\0")
-        translator = Translator(translation_config.get_key('app_id'), translation_config.get_key('secret_key'))
         return packetFactory.ChatPacket(0x0, translator.translate(message, "ja"), channel_id).build()
     if context.peer.psoClient and context.peer.playerId in data.clients.connectedClients:
         user_prefs = data.clients.connectedClients[context.peer.playerId].get_preferences()
@@ -87,7 +85,6 @@ def get_chat_packet(context, packet):
                 break
         if not japanese:
             return packet
-        translator = Translator(translation_config.get_key('app_id'), translation_config.get_key('secret_key'))
         new_msg = "%s (%s)" % (translator.translate(message, "en").rstrip('\0'), message.rstrip('\0'))
         return packetFactory.ChatPacket(player_id, new_msg, channel_id).build()
     return packet
