@@ -57,6 +57,8 @@ class ShipProxy(protocol.Protocol):
             self.peer.transport.loseConnection()
             self.peer = None
         if self.playerId is not None and not self.changingBlocks:
+            for f in plugin_manager.onClientRemove:
+                f(self)
             clients.remove_client(self)
         if self.playerId is not None and self.psoClient:
             for f in plugin_manager.onConnectionLoss:
@@ -139,7 +141,8 @@ class ShipProxy(protocol.Protocol):
 
             if (packet_type[0], packet_type[1]) in plugin_manager.packetFunctions:
                 for f in plugin_manager.packetFunctions[(packet_type[0], packet_type[1])]:
-                    packet = f(self, packet)
+                    if packet is not None:
+                        packet = f(self, packet)
 
             if packet is None:
                 return
@@ -148,7 +151,7 @@ class ShipProxy(protocol.Protocol):
                 if self.playerId not in clients.connectedClients:  # Inital add
                     clients.add_client(self)
                     self.loaded = True
-                    for f in plugin_manager.onConnection:
+                    for f in plugin_manager.onInitialConnection:
                         f(self)
                 elif not self.loaded:
                     clients.populate_data(self)
@@ -263,10 +266,14 @@ class ServerConsole(basic.LineReceiver):
             if command != "":
                 if command in commandList:
                     f = commandList[command][0]
-                    f(self, line)
+                    out = f(line).call_from_console()
+                    if out is not None:
+                        print(out)
                 elif command in plugin_manager.commands:
                     plugin_f = plugin_manager.commands[command][0]
-                    plugin_f(self, line)
+                    out = plugin_f(line).call_from_console()
+                    if out is not None:
+                        print(out)
                 else:
                     print("[Command] Command %s not found!" % command)
         except:
@@ -280,7 +287,7 @@ def main():
         os.makedirs("log/")
     log_file = logfile.LogFile.fromFullPath('log/serverlog.log')
     log.addObserver(log.FileLogObserver(log_file).emit)
-    print("===== PSO2Proxy v0 GIT =====")
+    print("===== PSO2Proxy vGIT %s =====" % config.proxy_ver)
     time_string = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())
     print("[ServerStart] Trying to start server at %s" % time_string)
     if myIp == "0.0.0.0":
@@ -310,11 +317,13 @@ def main():
         print("After you fix this, please restart PSO2Proxy.")
         sys.exit(0)
 
+    for shipNum in range(0, 10):  # PSO2 Checks all ships round robin, so sadly for max compatibility we have to open these no matter what ships are enabled...
+        ship_endpoint = TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=interface_ip)
+        ship_endpoint.listen(ShipAdvertiserFactory())
+
     for shipNum in config.globalConfig.get_key('enabledShips'):
         query_endpoint = TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=interface_ip)
         query_endpoint.listen(BlockScraperFactory())
-        ship_endpoint = TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=interface_ip)
-        ship_endpoint.listen(ShipAdvertiserFactory())
         print("[ShipProxy] Bound port %i for ship %i query server!" % ((12000 + (100 * shipNum)), shipNum))
         bound = 0
         for blockNum in xrange(1, 99):

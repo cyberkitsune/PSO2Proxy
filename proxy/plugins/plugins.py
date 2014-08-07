@@ -3,6 +3,9 @@ commands = {}
 onStart = []
 onConnection = []
 onConnectionLoss = []
+onQueryConnection = []
+onClientRemove = []
+onInitialConnection = []
 
 
 class PacketHook(object):
@@ -23,16 +26,22 @@ class CommandHook(object):
     def __init__(self, command, help_text=None, admin_only=False):
         self.command = command
         self.help_text = help_text
-        self.admin_only =admin_only
+        self.admin_only = admin_only
 
-    def __call__(self, f):
+    def __call__(self, command_class):
         global commands
-        commands[self.command] = [f, self.help_text, self.admin_only]
+        commands[self.command] = [command_class, self.help_text, self.admin_only]
 
 
 def on_start_hook(f):
     global onStart
     onStart.append(f)
+    return f
+
+
+def on_query_connection_hook(f):
+    global onQueryConnection
+    onQueryConnection.append(f)
     return f
 
 
@@ -45,4 +54,16 @@ def on_connection_hook(f):
 def on_connection_lost_hook(f):
     global onConnectionLoss
     onConnectionLoss.append(f)
+    return f
+
+
+def on_client_remove_hook(f):
+    global onClientRemove
+    onClientRemove.append(f)
+    return f
+
+
+def on_initial_connect_hook(f):
+    global onInitialConnection
+    onInitialConnection.append(f)
     return f

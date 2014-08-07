@@ -2,11 +2,14 @@ import plugins
 import packetFactory
 import data.clients
 import data.players
-from twisted.protocols import basic
+
+from PSO2DataTools import replace_irc_with_pso2, replace_pso2_with_irc
 from config import YAMLConfig
+import config
+from commands import Command
 
 ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
-                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': ""}, True)
+                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': "", 'autoexec': []}, True)
 
 ircMode = ircSettings.get_key('enabled')
 ircNick = ircSettings.get_key('nick')
@@ -46,30 +49,39 @@ if ircMode:
 
         def signedOn(self):
             global ircBot
+            for command in ircSettings.get_key('autoexec'):
+                self.sendLine(command)
+                print("[IRC-AUTO] >>> %s" % command)
             self.join(self.factory.channel)
             print("[GlobalChat] Joined %s" % self.factory.channel)
             ircBot = self
 
         def privmsg(self, user, channel, msg):
             if channel == self.factory.channel:
-                print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], msg))
+                print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8')))
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
                             packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]),
-                                                         "[GIRC] %s" % user.split("!")[0], msg.decode('utf-8')).build())
+                                                         "[GIRC] %s" % user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8')).build())
+            else:
+                print("[IRC] <%s> %s" % (user, msg))
+
+        def noticed(self, user, channel, message):
+            print("[IRC] [NOTICE] %s %s" % (user, message))
 
         def action(self, user, channel, msg):
             if channel == self.factory.channel:
-                print("[GlobalChat] [IRC] * %s %s" % (user, msg))
+                print("[GlobalChat] [IRC] * %s %s" % (user, replace_irc_with_pso2(msg).decode('utf-8')))
                 for client in data.clients.connectedClients.values():
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
                             packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]),
-                                                         "[GIRC] %s" % user.split("!")[0], "* %s" % msg.decode('utf-8')).build())
+                                                         "[GIRC] %s" % user.split("!")[0],
+                                                         "* %s" % replace_irc_with_pso2(msg).decode('utf-8')).build())
 
-        def send_global_message(self, user, message):
-            self.msg(self.factory.channel, "[G] <%s> %s" % (user, message))
+        def send_global_message(self, ship, user, message):
+            self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, replace_pso2_with_irc(message)))
 
     class GIRCFactory(protocol.ClientFactory):
         """docstring for ClassName"""
@@ -98,9 +110,10 @@ def create_preferences():
 
 
 # noinspection PyUnresolvedReferences
-@plugins.on_connection_hook
+@plugins.on_initial_connect_hook
 def check_config(user):
     global chatPreferences
+    global ircMode
     if user.playerId in data.clients.connectedClients:
         client_preferences = data.clients.connectedClients[user.playerId].get_preferences()
         if 'globalChat' not in client_preferences:
@@ -111,74 +124,83 @@ def check_config(user):
                 chatPreferences.set_key(user.playerId, {'toggle': True})
             if client_preferences['globalChat']:
                 user.send_crypto_packet(packetFactory.SystemMessagePacket(
-                    "[Proxy] {red}Global chat is enabled, use |g <Message> to chat and |goff to disable it.",
+                    "[Proxy] {red}Global chat is enabled, use %sg <Message> to chat and %sgoff to disable it." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
                     0x3).build())
             else:
                 user.send_crypto_packet(packetFactory.SystemMessagePacket(
-                    "[Proxy] {red}Global chat is disabled, use |gon to enable it and use |g <Message> to chat.",
+                    "[Proxy] {red}Global chat is disabled, use %sgon to enable it and use %sg <Message> to chat." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
                     0x3).build())
         data.clients.connectedClients[user.playerId].set_preferences(client_preferences)
 
 
-# noinspection PyUnresolvedReferences
+@plugins.CommandHook("irc")
+class IRCCommand(Command):
+    def call_from_console(self):
+        global ircMode
+        global ircBot
+        if ircMode and ircBot is not None:
+            ircBot.sendLine(self.args.split(" ", 1)[1])
+            return "[IRC] >>> %s" % self.args.split(" ", 1)[1]
+
+
 @plugins.CommandHook("gon", "Enable global chat.")
-def enable(context, params):
-    global chatPreferences
-    preferences = data.clients.connectedClients[context.playerId].get_preferences()
-    preferences['globalChat'] = True
-    context.send_crypto_packet(
-        packetFactory.SystemMessagePacket("[GlobalChat] Global chat enabled for you.", 0x3).build())
-    data.clients.connectedClients[context.playerId].set_preferences(preferences)
-    new_preferences = chatPreferences.get_key(context.playerId)
-    new_preferences['toggle'] = True
-    chatPreferences.set_key(context.playerId, new_preferences)
+class EnableGChat(Command):
+    def call_from_client(self, client):
+        global chatPreferences
+        preferences = data.clients.connectedClients[client.playerId].get_preferences()
+        preferences['globalChat'] = True
+        client.send_crypto_packet(
+            packetFactory.SystemMessagePacket("[GlobalChat] Global chat enabled for you.", 0x3).build())
+        data.clients.connectedClients[client.playerId].set_preferences(preferences)
+        new_preferences = chatPreferences.get_key(client.playerId)
+        new_preferences['toggle'] = True
+        chatPreferences.set_key(client.playerId, new_preferences)
 
 
-# noinspection PyUnresolvedReferences
 @plugins.CommandHook("goff", "Disable global chat.")
-def disable(context, params):
-    preferences = data.clients.connectedClients[context.playerId].get_preferences()
-    preferences['globalChat'] = False
-    context.send_crypto_packet(
-        packetFactory.SystemMessagePacket("[GlobalChat] Global chat disabled for you.", 0x3).build())
-    data.clients.connectedClients[context.playerId].set_preferences(preferences)
-    new_preferences = chatPreferences.get_key(context.playerId)
-    new_preferences['toggle'] = False
-    chatPreferences.set_key(context.playerId, new_preferences)
+class DisableGChat(Command):
+    def call_from_client(self, client):
+        preferences = data.clients.connectedClients[client.playerId].get_preferences()
+        preferences['globalChat'] = False
+        client.send_crypto_packet(
+            packetFactory.SystemMessagePacket("[GlobalChat] Global chat disabled for you.", 0x3).build())
+        data.clients.connectedClients[client.playerId].set_preferences(preferences)
+        new_preferences = chatPreferences.get_key(client.playerId)
+        new_preferences['toggle'] = False
+        chatPreferences.set_key(client.playerId, new_preferences)
 
 
-# noinspection PyUnresolvedReferences
 @plugins.CommandHook("g", "Chat in global chat.")
-def chat(context, params):
-    global ircMode
-    if isinstance(context, basic.LineReceiver):
+class GChat(Command):
+    def call_from_client(self, client):
+        global ircMode
+        if not data.clients.connectedClients[client.playerId].get_preferences()['globalChat']:
+            client.send_crypto_packet(packetFactory.SystemMessagePacket(
+                "[GlobalChat] You do not have global chat enabled, and can not send a global message.", 0x3).build())
+            return
+        print("[GlobalChat] <%s> %s" % (data.players.playerList[client.playerId][0], self.args[3:]))
         if ircMode:
             global ircBot
             if ircBot is not None:
-                import unicodedata
+                ircBot.send_global_message(data.clients.connectedClients[client.playerId].ship,
+                    data.players.playerList[client.playerId][0].encode('utf-8'), self.args[3:].encode('utf-8'))
+        for client_data in data.clients.connectedClients.values():
+            if client_data.get_preferences()['globalChat'] and client_data.get_handle() is not None:
+                client_data.get_handle().send_crypto_packet(
+                    packetFactory.TeamChatPacket(client.playerId,
+                                                 "[G-%02i] %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0]),
+                                                 self.args[3:]).build())
 
-                ircBot.send_global_message("Console", params[:2].encode('utf-8'))
+    def call_from_console(self):
+        global ircMode
+        if ircMode:
+            global ircBot
+            if ircBot is not None:
+                ircBot.send_global_message(0, "Console", self.args[:2].encode('utf-8'))
         for client in data.clients.connectedClients.values():
             if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(
-                    packetFactory.TeamChatPacket(0x1, "[GCONSOLE]",
-                                                 params[2:]).build())
-        return
-    if not data.clients.connectedClients[context.playerId].get_preferences()['globalChat']:
-        context.send_crypto_packet(packetFactory.SystemMessagePacket(
-            "[GlobalChat] You do not have global chat enabled, and can not send a global message.", 0x3).build())
-        return
-    print("[GlobalChat] <%s> %s" % (data.players.playerList[context.playerId][0], params[3:]))
-    if ircMode:
-        global ircBot
-        if ircBot is not None:
-            import unicodedata
-
-            ircBot.send_global_message(
-                data.players.playerList[context.playerId][0].encode('utf-8'), params[3:].encode('utf-8'))
-    for client in data.clients.connectedClients.values():
-        if client.get_preferences()['globalChat'] and client.get_handle() is not None:
-            client.get_handle().send_crypto_packet(
-                packetFactory.TeamChatPacket(context.playerId, "[G] %s" % data.players.playerList[context.playerId][0],
-                                             params[3:]).build())
+                    packetFactory.TeamChatPacket(0x999, "[GCONSOLE]",
+                                                 self.args[2:]).build())
+        return "[GlobalChat] <Console> %s" % self.args[2:]
 

@@ -21,6 +21,14 @@ shipList = {
     12000: "210.189.208.136",
 }
 
+
+def get_ship_from_port(port):
+    port_string = str(port)
+    ship_num = int(port_string[2])
+    if ship_num == 0:
+        ship_num = 10
+    return ship_num
+
 cachedBlocks = {}
 
 

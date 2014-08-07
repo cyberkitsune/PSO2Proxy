@@ -2,6 +2,7 @@ import json
 import calendar
 import datetime
 import os
+import traceback
 
 from twisted.web.resource import Resource
 from twisted.internet import reactor
@@ -10,16 +11,46 @@ from twisted.internet.endpoints import TCP4ServerEndpoint
 import data.clients
 import data.players
 import data.blocks
+from commands import commandList
+from plugins import commands as pluginCommands
 from config import bindIp as interfaceIp
 from config import myIpAddress as hostName
 from config import YAMLConfig as ConfigModel
 import plugins
 
 
-web_api_config = ConfigModel("cfg/webapi.config.yml", {"port": 8080, "ServerName": "Unnamed Server"}, True)
+web_api_config = ConfigModel("cfg/webapi.config.yml", {"port": 8080, "ServerName": "Unnamed Server", 'webRconEnabled': False, 'webRconKey': ''}, True)
 
 upStart = calendar.timegm(datetime.datetime.utcnow().utctimetuple())
 peakPlayers = 0
+
+
+class WEBRcon(Resource):
+    isLeaf = True
+
+    def render_GET(self, request):
+        request.setHeader('content-type', "application/json")
+        if 'key' not in request.args or request.args['key'][0] != web_api_config.get_key('webRconKey'):
+            return json.dumps({'success': False, 'reason': "Your RCON key is invalid!"})
+        else:
+            if 'command' not in request.args:
+                return json.dumps({'success': False, 'reason': "Command not specified."})
+            else:
+                try:
+                    if request.args['command'][0] in commandList:
+                        cmd_class = commandList[request.args['command'][0]][0]
+                        result = cmd_class("%s %s" % (request.args['command'][0], request.args['params'][0] if 'params' in request.args else None)).call_from_console()
+                        return json.dumps({'success': True, 'output': result})
+                    elif request.args['command'][0] in pluginCommands:
+                        cmd_class = pluginCommands[request.args['command'][0]][0]
+                        result = cmd_class("%s %s" % (request.args['command'][0], request.args['params'][0] if 'params' in request.args else None)).call_from_console()
+                        return json.dumps({'success': True, 'output': result})
+                    else:
+                        json.dumps({'success': False, 'reason': "Command not found."})
+                except:
+                    e = traceback.format_exc()
+                    return json.dumps({'success': False, 'reason': "Error executing command\n%s" % e})
+
 
 
 class JSONConfig(Resource):
@@ -76,6 +107,8 @@ def setup_web_api():
     web_resource = WebAPI()
     web_resource.putChild("config.json", JSONConfig())
     web_resource.putChild("publickey.blob", PublicKey())
+    if web_api_config.get_key('webRconEnabled'):
+        web_resource.putChild("rcon", WEBRcon())
     web_endpoint.listen(server.Site(web_resource))
 
 

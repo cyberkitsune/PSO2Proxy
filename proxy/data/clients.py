@@ -2,16 +2,19 @@ import blocks
 import config
 import packetFactory
 
+from ships import get_ship_from_port
+
 connectedClients = {}
 
 
 class ClientData(object):
     """docstring for ClientData"""
 
-    def __init__(self, ip_address, segaid, handle):
+    def __init__(self, ip_address, segaid, ship, handle):
         self.ipAddress = ip_address
         self.segaId = segaid
         self.handle = handle
+        self.ship = ship
         self.preferences = {}
 
     def get_handle(self):
@@ -28,14 +31,12 @@ class ClientData(object):
 
 
 def add_client(handle):
-    connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, handle.myUsername.rstrip('\0'),
-                                                   handle)
+    connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, handle.myUsername.rstrip('\0'), get_ship_from_port(handle.transport.getHost().port), handle)
     print('[Clients] Registered client %s (ID:%i) in online clients' % (handle.myUsername, handle.playerId))
     if config.is_player_id_banned(handle.playerId):
         print('[Bans] Player %s (ID:%i) is banned!' % (handle.myUsername, handle.playerId))
         handle.send_crypto_packet(packetFactory.SystemMessagePacket("You are banned from connecting to this PSO2Proxy.", 0x1).build())
         handle.transport.loseConnection()
-    handle.send_crypto_packet(packetFactory.SystemMessagePacket("{yel}Welcome to PSO2Proxy, %s! There are currently %i clients connected. Use |help for help!" % (handle.myUsername, len(connectedClients)), 0x3).build())
 
 
 def remove_client(handle):

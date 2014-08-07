@@ -21,9 +21,12 @@ class PSO2RSADecrypt(object):
     """docstring for PSO2RSADecrypt"""
 
     def __init__(self, private_key):
-        key_data = open(private_key).read()
-        self.key = RSA.importKey(key_data)
-        print("[CryptoUtils] loaded RSA decrypter from private_key '%s'." % (private_key,))
+        try:
+            key_data = open(private_key).read()
+            self.key = RSA.importKey(key_data)
+            print("[CryptoUtils] Loaded RSA decrypter from private_key '%s'." % (private_key,))
+        except IOError:
+            print("[CryptoUtils] Unable to load RSA decrypter from private key %s!" % private_key)
 
     def decrypt(self, data):
         cipher = PKCS1_v1_5.new(self.key)
@@ -34,9 +37,12 @@ class PSO2RSAEncrypt(object):
     """docstring for PSO2RSAEncrypt"""
 
     def __init__(self, pubkey):
-        key_data = open(pubkey).read()
-        self.key = RSA.importKey(key_data)
-        print("[CryptoUtils] loaded RSA decrypter from pubkey '%s'." % (pubkey,))
+        try:
+            key_data = open(pubkey).read()
+            self.key = RSA.importKey(key_data)
+            print("[CryptoUtils] loaded RSA decrypter from pubkey '%s'." % (pubkey,))
+        except IOError:
+            print("[CryptoUtils] Unable to load RSA decrypter from public key %s!" % pubkey)
 
     def encrypt(self, data):
         cipher = PKCS1_v1_5.new(self.key)
