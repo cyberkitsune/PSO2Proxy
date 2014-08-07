@@ -27,7 +27,7 @@ def notify_and_config(client):
     """
     if not logging_config.key_exists(client.myUsername):
         logging_config[client.myUsername] = False
-    if logging_config[client.playerId]:
+    if logging_config[client.myUsername]:
         client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have opted-in to packet logging, Thank you! View your contributions on http://pso2proxy.cyberkitsune.net/redpill/ or use !optout to opt out", 0x3).build())
     else:
         client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have not opted-in to packet logging, and it has been disabled. Use !optin to opt in.", 0x3).build())
@@ -107,7 +107,7 @@ def archive_packets(client):
     """
     :type client: ShipProxy
     """
-    if logging_config[client.playerId]:
+    if logging_config[client.myUsername]:
         metadata = {'sega_id': client.myUsername, 'player_id': client.playerId, 'timestamp': client.connTimestamp}
         json.dump(metadata, open("packets/%s/%s/metadata.json" % (client.myUsername, client.connTimestamp), 'w'))
         tar = tarfile.open("packets/%s/%i.tar.gz" % (client.myUsername, client.connTimestamp), "w:gz")
