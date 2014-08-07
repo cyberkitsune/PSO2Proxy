@@ -116,3 +116,4 @@ def archive_packets(client):
             tar.add("packets/%s/%i/" % (client.myUsername, client.connTimestamp), arcname="%i" % client.connTimestamp)
             tar.close()
             shutil.rmtree("packets/%s/%i" % (client.myUsername, client.connTimestamp))
+            print("[PacketLogger] Archived %s's packet session %i." % (client.myUsername, client.connTimestamp))
