@@ -1,5 +1,6 @@
 # redpill.py PSO2Proxy plugin
 # For use with redpill.py flask webapp and website for packet logging and management
+import exceptions
 import pymysql
 import os
 import glob
@@ -9,10 +10,11 @@ import cProfile
 import pstats
 import StringIO
 import json
+import struct
 
 import plugins
 
-jsonConfig = {'enabled': False, 'profiling': True, 'dbConfig': {'host': '', 'port': 3306, 'db': 'redpill', 'user': '', 'passwd': ''}, 'tarOut': None}
+jsonConfig = {'profiling': True, 'dbConfig': {'host': '', 'port': 3306, 'db': 'redpill', 'user': '', 'passwd': ''}, 'tarOut': None}
 
 if not os.path.exists("cfg/redpill.config.json"):
     f = open("cfg/redpill.config.json", 'w')
@@ -25,30 +27,90 @@ else:
     f.close()
     print("[Redpill] Redpill config loaded!")
 
-enabled = jsonConfig['enabled']
 profiling = jsonConfig['profiling']
 
-if enabled:
 
-    @plugins.on_start_hook
-    def redpill_init():
-        print("[Redpill] Redpill initialized.")
+@plugins.on_start_hook
+def redpill_init():
+    print("[Redpill] Redpill initialized.")
 
-    @plugins.PacketHook(0x11, 0x0)
-    def login_packet_hook(context, packet):
-        username = packet[0x8:0x48].decode('utf-8')
-        username = username.rstrip('\0')
-        con = get_connection()
-        with con:
-            if get_userid(con, username) is None:
-                context.transport.loseConnection()
-                print("[Redpill] %s is not in the whitelist database. Hanging up." % username)
-            else:
-                increment_login_count(con, get_userid(con, username))
+
+@plugins.PacketHook(0x11, 0x0)
+def login_packet_hook(context, packet):
+    """
+    :type context: ShipProxy
+    """
+    username = packet[0x8:0x48].decode('utf-8')
+    username = username.rstrip('\0')
+    con = get_connection()
+    with con:
+        if get_userid(con, username) is None:
+            context.extendedData['redpill'] = False
+            print("[Redpill] %s is not in the whitelist database. Disabling functionality." % username)
+        else:
+            context.extendedData['redpill'] = True
+            increment_login_count(con, get_userid(con, username))
+    return packet
+
+
+@plugins.raw_packet_hook
+def on_packet_received(context, packet, packet_type, packet_subtype):
+    """
+    :type context: ShipProxy
+    """
+    if 'redpill' in context.extendedData and not context.extendedData['redpill']:
+        if 'orphans' in context.extendedData:
+            del context.extendedData['orphans']
+            print("[Redpill] Deleted orphans for non-participating client.")
         return packet
+    if packet_type == 0x11 and packet_subtype == 0x0:
+        packet_data = bytearray(packet)
+        struct.pack_into("64x", packet_data, 0x48)
+        packet_data = str(packet_data)
+    else:
+        packet_data = packet
+    if context.myUsername is not None:
+        path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (
+            context.myUsername, context.connTimestamp, context.packetCount, packet_type, packet_subtype,
+            context.transport.getPeer().host)
+        try:
+            os.makedirs(os.path.dirname(path))
+        except exceptions.OSError:
+            pass
+        with open(path, 'wb') as f:
+            f.write(packet_data)
+    else:
+        if 'orphans' not in context.extendedData:
+            context.extendedData['orphans'] = []
+        context.extendedData['orphans'].append(
+            {'data': packet_data, 'count': context.packetCount, 'type': packet_type, "sub": packet_subtype})
 
-    @plugins.on_connection_lost_hook
-    def archive_packets(client):
+    if context.myUsername is not None and 'orphans' in context.extendedData and len(context.extendedData['orphans'] and 'redpill' in context.extendedData and context.extendedData['redpill']) > 0:
+        count = 0
+        while len(context.extendedData['orphans']) > 0:
+            orphan_packet = context.extendedData['orphans'].pop()
+            path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (
+                context.myUsername, context.connTimestamp, orphan_packet['count'], orphan_packet['type'],
+                orphan_packet['sub'],
+                context.transport.getPeer().host)
+            try:
+                os.makedirs(os.path.dirname(path))
+            except exceptions.OSError:
+                pass
+            with open(path, 'wb') as f:
+                f.write(orphan_packet['data'])
+            count += 1
+        print('[ShipProxy] Flushed %i orphan packets for %s.' % (count, context.myUsername))
+
+    return str(packet)
+
+
+@plugins.on_connection_lost_hook
+def archive_packets(client):
+    """
+    :type client: ShipProxy
+    """
+    if 'redpill' in client.extendedData and client.extendedData['redpill']:
         global profiling
         sid = client.myUsername
         timestamp = client.connTimestamp
@@ -94,61 +156,70 @@ if enabled:
             ps = pstats.Stats(profile, stream=s).sort_stats(sort_by)
             ps.print_stats()
 
-    def get_connection():
-        global jsonConfig
-        db_settings = jsonConfig['dbConfig']
-        connection = pymysql.connect(host=db_settings['host'], port=db_settings['port'], db=db_settings['db'],
-                                     user=db_settings['user'], passwd=db_settings['passwd'], cursorclass=pymysql.cursors.DictCursor)
-        return connection
 
-    def get_userid(con, username):
-        cur = con.cursor()
-        cur.execute("select id from users where segaid = %s", (username, ))
-        out = cur.fetchone()
-        if out is None:
-            return None
-        else:
-            return out['id']
+def get_connection():
+    global jsonConfig
+    db_settings = jsonConfig['dbConfig']
+    connection = pymysql.connect(host=db_settings['host'], port=db_settings['port'], db=db_settings['db'],
+                                 user=db_settings['user'], passwd=db_settings['passwd'], cursorclass=pymysql.cursors.DictCursor)
+    return connection
 
-    def create_session(con, userid, timestamp):
-        cur = con.cursor()
-        cur.execute("insert into sessions (user, timestamp, name, notes) VALUES (%s,%s,%s,%s) ",
-                    (userid, timestamp, "Unnamed Session %s" % timestamp, "No notes."))
-        return cur.lastrowid
 
-    def get_session_id(con, userid, timestamp):
-        cur = con.cursor()
-        cur.execute("select id from sessions where user = %s and timestamp = %s", (userid, timestamp))
-        out = cur.fetchone()
-        if out is None:
-            return None
-        else:
-            return out['id']
+def get_userid(con, username):
+    cur = con.cursor()
+    cur.execute("select id from users where segaid = %s", (username, ))
+    out = cur.fetchone()
+    if out is None:
+        return None
+    else:
+        return out['id']
 
-    def add_session_data(con, session_id, packet_id, sent_from, order):
-        cur = con.cursor()
-        cur.execute("insert into session_data (sessionID, sentFrom, packetId, notes, pOrder) values (%s,%s,%s,%s,%s)",
-                    (session_id, sent_from, packet_id, "No notes.", int(order)))
 
-    def get_packet_id(con, packet_type, packet_subtype):
-        cur = con.cursor()
-        cur.execute("select id from packets where type = %s and subType = %s", (packet_type, packet_subtype))
-        out = cur.fetchone()
-        if out is None:
-            return None
-        else:
-            return out['id']
+def create_session(con, userid, timestamp):
+    cur = con.cursor()
+    cur.execute("insert into sessions (user, timestamp, name, notes) VALUES (%s,%s,%s,%s) ",
+                (userid, timestamp, "Unnamed Session %s" % timestamp, "No notes."))
+    return cur.lastrowid
 
-    def increment_packet_count(con, packet_id):
-        cur = con.cursor()
-        cur.execute("update packets set count=count+1 where id = %s", (packet_id,))
 
-    def increment_login_count(con, player_id):
-        cur = con.cursor()
-        cur.execute("update users set logincount=logincount+1 where id = %s", (player_id,))
+def get_session_id(con, userid, timestamp):
+    cur = con.cursor()
+    cur.execute("select id from sessions where user = %s and timestamp = %s", (userid, timestamp))
+    out = cur.fetchone()
+    if out is None:
+        return None
+    else:
+        return out['id']
 
-    def create_packet(con, packet_type, packet_subtype, logger):
-        cur = con.cursor()
-        cur.execute("insert into packets (type, subType, firstLoggedBy, count) values (%s, %s, %s, 0)",
-                    (packet_type, packet_subtype, logger))
-        return cur.lastrowid
+
+def add_session_data(con, session_id, packet_id, sent_from, order):
+    cur = con.cursor()
+    cur.execute("insert into session_data (sessionID, sentFrom, packetId, notes, pOrder) values (%s,%s,%s,%s,%s)",
+                (session_id, sent_from, packet_id, "No notes.", int(order)))
+
+
+def get_packet_id(con, packet_type, packet_subtype):
+    cur = con.cursor()
+    cur.execute("select id from packets where type = %s and subType = %s", (packet_type, packet_subtype))
+    out = cur.fetchone()
+    if out is None:
+        return None
+    else:
+        return out['id']
+
+
+def increment_packet_count(con, packet_id):
+    cur = con.cursor()
+    cur.execute("update packets set count=count+1 where id = %s", (packet_id,))
+
+
+def increment_login_count(con, player_id):
+    cur = con.cursor()
+    cur.execute("update users set logincount=logincount+1 where id = %s", (player_id,))
+
+
+def create_packet(con, packet_type, packet_subtype, logger):
+    cur = con.cursor()
+    cur.execute("insert into packets (type, subType, firstLoggedBy, count) values (%s, %s, %s, 0)",
+                (packet_type, packet_subtype, logger))
+    return cur.lastrowid
