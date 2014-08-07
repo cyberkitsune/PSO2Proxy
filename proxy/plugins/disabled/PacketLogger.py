@@ -31,15 +31,15 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
         with open(path, 'wb') as f:
             f.write(packet_data)
     else:
-        if 'orphans' not in context.exendedData:
-            context.exendedData['orphans'] = []
-        context.exendedData['orphans'].append(
+        if 'orphans' not in context.extendedData:
+            context.extendedData['orphans'] = []
+        context.extendedData['orphans'].append(
             {'data': packet_data, 'count': context.packetCount, 'type': packet_type, "sub": packet_subtype})
 
-    if context.myUsername is not None and 'orphans' in context.exendedData and len(context.exendedData['orphans']) > 0:
+    if context.myUsername is not None and 'orphans' in context.extendedData and len(context.extendedData['orphans']) > 0:
         count = 0
         while len(context.exendedData['orphans']) > 0:
-            orphan_packet = context.exendedData['orphans'].pop()
+            orphan_packet = context.extendedData['orphans'].pop()
             path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (
                 context.myUsername, context.connTimestamp, orphan_packet['count'], orphan_packet['type'],
                 orphan_packet['sub'],
