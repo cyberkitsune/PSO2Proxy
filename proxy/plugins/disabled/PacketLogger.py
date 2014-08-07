@@ -1,5 +1,5 @@
 import exceptions
-import plugins.plugins as plugins
+import plugins as plugins
 import struct
 import os
 
