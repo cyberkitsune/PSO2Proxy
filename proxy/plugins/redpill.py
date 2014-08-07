@@ -85,7 +85,7 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
         context.extendedData['orphans'].append(
             {'data': packet_data, 'count': context.packetCount, 'type': packet_type, "sub": packet_subtype})
 
-    if context.myUsername is not None and 'orphans' in context.extendedData and len(context.extendedData['orphans'] and 'redpill' in context.extendedData and context.extendedData['redpill']) > 0:
+    if context.myUsername is not None and 'orphans' in context.extendedData and len(context.extendedData['orphans']) > 0 and 'redpill' in context.extendedData and context.extendedData['redpill']:
         count = 0
         while len(context.extendedData['orphans']) > 0:
             orphan_packet = context.extendedData['orphans'].pop()
