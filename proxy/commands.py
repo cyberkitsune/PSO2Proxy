@@ -269,7 +269,7 @@ class Kick(Command):
                                                   0x2).build())
             data.clients.connectedClients[int(args[1])].get_handle().transport.loseConnection()
             client.send_crypto_packet(
-                packetFactory.SystemMessagePacket("[Command] {grn}Kicked %s." % args[1], 0x3).build())
+                packetFactory.SystemMessagePacket("[Command] {gre}Kicked %s." % args[1], 0x3).build())
         else:
             client.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Command] {red}I couldn't find %s!" % args[1], 0x3).build())
