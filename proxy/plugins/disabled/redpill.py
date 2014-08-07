@@ -146,6 +146,9 @@ def archive_packets(client):
     """
     :type client: ShipProxy
     """
+    if not client.changingBlocks and client.myUsername in enabledCache:
+        print("[Redpill] Removing %s from the enabled cache." % client.myUsername)
+        enabledCache.remove(client.myUsername)
     if 'redpill' in client.extendedData and client.extendedData['redpill']:
         global profiling
         sid = client.myUsername
