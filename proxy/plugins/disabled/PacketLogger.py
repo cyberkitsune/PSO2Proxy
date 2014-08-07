@@ -44,7 +44,7 @@ class OptOut(Command):
     def call_from_client(self, client):
         archive_packets(client)
         data.clients.connectedClients[client.playerId].preferences['logPackets'] = False
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have disabled packet logging! :( If you change your mind, please use !optin to rejoin!"))
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have disabled packet logging! :( If you change your mind, please use !optin to rejoin!", 0x3).build())
 
 
 @plugins.raw_packet_hook
