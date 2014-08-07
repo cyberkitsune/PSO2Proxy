@@ -5,7 +5,6 @@ import time
 import calendar
 import datetime
 import os
-import exceptions
 import sys
 import traceback
 import config
@@ -21,7 +20,6 @@ import data.blocks as blocks
 import data.clients as clients
 import plugins.plugins as plugin_manager
 from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
-from config import packetLogging as logPackets  # Do this better
 from config import myIpAddress as myIp
 from config import bindIp
 from config import noisy as verbose  # // Do this better
@@ -44,7 +42,8 @@ class ShipProxy(protocol.Protocol):
     packetCount = 0
     readBuffer = ''
     c4crypto = None
-    orphans = []
+
+    extendedData = {}
 
     def set_peer(self, peer):
         self.peer = peer
@@ -102,26 +101,10 @@ class ShipProxy(protocol.Protocol):
 
             packet = self.readBuffer[:packet_size]
             self.readBuffer = self.readBuffer[packet_size:]
-            if logPackets:
-                if packet_type[0] == 0x11 and packet_type[1] == 0x0:
-                    packet_data = bytearray(packet)
-                    struct.pack_into("64x", packet_data, 0x48)
-                    packet_data = str(packet_data)
-                else:
-                    packet_data = packet
-                if self.myUsername is not None:
-                    path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (
-                        self.myUsername, self.connTimestamp, self.packetCount, packet_type[0], packet_type[1],
-                        self.transport.getPeer().host)
-                    try:
-                        os.makedirs(os.path.dirname(path))
-                    except exceptions.OSError:
-                        pass
-                    with open(path, 'wb') as f:
-                        f.write(packet_data)
-                else:
-                    self.orphans.append(
-                        {'data': packet_data, 'count': self.packetCount, 'type': packet_type[0], "sub": packet_type[1]})
+
+            if packet is not None:
+                for f in plugin_manager.rawPacketFunctions:
+                    packet = f(self, packet, packet_type[0], packet_type[1])
 
             try:
                 packet_handler = packets.packetList[packet_type]
@@ -149,23 +132,6 @@ class ShipProxy(protocol.Protocol):
                     clients.populate_data(self)
                     for f in plugin_manager.onConnection:
                         f(self)
-            if logPackets:
-                if self.myUsername is not None and len(self.orphans) > 0:
-                    count = 0
-                    while len(self.orphans) > 0:
-                        orphan_packet = self.orphans.pop()
-                        path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (
-                            self.myUsername, self.connTimestamp, orphan_packet['count'], orphan_packet['type'],
-                            orphan_packet['sub'],
-                            self.transport.getPeer().host)
-                        try:
-                            os.makedirs(os.path.dirname(path))
-                        except exceptions.OSError:
-                            pass
-                        with open(path, 'wb') as f:
-                            f.write(orphan_packet['data'])
-                        count += 1
-                    print('[ShipProxy] Flushed %i orphan packets for %s.' % (count, self.myUsername))
 
             if encryption_enabled:
                 packet = self.c4crypto.encrypt(packet)
