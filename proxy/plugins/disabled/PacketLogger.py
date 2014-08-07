@@ -53,10 +53,11 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
     :type context: ShipProxy
     """
     if 'prefs' not in context.extendedData and context.myUsername is not None and context.playerId not in data.clients.connectedClients:
-        context.extendedData['prefs'] = data.clients.ClientPreferences(context.myUsername)
-    elif context.playerId in data.clients.connectedClients and 'prefs' in context.extendedData:
-        context.extendedData['prefs'] = data.clients.connectedClients[context.playerId].preferences
-    if context.myUsername is not None and context.extendedData['prefs']['logPackets'] is not None and not context.extendedData['prefs']['logPackets']:
+        prefs = context.extendedData['prefs'] = data.clients.ClientPreferences(context.myUsername)
+    if context.playerId in data.clients.connectedClients:
+        prefs = data.clients.connectedClients[context.playerId].preferences
+
+    if context.myUsername is not None and prefs['logPackets'] is not None and not prefs['logPackets']:
         if 'orphans' in context.extendedData:
             print("[PacketLogger] %s has opted out of packet logging. Deleting orphans..." % context.myUsername)
             del context.extendedData['orphans']
