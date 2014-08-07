@@ -1,14 +1,15 @@
 import exceptions
 import shutil
 from commands import Command
+from config import YAMLConfig
 import plugins as plugins
 import struct
-import data.clients
 import packetFactory
 import tarfile
 import json
 import os
 
+logging_config = YAMLConfig("cfg/packetlogging.prefs.yml", {}, False)
 
 @plugins.on_start_hook
 def on_start():
@@ -24,9 +25,9 @@ def notify_and_config(client):
     """
     :type client: ShipProxy
     """
-    if data.clients.connectedClients[client.playerId].preferences['logPackets'] is None:
-        data.clients.connectedClients[client.playerId].preferences['logPackets'] = False
-    if data.clients.connectedClients[client.playerId].preferences['logPackets']:
+    if client.myUsername not in logging_config:
+        logging_config[client.myUsername] = False
+    if logging_config[client.playerId]:
         client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have opted-in to packet logging, Thank you! View your contributions on http://pso2proxy.cyberkitsune.net/redpill/ or use !optout to opt out", 0x3).build())
     else:
         client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have not opted-in to packet logging, and it has been disabled. Use !optin to opt in.", 0x3).build())
@@ -35,7 +36,7 @@ def notify_and_config(client):
 @plugins.CommandHook("optin", "Opts you into packet logging for the redpill project.")
 class OptIn(Command):
     def call_from_client(self, client):
-        data.clients.connectedClients[client.playerId].preferences['logPackets'] = True
+        logging_config[client.myUsername] = True
         client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have enabled packet logging! Thank you! Track your data at http://pso2proxy.cyberkitsune.net/redpill/", 0x3).build())
 
 
@@ -43,7 +44,7 @@ class OptIn(Command):
 class OptOut(Command):
     def call_from_client(self, client):
         archive_packets(client)
-        data.clients.connectedClients[client.playerId].preferences['logPackets'] = False
+        logging_config[client.myUsername] = False
         client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have disabled packet logging! :( If you change your mind, please use !optin to rejoin!", 0x3).build())
 
 
@@ -52,14 +53,9 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
     """
     :type context: ShipProxy
     """
-    prefs = None
-    if 'prefs' not in context.extendedData and context.myUsername is not None and context.playerId not in data.clients.connectedClients:
-        prefs = context.extendedData['prefs'] = data.clients.ClientPreferences(context.myUsername)
-    if context.playerId in data.clients.connectedClients:
-        del context.extendedData['prefs']
-        prefs = data.clients.connectedClients[context.playerId].preferences
-
-    if prefs is not None and context.myUsername is not None and prefs['logPackets'] is not None and not prefs['logPackets']:
+    if context.playerId is not None and context.myUsername not in logging_config:
+        logging_config[context.myUsername] = False
+    if context.myUsername is not None and not logging_config[context.myUsername]:
         if 'orphans' in context.extendedData:
             print("[PacketLogger] %s has opted out of packet logging. Deleting orphans..." % context.myUsername)
             del context.extendedData['orphans']
@@ -111,12 +107,11 @@ def archive_packets(client):
     """
     :type client: ShipProxy
     """
-    if client.playerId in data.clients.connectedClients:
-        if data.clients.connectedClients[client.playerId].preferences['logPackets']:
-            metadata = {'sega_id': client.myUsername, 'player_id': client.playerId, 'timestamp': client.connTimestamp}
-            json.dump(metadata, open("packets/%s/%s/metadata.json" % (client.myUsername, client.connTimestamp), 'w'))
-            tar = tarfile.open("packets/%s/%i.tar.gz" % (client.myUsername, client.connTimestamp), "w:gz")
-            tar.add("packets/%s/%i/" % (client.myUsername, client.connTimestamp), arcname="%i" % client.connTimestamp)
-            tar.close()
-            shutil.rmtree("packets/%s/%i" % (client.myUsername, client.connTimestamp))
-            print("[PacketLogger] Archived %s's packet session %i." % (client.myUsername, client.connTimestamp))
+    if logging_config[client.playerId]:
+        metadata = {'sega_id': client.myUsername, 'player_id': client.playerId, 'timestamp': client.connTimestamp}
+        json.dump(metadata, open("packets/%s/%s/metadata.json" % (client.myUsername, client.connTimestamp), 'w'))
+        tar = tarfile.open("packets/%s/%i.tar.gz" % (client.myUsername, client.connTimestamp), "w:gz")
+        tar.add("packets/%s/%i/" % (client.myUsername, client.connTimestamp), arcname="%i" % client.connTimestamp)
+        tar.close()
+        shutil.rmtree("packets/%s/%i" % (client.myUsername, client.connTimestamp))
+        print("[PacketLogger] Archived %s's packet session %i." % (client.myUsername, client.connTimestamp))
