@@ -43,7 +43,9 @@ def notify_user(client):
     :type client: ShipProxy
     """
     if 'redpill' in client.extendedData and client.extendedData['redpill']:
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[Redpill] {red}You have chosen to opt-in to PacketDB. Your packets are being logged.", 0x3).build())
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[Redpill] {grn}You have chosen to opt-in to PacketDB. Your packets are being logged.", 0x3).build())
+    else:
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[Redpill] {red}You have chosen to opt-out from PacketDB. Your packets are not being logged.", 0x3).build())
 
 
 @plugins.on_connection_hook
