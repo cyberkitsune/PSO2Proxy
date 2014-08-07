@@ -26,7 +26,7 @@ def create_preferences(client):
         data.clients.connectedClients[client.playerId].set_preferences(user_prefs)
 
 
-@p.CommandHook("jpin", "Toggles proxy-end chat translation. (Powered by Bing Translate, Incoming only.)")
+@p.CommandHook("jpin", "Toggles proxy-end chat translation. (Powered by Google Translate, Incoming only.)")
 class ToggleTranslate(Command):
     def call_from_client(self, client):
         if client.playerId in data.clients.connectedClients:
@@ -41,7 +41,7 @@ class ToggleTranslate(Command):
             cur_key['translate_chat'] = user_prefs['translate_chat']
             translatePrefrences.set_key(client.playerId, cur_key)
 
-@p.CommandHook("jpout", "Toggles outbound chat translation to japanese. (Powered by Bing Translate, Outgoing only.)")
+@p.CommandHook("jpout", "Toggles outbound chat translation to japanese. (Powered by Google Translate, Outgoing only.)")
 class ToggleTranslate(Command):
     def call_from_client(self, client):
         if client.playerId in data.clients.connectedClients:
