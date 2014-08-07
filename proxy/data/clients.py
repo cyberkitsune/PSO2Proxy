@@ -5,6 +5,9 @@ import packetFactory
 from ships import get_ship_from_port
 
 connectedClients = {}
+"""
+:type connectedClients: dict[int, ClientData]
+"""
 
 
 class ClientData(object):
@@ -15,7 +18,7 @@ class ClientData(object):
         self.segaId = segaid
         self.handle = handle
         self.ship = ship
-        self.preferences = {}
+        self.preferences = ClientPreferences(segaid)
 
     def get_handle(self):
         return self.handle
@@ -23,11 +26,32 @@ class ClientData(object):
     def set_handle(self, handle):
         self.handle = handle
 
-    def get_preferences(self):
-        return self.preferences
 
-    def set_preferences(self, preferences):
-        self.preferences = preferences
+class ClientPreferences():
+    def __init__(self, segaid):
+        self._config = config.YAMLConfig("cfg/user.preferences.yml")
+        self.segaid = segaid
+        if not self._config.key_exists(segaid):
+            self._config.set_key(segaid, {})
+
+    def has_preference(self, preference):
+        my_preferences = self._config.get_key(self.segaid)
+        if preference in my_preferences:
+            return True
+        else:
+            return False
+
+    def get_preference(self, preference):
+        my_preferences = self._config.get_key(self.segaid)
+        if self.has_preference(preference):
+            return my_preferences[preference]
+        else:
+            return None
+
+    def set_preference(self, preference, value):
+        my_preferences = self._config.get_key(self.segaid)
+        my_preferences[preference] = value
+        self._config.set_key(self.segaid, my_preferences)
 
 
 def add_client(handle):
