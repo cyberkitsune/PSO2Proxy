@@ -1,3 +1,4 @@
+import urllib2
 import data.clients
 import packetFactory
 import struct
@@ -65,7 +66,11 @@ def get_chat_packet(context, packet):
             return
         channel_id = struct.unpack_from("I", packet, 0x14)[0]
         message = packet[0x1C:].decode('utf-16').rstrip("\0")
-        return packetFactory.ChatPacket(0x0, translator.translate(message, "ja"), channel_id).build()
+        try:
+            return packetFactory.ChatPacket(0x0, translator.translate(message, "ja"), channel_id).build()
+        except:
+            print("[Translator] Got an exception! Bailing out...")
+            return packet
     if context.peer.psoClient and context.peer.playerId in data.clients.connectedClients:
         user_prefs = data.clients.connectedClients[context.peer.playerId].get_preferences()
         if not user_prefs['translate_chat']:
@@ -85,6 +90,10 @@ def get_chat_packet(context, packet):
                 break
         if not japanese:
             return packet
-        new_msg = "%s (%s)" % (translator.translate(message, "en").rstrip('\0'), message.rstrip('\0'))
-        return packetFactory.ChatPacket(player_id, new_msg, channel_id).build()
+        try:
+            new_msg = "%s (%s)" % (translator.translate(message, "en").rstrip('\0'), message.rstrip('\0'))
+            return packetFactory.ChatPacket(player_id, new_msg, channel_id).build()
+        except:
+            print("[Translator] Got an exception! Bailing out...")
+            return packet
     return packet
