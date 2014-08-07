@@ -1,371 +1,372 @@
 PSO2_IRC = [
-("{red}"    ,r"\x03""04"), # Red
+("{red}"   ,"\x03""04"), # Red
 
-("{blu}"    ,r"\x03""02"), # Blue
-("{blue}"   ,r"\x03""02"), # Blue
+("{blu}"   ,"\x03""02"), # Blue
+("{blue}"  ,"\x03""02"), # Blue
 
-("{gre}"    ,r"\x03""03"), # green
-("{green}"  ,r"\x03""03"), # green
-("{grn}"    ,r"\x03""03"), # green
-("{gree}"   ,r"\x03""03"), # green
+("{gre}"   ,"\x03""03"), # green
+("{green}" ,"\x03""03"), # green
+("{grn}"   ,"\x03""03"), # green
+("{gree}"  ,"\x03""03"), # green
 
-("{yel}"    ,r"\x03""08"), # yellow
-("{yellow}" ,r"\x03""08"), # yellow
+("{yel}"   ,"\x03""08"), # yellow
+("{yellow}","\x03""08"), # yellow
 
-("{ora}"   ,r"\x03""07"), # orange (olive)
-("{orange}",r"\x03""07"), # orange (olive)
-("{org}"   ,r"\x03""07"), # orange (olive)
+("{ora}"   ,"\x03""07"), # orange (olive)
+("{orange}","\x03""07"), # orange (olive)
+("{org}"   ,"\x03""07"), # orange (olive)
 
-("{pur}"   ,r"\x03""06"), # purple
-("{purple}",r"\x03""06"), # purple
-("{vir}"   ,r"\x03""06"), # purple
+("{pur}"   ,"\x03""06"), # purple
+("{purple}","\x03""06"), # purple
+("{vir}"   ,"\x03""06"), # purple
 
-("{vio}"   ,r"\x03""13"), # Violet
-("{violet}",r"\x03""13"), # Violet
+("{vio}"   ,"\x03""13"), # Violet
+("{violet}","\x03""13"), # Violet
 
-("{bro}"   ,r"\x03""11"), # light purple?
+("{bro}"   ,"\x03""11"), # light purple?
 
 
-("{bei}"   ,r"\x03""05"), # Beige
-("{beige}" ,r"\x03""05"), # Beige
+("{bei}"   ,"\x03""05"), # Beige
+("{beige}" ,"\x03""05"), # Beige
 
-("{gra}"   ,r"\x03""14"), # grey
-("{gray}"  ,r"\x03""14"), # grey
-("{gra}"   ,r"\x03""14"), # grey
-("{gry}"   ,r"\x03""14"), # grey
-("{bla}"   ,r"\x03""14"), # grey
-("{ble}"   ,r"\x03""14"), # grey
-("{ble}"   ,r"\x03""14"), # grey
-("{bra}"   ,r"\x03""14"), # grey
+("{gra}"   ,"\x03""14"), # grey
+("{gray}"  ,"\x03""14"), # grey
+("{gra}"   ,"\x03""14"), # grey
+("{gry}"   ,"\x03""14"), # grey
+("{bla}"   ,"\x03""14"), # grey
+("{ble}"   ,"\x03""14"), # grey
+("{ble}"   ,"\x03""14"), # grey
+("{bra}"   ,"\x03""14"), # grey
 
-("{whi}"   ,r"\x03""00"), # white
-("{white}" ,r"\x03""00"), # white
-("{whit}"  ,r"\x03""00"), # white
+("{whi}"   ,"\x03""00"), # white
+("{white}" ,"\x03""00"), # white
+("{whit}"  ,"\x03""00"), # white
 
-("{blk}"   ,r"\x03""01"), # black
-("{black}" ,r"\x03""01"), # black
-("{pla}"   ,r"\x03""01"), # black
+("{blk}"   ,"\x03""01"), # black
+("{black}" ,"\x03""01"), # black
+("{pla}"   ,"\x03""01"), # black
 
-("{def}"   ,"\x0F"), # colour reset
+("{def}"   ,"\x0F"    ), # colour reset
 
-("{orang}" , r"\x03""10"), # teal (a green/blue cyan)
+("{orang}" ,"\x03""10"), # teal (a green/blue cyan)
 
-("{yello}"  ,r"\x03""05"), # brown (maroon)
+("{yello}" ,"\x03""05"), # brown (maroon)
 ]
 
 IRC_PSO2 = [
 # Color text on white background
-(r"\x03""0000","{whi}"), # white
-(r"\x03""0100","{blk}"), # black
-(r"\x03""0200","{blu}"), # blue (navy)
-(r"\x03""0300","{gre}"), # green
-(r"\x03""0400","{red}"), # red
-(r"\x03""0500",""), # brown (maroon)
-(r"\x03""0600","{pur}"), # purple
-(r"\x03""0700","{ora}"), # orange (olive)
-(r"\x03""0800","{yel}"), # yellow
-(r"\x03""0900",""), # light green (lime)
-(r"\x03""1000",""), # teal (a green/blue cyan)
-(r"\x03""1100",""), # light cyan (cyan) (aqua)
-(r"\x03""1200",""), # light blue (royal)
-(r"\x03""1300","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1400","{gra}"), # grey
-(r"\x03""1500",""), # light grey (silver)
-(r"\x03""9900",""), # transparent
+("\x03""00,,00","{whi}"), # white
+("\x03""01,00","{blk}"), # black
+("\x03""02,00","{blu}"), # blue (navy)
+("\x03""03,00","{gre}"), # green
+("\x03""04,00","{red}"), # red
+("\x03""05,00",""), # brown (maroon)
+("\x03""06,00","{pur}"), # purple
+("\x03""07,00","{ora}"), # orange (olive)
+("\x03""08,00","{yel}"), # yellow
+("\x03""09,00",""), # light green (lime)
+("\x03""10,00",""), # teal (a green/blue cyan)
+("\x03""11,00",""), # light cyan (cyan) (aqua)
+("\x03""12,00",""), # light blue (royal)
+("\x03""13,00","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,00","{gra}"), # grey
+("\x03""15,00",""), # light grey (silver)
+("\x03""99,00",""), # transparent
 # Color text on black background
-(r"\x03""0001","{whi}"), # white
-(r"\x03""0101","{blk}"), # black
-(r"\x03""0201","{blu}"), # blue (navy)
-(r"\x03""0301","{gre}"), # green
-(r"\x03""0401","{red}"), # red
-(r"\x03""0501",""), # brown (maroon)
-(r"\x03""0601","{pur}"), # purple
-(r"\x03""0701","{ora}"), # orange (olive)
-(r"\x03""0801","{yel}"), # yellow
-(r"\x03""0901",""), # light green (lime)
-(r"\x03""1001",""), # teal (a green/blue cyan)
-(r"\x03""1101",""), # light cyan (cyan) (aqua)
-(r"\x03""1201",""), # light blue (royal)
-(r"\x03""1301","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1401","{gra}"), # grey
-(r"\x03""1501",""), # light grey (silver)
-(r"\x03""9901",""), # transparent
+("\x03""00,,01","{whi}"), # white
+("\x03""01,01","{blk}"), # black
+("\x03""02,01","{blu}"), # blue (navy)
+("\x03""03,01","{gre}"), # green
+("\x03""04,01","{red}"), # red
+("\x03""05,01",""), # brown (maroon)
+("\x03""06,01","{pur}"), # purple
+("\x03""07,01","{ora}"), # orange (olive)
+("\x03""08,01","{yel}"), # yellow
+("\x03""09,01",""), # light green (lime)
+("\x03""10,01",""), # teal (a green/blue cyan)
+("\x03""11,01",""), # light cyan (cyan) (aqua)
+("\x03""12,01",""), # light blue (royal)
+("\x03""13,01","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,01","{gra}"), # grey
+("\x03""15,01",""), # light grey (silver)
+("\x03""99,01",""), # transparent
 # Color text on blue background
-(r"\x03""0002","{whi}"), # white
-(r"\x03""0102","{blk}"), # black
-(r"\x03""0202","{blu}"), # blue (navy)
-(r"\x03""0302","{gre}"), # green
-(r"\x03""0402","{red}"), # red
-(r"\x03""0502",""), # brown (maroon)
-(r"\x03""0602","{pur}"), # purple
-(r"\x03""0702","{ora}"), # orange (olive)
-(r"\x03""0802","{yel}"), # yellow
-(r"\x03""0902",""), # light green (lime)
-(r"\x03""1002",""), # teal (a green/blue cyan)
-(r"\x03""1102",""), # light cyan (cyan) (aqua)
-(r"\x03""1202",""), # light blue (royal)
-(r"\x03""1302","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1402","{gra}"), # grey
-(r"\x03""1502",""), # light grey (silver)
-(r"\x03""9902",""), # transparent
+("\x03""00,,02","{whi}"), # white
+("\x03""01,02","{blk}"), # black
+("\x03""02,02","{blu}"), # blue (navy)
+("\x03""03,02","{gre}"), # green
+("\x03""04,02","{red}"), # red
+("\x03""05,02",""), # brown (maroon)
+("\x03""06,02","{pur}"), # purple
+("\x03""07,02","{ora}"), # orange (olive)
+("\x03""08,02","{yel}"), # yellow
+("\x03""09,02",""), # light green (lime)
+("\x03""10,02",""), # teal (a green/blue cyan)
+("\x03""11,02",""), # light cyan (cyan) (aqua)
+("\x03""12,02",""), # light blue (royal)
+("\x03""13,02","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,02","{gra}"), # grey
+("\x03""15,02",""), # light grey (silver)
+("\x03""99,02",""), # transparent
 # Color text on green background
-(r"\x03""0003","{whi}"), # white
-(r"\x03""0103","{blk}"), # black
-(r"\x03""0203","{blu}"), # blue (navy)
-(r"\x03""0303","{gre}"), # green
-(r"\x03""0403","{red}"), # red
-(r"\x03""0503",""), # brown (maroon)
-(r"\x03""0603","{pur}"), # purple
-(r"\x03""0703","{ora}"), # orange (olive)
-(r"\x03""0803","{yel}"), # yellow
-(r"\x03""0903",""), # light green (lime)
-(r"\x03""1003",""), # teal (a green/blue cyan)
-(r"\x03""1103",""), # light cyan (cyan) (aqua)
-(r"\x03""1203",""), # light blue (royal)
-(r"\x03""1303","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1403","{gra}"), # grey
-(r"\x03""1503",""), # light grey (silver)
-(r"\x03""9903",""), # transparent
+("\x03""00,,03","{whi}"), # white
+("\x03""01,03","{blk}"), # black
+("\x03""02,03","{blu}"), # blue (navy)
+("\x03""03,03","{gre}"), # green
+("\x03""04,03","{red}"), # red
+("\x03""05,03",""), # brown (maroon)
+("\x03""06,03","{pur}"), # purple
+("\x03""07,03","{ora}"), # orange (olive)
+("\x03""08,03","{yel}"), # yellow
+("\x03""09,03",""), # light green (lime)
+("\x03""10,03",""), # teal (a green/blue cyan)
+("\x03""11,03",""), # light cyan (cyan) (aqua)
+("\x03""12,03",""), # light blue (royal)
+("\x03""13,03","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,03","{gra}"), # grey
+("\x03""15,03",""), # light grey (silver)
+("\x03""99,03",""), # transparent
 # Color text on red background
-(r"\x03""0004","{whi}"), # white
-(r"\x03""0104","{blk}"), # black
-(r"\x03""0204","{blu}"), # blue (navy)
-(r"\x03""0304","{gre}"), # green
-(r"\x03""0404","{red}"), # red
-(r"\x03""0504",""), # brown (maroon)
-(r"\x03""0604","{pur}"), # purple
-(r"\x03""0704","{ora}"), # orange (olive)
-(r"\x03""0804","{yel}"), # yellow
-(r"\x03""0904",""), # light green (lime)
-(r"\x03""1004",""), # teal (a green/blue cyan)
-(r"\x03""1104",""), # light cyan (cyan) (aqua)
-(r"\x03""1204",""), # light blue (royal)
-(r"\x03""1304","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1404","{gra}"), # grey
-(r"\x03""1504",""), # light grey (silver)
-(r"\x03""9904",""), # transparent
+("\x03""00,,04","{whi}"), # white
+("\x03""01,04","{blk}"), # black
+("\x03""02,04","{blu}"), # blue (navy)
+("\x03""03,04","{gre}"), # green
+("\x03""04,04","{red}"), # red
+("\x03""05,04",""), # brown (maroon)
+("\x03""06,04","{pur}"), # purple
+("\x03""07,04","{ora}"), # orange (olive)
+("\x03""08,04","{yel}"), # yellow
+("\x03""09,04",""), # light green (lime)
+("\x03""10,04",""), # teal (a green/blue cyan)
+("\x03""11,04",""), # light cyan (cyan) (aqua)
+("\x03""12,04",""), # light blue (royal)
+("\x03""13,04","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,04","{gra}"), # grey
+("\x03""15,04",""), # light grey (silver)
+("\x03""99,04",""), # transparent
 # Color text on brown background
-(r"\x03""0005","{whi}"), # white
-(r"\x03""0105","{blk}"), # black
-(r"\x03""0205","{blu}"), # blue (navy)
-(r"\x03""0305","{gre}"), # green
-(r"\x03""0405","{red}"), # red
-(r"\x03""0505",""), # brown (maroon)
-(r"\x03""0605","{pur}"), # purple
-(r"\x03""0705","{ora}"), # orange (olive)
-(r"\x03""0805","{yel}"), # yellow
-(r"\x03""0905",""), # light green (lime)
-(r"\x03""1005",""), # teal (a green/blue cyan)
-(r"\x03""1105",""), # light cyan (cyan) (aqua)
-(r"\x03""1205",""), # light blue (royal)
-(r"\x03""1305","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1405","{gra}"), # grey
-(r"\x03""1505",""), # light grey (silver)
-(r"\x03""9905",""), # transparent
+("\x03""00,,05","{whi}"), # white
+("\x03""01,05","{blk}"), # black
+("\x03""02,05","{blu}"), # blue (navy)
+("\x03""03,05","{gre}"), # green
+("\x03""04,05","{red}"), # red
+("\x03""05,05",""), # brown (maroon)
+("\x03""06,05","{pur}"), # purple
+("\x03""07,05","{ora}"), # orange (olive)
+("\x03""08,05","{yel}"), # yellow
+("\x03""09,05",""), # light green (lime)
+("\x03""10,05",""), # teal (a green/blue cyan)
+("\x03""11,05",""), # light cyan (cyan) (aqua)
+("\x03""12,05",""), # light blue (royal)
+("\x03""13,05","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,05","{gra}"), # grey
+("\x03""15,05",""), # light grey (silver)
+("\x03""99,05",""), # transparent
 # Color text on purple background
-(r"\x03""0006","{whi}"), # white
-(r"\x03""0106","{blk}"), # black
-(r"\x03""0206","{blu}"), # blue (navy)
-(r"\x03""0306","{gre}"), # green
-(r"\x03""0406","{red}"), # red
-(r"\x03""0506",""), # brown (maroon)
-(r"\x03""0606","{pur}"), # purple
-(r"\x03""0706","{ora}"), # orange (olive)
-(r"\x03""0806","{yel}"), # yellow
-(r"\x03""0906",""), # light green (lime)
-(r"\x03""1006",""), # teal (a green/blue cyan)
-(r"\x03""1106",""), # light cyan (cyan) (aqua)
-(r"\x03""1206",""), # light blue (royal)
-(r"\x03""1306","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1406","{gra}"), # grey
-(r"\x03""1506",""), # light grey (silver)
-(r"\x03""9906",""), # transparent
+("\x03""00,,06","{whi}"), # white
+("\x03""01,06","{blk}"), # black
+("\x03""02,06","{blu}"), # blue (navy)
+("\x03""03,06","{gre}"), # green
+("\x03""04,06","{red}"), # red
+("\x03""05,06",""), # brown (maroon)
+("\x03""06,06","{pur}"), # purple
+("\x03""07,06","{ora}"), # orange (olive)
+("\x03""08,06","{yel}"), # yellow
+("\x03""09,06",""), # light green (lime)
+("\x03""10,06",""), # teal (a green/blue cyan)
+("\x03""11,06",""), # light cyan (cyan) (aqua)
+("\x03""12,06",""), # light blue (royal)
+("\x03""13,06","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,06","{gra}"), # grey
+("\x03""15,06",""), # light grey (silver)
+("\x03""99,06",""), # transparent
 # Color text on orange background
-(r"\x03""0007","{whi}"), # white
-(r"\x03""0107","{blk}"), # black
-(r"\x03""0207","{blu}"), # blue (navy)
-(r"\x03""0307","{gre}"), # green
-(r"\x03""0407","{red}"), # red
-(r"\x03""0507",""), # brown (maroon)
-(r"\x03""0607","{pur}"), # purple
-(r"\x03""0707","{ora}"), # orange (olive)
-(r"\x03""0807","{yel}"), # yellow
-(r"\x03""0907",""), # light green (lime)
-(r"\x03""1007",""), # teal (a green/blue cyan)
-(r"\x03""1107",""), # light cyan (cyan) (aqua)
-(r"\x03""1207",""), # light blue (royal)
-(r"\x03""1307","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1407","{gra}"), # grey
-(r"\x03""1507",""), # light grey (silver)
-(r"\x03""9907",""), # transparent
+("\x03""00,,07","{whi}"), # white
+("\x03""01,07","{blk}"), # black
+("\x03""02,07","{blu}"), # blue (navy)
+("\x03""03,07","{gre}"), # green
+("\x03""04,07","{red}"), # red
+("\x03""05,07",""), # brown (maroon)
+("\x03""06,07","{pur}"), # purple
+("\x03""07,07","{ora}"), # orange (olive)
+("\x03""08,07","{yel}"), # yellow
+("\x03""09,07",""), # light green (lime)
+("\x03""10,07",""), # teal (a green/blue cyan)
+("\x03""11,07",""), # light cyan (cyan) (aqua)
+("\x03""12,07",""), # light blue (royal)
+("\x03""13,07","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,07","{gra}"), # grey
+("\x03""15,07",""), # light grey (silver)
+("\x03""99,07",""), # transparent
 # Color text on light yelll background
-(r"\x03""0008","{whi}"), # white
-(r"\x03""0108","{blk}"), # black
-(r"\x03""0208","{blu}"), # blue (navy)
-(r"\x03""0308","{gre}"), # green
-(r"\x03""0408","{red}"), # red
-(r"\x03""0508",""), # brown (maroon)
-(r"\x03""0608","{pur}"), # purple
-(r"\x03""0708","{ora}"), # orange (olive)
-(r"\x03""0808","{yel}"), # yellow
-(r"\x03""0908",""), # light green (lime)
-(r"\x03""1008",""), # teal (a green/blue cyan)
-(r"\x03""1108",""), # light cyan (cyan) (aqua)
-(r"\x03""1208",""), # light blue (royal)
-(r"\x03""1308","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1408","{gra}"), # grey
-(r"\x03""1508",""), # light grey (silver)
-(r"\x03""9908",""), # transparent
+("\x03""00,,08","{whi}"), # white
+("\x03""01,08","{blk}"), # black
+("\x03""02,08","{blu}"), # blue (navy)
+("\x03""03,08","{gre}"), # green
+("\x03""04,08","{red}"), # red
+("\x03""05,08",""), # brown (maroon)
+("\x03""06,08","{pur}"), # purple
+("\x03""07,08","{ora}"), # orange (olive)
+("\x03""08,08","{yel}"), # yellow
+("\x03""09,08",""), # light green (lime)
+("\x03""10,08",""), # teal (a green/blue cyan)
+("\x03""11,08",""), # light cyan (cyan) (aqua)
+("\x03""12,08",""), # light blue (royal)
+("\x03""13,08","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,08","{gra}"), # grey
+("\x03""15,08",""), # light grey (silver)
+("\x03""99,08",""), # transparent
 # Color text on light green background
-(r"\x03""0009","{whi}"), # white
-(r"\x03""0109","{blk}"), # black
-(r"\x03""0209","{blu}"), # blue (navy)
-(r"\x03""0309","{gre}"), # green
-(r"\x03""0409","{red}"), # red
-(r"\x03""0509",""), # brown (maroon)
-(r"\x03""0609","{pur}"), # purple
-(r"\x03""0709","{ora}"), # orange (olive)
-(r"\x03""0809","{yel}"), # yellow
-(r"\x03""0909",""), # light green (lime)
-(r"\x03""1009",""), # teal (a green/blue cyan)
-(r"\x03""1109",""), # light cyan (cyan) (aqua)
-(r"\x03""1209",""), # light blue (royal)
-(r"\x03""1309","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1409","{gra}"), # grey
-(r"\x03""1509",""), # light grey (silver)
-(r"\x03""9909",""), # transparent
+("\x03""00,,09","{whi}"), # white
+("\x03""01,09","{blk}"), # black
+("\x03""02,09","{blu}"), # blue (navy)
+("\x03""03,09","{gre}"), # green
+("\x03""04,09","{red}"), # red
+("\x03""05,09",""), # brown (maroon)
+("\x03""06,09","{pur}"), # purple
+("\x03""07,09","{ora}"), # orange (olive)
+("\x03""08,09","{yel}"), # yellow
+("\x03""09,09",""), # light green (lime)
+("\x03""10,09",""), # teal (a green/blue cyan)
+("\x03""11,09",""), # light cyan (cyan) (aqua)
+("\x03""12,09",""), # light blue (royal)
+("\x03""13,09","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,09","{gra}"), # grey
+("\x03""15,09",""), # light grey (silver)
+("\x03""99,09",""), # transparent
 # Color text on teal background
-(r"\x03""0010","{whi}"), # white
-(r"\x03""0110","{blk}"), # black
-(r"\x03""0210","{blu}"), # blue (navy)
-(r"\x03""0310","{gre}"), # green
-(r"\x03""0410","{red}"), # red
-(r"\x03""0510",""), # brown (maroon)
-(r"\x03""0610","{pur}"), # purple
-(r"\x03""0710","{ora}"), # orange (olive)
-(r"\x03""0810","{yel}"), # yellow
-(r"\x03""0910",""), # light green (lime)
-(r"\x03""1010",""), # teal (a green/blue cyan)
-(r"\x03""1110",""), # light cyan (cyan) (aqua)
-(r"\x03""1210",""), # light blue (royal)
-(r"\x03""1310","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1410","{gra}"), # grey
-(r"\x03""1510",""), # light grey (silver)
-(r"\x03""9910",""), # transparent
+("\x03""00,10","{whi}"), # white
+("\x03""01,10","{blk}"), # black
+("\x03""02,10","{blu}"), # blue (navy)
+("\x03""03,10","{gre}"), # green
+("\x03""04,10","{red}"), # red
+("\x03""05,10",""), # brown (maroon)
+("\x03""06,10","{pur}"), # purple
+("\x03""07,10","{ora}"), # orange (olive)
+("\x03""08,10","{yel}"), # yellow
+("\x03""09,10",""), # light green (lime)
+("\x03""10,10",""), # teal (a green/blue cyan)
+("\x03""11,10",""), # light cyan (cyan) (aqua)
+("\x03""12,10",""), # light blue (royal)
+("\x03""13,10","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,10","{gra}"), # grey
+("\x03""15,10",""), # light grey (silver)
+("\x03""99,10",""), # transparent
 # Color text on light cyan background
-(r"\x03""0011","{whi}"), # white
-(r"\x03""0111","{blk}"), # black
-(r"\x03""0211","{blu}"), # blue (navy)
-(r"\x03""0311","{gre}"), # green
-(r"\x03""0411","{red}"), # red
-(r"\x03""0511",""), # brown (maroon)
-(r"\x03""0611","{pur}"), # purple
-(r"\x03""0711","{ora}"), # orange (olive)
-(r"\x03""0811","{yel}"), # yellow
-(r"\x03""0911",""), # light green (lime)
-(r"\x03""1011",""), # teal (a green/blue cyan)
-(r"\x03""1111",""), # light cyan (cyan) (aqua)
-(r"\x03""1211",""), # light blue (royal)
-(r"\x03""1311","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1411","{gra}"), # grey
-(r"\x03""1511",""), # light grey (silver)
-(r"\x03""9911",""), # transparent
+("\x03""00,11","{whi}"), # white
+("\x03""01,11","{blk}"), # black
+("\x03""02,11","{blu}"), # blue (navy)
+("\x03""03,11","{gre}"), # green
+("\x03""04,11","{red}"), # red
+("\x03""05,11",""), # brown (maroon)
+("\x03""06,11","{pur}"), # purple
+("\x03""07,11","{ora}"), # orange (olive)
+("\x03""08,11","{yel}"), # yellow
+("\x03""09,11",""), # light green (lime)
+("\x03""10,11",""), # teal (a green/blue cyan)
+("\x03""11,11",""), # light cyan (cyan) (aqua)
+("\x03""12,11",""), # light blue (royal)
+("\x03""13,11","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,11","{gra}"), # grey
+("\x03""15,11",""), # light grey (silver)
+("\x03""99,11",""), # transparent
 # Color text on light blue background
-(r"\x03""0012","{whi}"), # white
-(r"\x03""0112","{blk}"), # black
-(r"\x03""0212","{blu}"), # blue (navy)
-(r"\x03""0312","{gre}"), # green
-(r"\x03""0412","{red}"), # red
-(r"\x03""0512",""), # brown (maroon)
-(r"\x03""0612","{pur}"), # purple
-(r"\x03""0712","{ora}"), # orange (olive)
-(r"\x03""0812","{yel}"), # yellow
-(r"\x03""0912",""), # light green (lime)
-(r"\x03""1012",""), # teal (a green/blue cyan)
-(r"\x03""1112",""), # light cyan (cyan) (aqua)
-(r"\x03""1212",""), # light blue (royal)
-(r"\x03""1312","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1412","{gra}"), # grey
-(r"\x03""1512",""), # light grey (silver)
-(r"\x03""9912",""), # transparent
+("\x03""00,12","{whi}"), # white
+("\x03""01,12","{blk}"), # black
+("\x03""02,12","{blu}"), # blue (navy)
+("\x03""03,12","{gre}"), # green
+("\x03""04,12","{red}"), # red
+("\x03""05,12",""), # brown (maroon)
+("\x03""06,12","{pur}"), # purple
+("\x03""07,12","{ora}"), # orange (olive)
+("\x03""08,12","{yel}"), # yellow
+("\x03""09,12",""), # light green (lime)
+("\x03""10,12",""), # teal (a green/blue cyan)
+("\x03""11,12",""), # light cyan (cyan) (aqua)
+("\x03""12,12",""), # light blue (royal)
+("\x03""13,12","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,12","{gra}"), # grey
+("\x03""15,12",""), # light grey (silver)
+("\x03""99,12",""), # transparent
 # Color text on pink background
-(r"\x03""0013","{whi}"), # white
-(r"\x03""0113","{blk}"), # black
-(r"\x03""0213","{blu}"), # blue (navy)
-(r"\x03""0313","{gre}"), # green
-(r"\x03""0413","{red}"), # red
-(r"\x03""0513",""), # brown (maroon)
-(r"\x03""0613","{pur}"), # purple
-(r"\x03""0713","{ora}"), # orange (olive)
-(r"\x03""0813","{yel}"), # yellow
-(r"\x03""0913",""), # light green (lime)
-(r"\x03""1013",""), # teal (a green/blue cyan)
-(r"\x03""1113",""), # light cyan (cyan) (aqua)
-(r"\x03""1213",""), # light blue (royal)
-(r"\x03""1313","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1413","{gra}"), # grey
-(r"\x03""1513",""), # light grey (silver)
-(r"\x03""9913",""), # transparent
+("\x03""00,13","{whi}"), # white
+("\x03""01,13","{blk}"), # black
+("\x03""02,13","{blu}"), # blue (navy)
+("\x03""03,13","{gre}"), # green
+("\x03""04,13","{red}"), # red
+("\x03""05,13",""), # brown (maroon)
+("\x03""06,13","{pur}"), # purple
+("\x03""07,13","{ora}"), # orange (olive)
+("\x03""08,13","{yel}"), # yellow
+("\x03""09,13",""), # light green (lime)
+("\x03""10,13",""), # teal (a green/blue cyan)
+("\x03""11,13",""), # light cyan (cyan) (aqua)
+("\x03""12,13",""), # light blue (royal)
+("\x03""13,13","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,13","{gra}"), # grey
+("\x03""15,13",""), # light grey (silver)
+("\x03""99,13",""), # transparent
 # Color text on grey background
-(r"\x03""0014","{whi}"), # white
-(r"\x03""0114","{blk}"), # black
-(r"\x03""0214","{blu}"), # blue (navy)
-(r"\x03""0314","{gre}"), # green
-(r"\x03""0414","{red}"), # red
-(r"\x03""0514",""), # brown (maroon)
-(r"\x03""0614","{pur}"), # purple
-(r"\x03""0714","{ora}"), # orange (olive)
-(r"\x03""0814","{yel}"), # yellow
-(r"\x03""0914",""), # light green (lime)
-(r"\x03""1014",""), # teal (a green/blue cyan)
-(r"\x03""1114",""), # light cyan (cyan) (aqua)
-(r"\x03""1214",""), # light blue (royal)
-(r"\x03""1314","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1414","{gra}"), # grey
-(r"\x03""1514",""), # light grey (silver)
-(r"\x03""9914",""), # transparent
+("\x03""00,14","{whi}"), # white
+("\x03""01,14","{blk}"), # black
+("\x03""02,14","{blu}"), # blue (navy)
+("\x03""03,14","{gre}"), # green
+("\x03""04,14","{red}"), # red
+("\x03""05,14",""), # brown (maroon)
+("\x03""06,14","{pur}"), # purple
+("\x03""07,14","{ora}"), # orange (olive)
+("\x03""08,14","{yel}"), # yellow
+("\x03""09,14",""), # light green (lime)
+("\x03""10,14",""), # teal (a green/blue cyan)
+("\x03""11,14",""), # light cyan (cyan) (aqua)
+("\x03""12,14",""), # light blue (royal)
+("\x03""13,14","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,14","{gra}"), # grey
+("\x03""15,14",""), # light grey (silver)
+("\x03""99,14",""), # transparent
 # Color text on silver background
-(r"\x03""0015","{whi}"), # white
-(r"\x03""0115","{blk}"), # black
-(r"\x03""0215","{blu}"), # blue (navy)
-(r"\x03""0315","{gre}"), # green
-(r"\x03""0415","{red}"), # red
-(r"\x03""0515",""), # brown (maroon)
-(r"\x03""0615","{pur}"), # purple
-(r"\x03""0715","{ora}"), # orange (olive)
-(r"\x03""0815","{yel}"), # yellow
-(r"\x03""0915",""), # light green (lime)
-(r"\x03""1015",""), # teal (a green/blue cyan)
-(r"\x03""1115",""), # light cyan (cyan) (aqua)
-(r"\x03""1215",""), # light blue (royal)
-(r"\x03""1315","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""1415","{gra}"), # grey
-(r"\x03""1515",""), # light grey (silver)
-(r"\x03""9915",""), # transparent
+("\x03""00,15","{whi}"), # white
+("\x03""01,15","{blk}"), # black
+("\x03""02,15","{blu}"), # blue (navy)
+("\x03""03,15","{gre}"), # green
+("\x03""04,15","{red}"), # red
+("\x03""05,15",""), # brown (maroon)
+("\x03""06,15","{pur}"), # purple
+("\x03""07,15","{ora}"), # orange (olive)
+("\x03""08,15","{yel}"), # yellow
+("\x03""09,15",""), # light green (lime)
+("\x03""10,15",""), # teal (a green/blue cyan)
+("\x03""11,15",""), # light cyan (cyan) (aqua)
+("\x03""12,15",""), # light blue (royal)
+("\x03""13,15","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,15","{gra}"), # grey
+("\x03""15,15",""), # light grey (silver)
+("\x03""99,15",""), # transparent
 # Color text on default background
-(r"\x03""00","{whi}"), # white
-(r"\x03""01","{blk}"), # black
-(r"\x03""02","{blu}"), # blue (navy)
-(r"\x03""03","{gre}"), # green
-(r"\x03""04","{red}"), # red
-(r"\x03""05",""), # brown (maroon)
-(r"\x03""06","{pur}"), # purple
-(r"\x03""07","{ora}"), # orange (olive)
-(r"\x03""08","{yel}"), # yellow
-(r"\x03""09",""), # light green (lime)
-(r"\x03""10",""), # teal (a green/blue cyan)
-(r"\x03""11",""), # light cyan (cyan) (aqua)
-(r"\x03""12",""), # light blue (royal)
-(r"\x03""13","{vio}"), # pink (light purple) (fuchsia)
-(r"\x03""14","{gra}"), # grey
-(r"\x03""15",""), # light grey (silver)
-(r"\x03""99",""), # transparent
+("\x03""00","{whi}"), # white
+("\x03""01","{blk}"), # black
+("\x03""02","{blu}"), # blue (navy)
+("\x03""03","{gre}"), # green
+("\x03""04","{red}"), # red
+("\x03""05",""), # brown (maroon)
+("\x03""06","{pur}"), # purple
+("\x03""07","{ora}"), # orange (olive)
+("\x03""08","{yel}"), # yellow
+("\x03""09",""), # light green (lime)
+("\x03""10",""), # teal (a green/blue cyan)
+("\x03""11",""), # light cyan (cyan) (aqua)
+("\x03""12",""), # light blue (royal)
+("\x03""13","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14","{gra}"), # grey
+("\x03""15",""), # light grey (silver)
+("\x03""99",""), # transparent
 # Format codes
-("\x02",""), # bold
-("\x1D",""), # italic text
-("\x0F","{def}"), # colour reset
-("\x16",""), # reverse colour
-("\x1F",""), # underlined text
+("\x02"     ,""), # bold
+("\x03"     ,"{def}"), # no more color
+("\x1D"     ,""), # italic text
+("\x0F"     ,"{def}"), # colour reset
+("\x16"     ,""), # reverse colour
+("\x1F"     ,""), # underlined text
 ]
 
 def replace_PSO2_with_IRC(pIncoming):
