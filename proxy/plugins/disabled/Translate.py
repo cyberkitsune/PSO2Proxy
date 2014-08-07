@@ -67,7 +67,7 @@ def get_chat_packet(context, packet):
         channel_id = struct.unpack_from("I", packet, 0x14)[0]
         message = packet[0x1C:].decode('utf-16').rstrip("\0")
         try:
-            return packetFactory.ChatPacket(0x0, translator.translate(message, "ja"), channel_id).build()
+            return packetFactory.ChatPacket(0x0, translator.translate(message, "ja", "en"), channel_id).build()
         except:
             print("[Translator] Got an exception! Bailing out...")
             return packet
