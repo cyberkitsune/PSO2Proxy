@@ -38,7 +38,7 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
 
     if context.myUsername is not None and 'orphans' in context.extendedData and len(context.extendedData['orphans']) > 0:
         count = 0
-        while len(context.exendedData['orphans']) > 0:
+        while len(context.extendedData['orphans']) > 0:
             orphan_packet = context.extendedData['orphans'].pop()
             path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (
                 context.myUsername, context.connTimestamp, orphan_packet['count'], orphan_packet['type'],
