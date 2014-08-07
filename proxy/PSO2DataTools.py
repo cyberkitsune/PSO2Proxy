@@ -342,6 +342,24 @@ IRC_PSO2 = [
 ("\x03""14,15","{gra}"), # grey
 ("\x03""15,15",""), # light grey (silver)
 ("\x03""99,15",""), # transparent
+# Color text on restored defaulted background
+("\x03""00,","{whi}"), # white
+("\x03""01,","{blk}"), # black
+("\x03""02,","{blu}"), # blue (navy)
+("\x03""03,","{gre}"), # green
+("\x03""04,","{red}"), # red
+("\x03""05,",""), # brown (maroon)
+("\x03""06,","{pur}"), # purple
+("\x03""07,","{ora}"), # orange (olive)
+("\x03""08,","{yel}"), # yellow
+("\x03""09,",""), # light green (lime)
+("\x03""10,",""), # teal (a green/blue cyan)
+("\x03""11,",""), # light cyan (cyan) (aqua)
+("\x03""12,",""), # light blue (royal)
+("\x03""13,","{vio}"), # pink (light purple) (fuchsia)
+("\x03""14,","{gra}"), # grey
+("\x03""15,",""), # light grey (silver)
+("\x03""99,",""), # transparent
 # Color text on default background
 ("\x03""00","{whi}"), # white
 ("\x03""01","{blk}"), # black
@@ -362,6 +380,7 @@ IRC_PSO2 = [
 ("\x03""99",""), # transparent
 # Format codes
 ("\x02"     ,""), # bold
+("\x03,"    ,"{def}"), # no more color
 ("\x03"     ,"{def}"), # no more color
 ("\x1D"     ,""), # italic text
 ("\x0F"     ,"{def}"), # colour reset
