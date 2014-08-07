@@ -3,7 +3,7 @@ import packetFactory
 import data.clients
 import data.players
 
-from PSO2DataTools import replace_IRC_with_PSO2, replace_PSO2_with_IRC
+from PSO2DataTools import replace_irc_with_pso2, replace_pso2_with_irc
 from config import YAMLConfig
 import config
 from commands import Command
@@ -63,7 +63,7 @@ if ircMode:
                     if client.get_preferences()['globalChat'] and client.get_handle() is not None:
                         client.get_handle().send_crypto_packet(
                             packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]),
-                                                         "[GIRC] %s" % user.split("!")[0], replace_IRC_with_PSO2(msg).decode('utf-8')).build())
+                                                         "[GIRC] %s" % user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8')).build())
             else:
                 print("[IRC] <%s> %s" % (user, msg))
 
@@ -78,10 +78,10 @@ if ircMode:
                         client.get_handle().send_crypto_packet(
                             packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]),
                                                          "[GIRC] %s" % user.split("!")[0],
-                                                         "* %s" % replace_IRC_with_PSO2(msg).decode('utf-8')).build())
+                                                         "* %s" % replace_irc_with_pso2(msg).decode('utf-8')).build())
 
         def send_global_message(self, ship, user, message):
-            self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, replace_PSO2_with_IRC(message)))
+            self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, replace_pso2_with_irc(message)))
 
     class GIRCFactory(protocol.ClientFactory):
         """docstring for ClassName"""
