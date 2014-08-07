@@ -56,6 +56,12 @@ class ClientPreferences():
         my_preferences[preference] = value
         self._config.set_key(self.segaid, my_preferences)
 
+    def __getitem__(self, item):
+        return self.get_preference(item)
+
+    def __setitem__(self, key, value):
+        self.set_preference(key, value)
+
 
 def add_client(handle):
     connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, handle.myUsername.rstrip('\0'), get_ship_from_port(handle.transport.getHost().port), handle)
