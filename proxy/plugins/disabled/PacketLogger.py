@@ -4,6 +4,14 @@ import struct
 import os
 
 
+@plugins.on_start_hook
+def on_start():
+    print("!!! WARNING !!!")
+    print("You have PacketLogger.py outside of the disabled plugins folder! This means it is ON!")
+    print("This plugin can log sensitive data!")
+    print("Please be careful!")
+    print("!!! WARNING !!!")
+
 @plugins.raw_packet_hook
 def on_packet_received(context, packet, packet_type, packet_subtype):
     if packet_type == 0x11 and packet_subtype == 0x0:
