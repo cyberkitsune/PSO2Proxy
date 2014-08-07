@@ -1,7 +1,7 @@
 import exceptions
 import shutil
 from commands import Command
-import plugins.plugins as plugins
+import plugins as plugins
 import struct
 import data.clients
 import packetFactory
