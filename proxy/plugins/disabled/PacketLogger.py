@@ -56,6 +56,7 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
     if 'prefs' not in context.extendedData and context.myUsername is not None and context.playerId not in data.clients.connectedClients:
         prefs = context.extendedData['prefs'] = data.clients.ClientPreferences(context.myUsername)
     if context.playerId in data.clients.connectedClients:
+        del context.extendedData['prefs']
         prefs = data.clients.connectedClients[context.playerId].preferences
 
     if prefs is not None and context.myUsername is not None and prefs['logPackets'] is not None and not prefs['logPackets']:
