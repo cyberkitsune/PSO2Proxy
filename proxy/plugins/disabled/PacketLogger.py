@@ -1,6 +1,12 @@
 import exceptions
-import plugins as plugins
+import shutil
+from commands import Command
+import plugins.plugins as plugins
 import struct
+import data.clients
+import packetFactory
+import tarfile
+import json
 import os
 
 
@@ -13,8 +19,44 @@ def on_start():
     print("!!! WARNING !!!")
 
 
+@plugins.on_initial_connect_hook
+def notify_and_config(client):
+    """
+    :type client: ShipProxy
+    """
+    if data.clients.connectedClients[client.playerId].preferences['logPackets'] is None:
+        data.clients.connectedClients[client.playerId].preferences['logPackets'] = False
+    if data.clients.connectedClients[client.playerId].preferences['logPackets']:
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have opted-in to packet logging, Thank you! View your contributions on http://pso2proxy.cyberkitsune.net/redpill/ or use !optout to opt out", 0x3).build())
+    else:
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have not opted-in to packet logging, and it has been disabled. Use !optin to opt in.", 0x3).build())
+
+
+@plugins.CommandHook("optin", "Opts you into packet logging for the redpill project.")
+class OptIn(Command):
+    def call_from_client(self, client):
+        data.clients.connectedClients[client.playerId].preferences['logPackets'] = True
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have enabled packet logging! Thank you! Track your data at http://pso2proxy.cyberkitsune.net/redpill/", 0x3).build())
+
+
+@plugins.CommandHook("optout", "Opts you out of the packet logging for the redpill project.")
+class OptOut(Command):
+    def call_from_client(self, client):
+        archive_packets(client)
+        data.clients.connectedClients[client.playerId].preferences['logPackets'] = False
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have disabled packet logging! :( If you change your mind, please use !optin to rejoin!"))
+
+
 @plugins.raw_packet_hook
 def on_packet_received(context, packet, packet_type, packet_subtype):
+    """
+    :type context: ShipProxy
+    """
+    if context.myUsername is not None and data.clients.ClientPreferences(context.myUsername)['logPackets'] is not None and not data.clients.ClientPreferences(context.myUsername)['logPackets']:
+        if 'orphans' in context.extendedData:
+            print("[PacketLogger] %s has opted out of packet logging. Deleting orphans..." % context.myUsername)
+            del context.extendedData['orphans']
+        return packet
     if packet_type == 0x11 and packet_subtype == 0x0:
         packet_data = bytearray(packet)
         struct.pack_into("64x", packet_data, 0x48)
@@ -55,3 +97,18 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
         print('[ShipProxy] Flushed %i orphan packets for %s.' % (count, context.myUsername))
 
     return str(packet)
+
+
+@plugins.on_connection_lost_hook
+def archive_packets(client):
+    """
+    :type client: ShipProxy
+    """
+    if client.playerId in data.clients.connectedClients:
+        if data.clients.connectedClients[client.playerId].preferences['logPackets']:
+            metadata = {'sega_id': client.myUsername, 'player_id': client.playerId, 'timestamp': client.connTimestamp}
+            json.dump(metadata, open("packets/%s/%s/metadata.json" % (client.myUsername, client.connTimestamp), 'w'))
+            tar = tarfile.open("packets/%s/%i.tar.gz" % (client.myUsername, client.connTimestamp), "w:gz")
+            tar.add("packets/%s/%i/" % (client.myUsername, client.connTimestamp), arcname="%i" % client.connTimestamp)
+            tar.close()
+            shutil.rmtree("packets/%s/%i" % (client.myUsername, client.connTimestamp))
