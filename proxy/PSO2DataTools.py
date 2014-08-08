@@ -400,7 +400,7 @@ def replace_pso2_with_irc(pIncoming, debug=0):
         outtext = lIncoming.replace(couple[0], couple[1])
         lIncoming = outtext
 
-    outtext = lIncoming.encode('utf-8-sig')
+    outtext = lIncoming.encode('utf-8')
 
     if debug > 0 :
         print "Outgoing replace: {}".format(repr(lIncoming))
@@ -420,8 +420,10 @@ def replace_irc_with_pso2(pIncoming, debug=0):
         outtext = lIncoming.replace(couple[0], couple[1])
         lIncoming = outtext
 
+    outtext = lIncoming.encode('utf-8')
+
     if debug > 0 :
         print "Outgoing replace: {}".format(repr(lIncoming))
         print "Outgoing string:  {}".format(repr(outtext))
 
-    return outtext.encode('utf-8-sig')
+    return outtext

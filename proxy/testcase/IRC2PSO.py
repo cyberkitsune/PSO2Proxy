@@ -2,7 +2,7 @@
 import sys
 from PSO2DataTools import replace_irc_with_pso2, replace_pso2_with_irc
 
-# echo -e "\00038yellow" | python ./IRC2PSO.py
+# echo -e "\000308yellow" | python ./IRC2PSO.py
 def main():
    f = sys.stdin
    if len(sys.argv) > 1:
