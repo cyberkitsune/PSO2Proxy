@@ -304,16 +304,7 @@ def main():
         __import__(plug)
     for f in plugin_manager.onStart:
         f()
-    profile = cProfile.Profile()
-    profile.enable()
     reactor.run()
-    profile.disable()
-    s = open("latest_profile.txt", "w")
-    sort_by = 'cumulative'
-    ps = pstats.Stats(profile, stream=s).sort_stats(sort_by)
-    ps.print_stats()
-    s.close()
-    print("Stats saved to file.")
 
 
 if __name__ == "__main__":

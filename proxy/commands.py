@@ -1,3 +1,7 @@
+import cProfile
+import calendar
+import pstats
+import datetime
 from twisted.protocols import basic
 from twisted.internet import reactor
 
@@ -380,3 +384,24 @@ class ReloadBlockNames(Command):
     def call_from_console(self):
         config.load_block_names()
         return
+
+
+profile = None
+
+@CommandHandler("profile")
+class Profiler(Command):
+    def call_from_console(self):
+        global profile
+        if profile is None:
+            profile = cProfile.Profile()
+            profile.enable()
+            return "[Profiling] Profiling has been enabled."
+        else:
+            profile.disable()
+            out = open("latest_profile_%s.txt" % calendar.timegm(datetime.datetime.utcnow().utctimetuple()))
+            sort_by = 'ncalls'
+            ps = pstats.Stats(profile, stream=out).sort_stats(sort_by)
+            ps.print_stats()
+            out.close()
+            profile = None
+            print("[Profiling] Profiling has been disabled, results written to disk.")
