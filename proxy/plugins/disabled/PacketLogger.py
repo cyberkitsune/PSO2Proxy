@@ -113,8 +113,4 @@ def archive_packets(client):
     if logging_config[client.myUsername]:
         metadata = {'sega_id': client.myUsername, 'player_id': client.playerId, 'timestamp': client.connTimestamp}
         json.dump(metadata, open("packets/%s/%s/metadata.json" % (client.myUsername, client.connTimestamp), 'w'))
-        tar = tarfile.open("packets/%s/%i.tar.gz" % (client.myUsername, client.connTimestamp), "w:gz")
-        tar.add("packets/%s/%i/" % (client.myUsername, client.connTimestamp), arcname="%i" % client.connTimestamp)
-        tar.close()
-        shutil.rmtree("packets/%s/%i" % (client.myUsername, client.connTimestamp))
-        print("[PacketLogger] Archived %s's packet session %i." % (client.myUsername, client.connTimestamp))
+        print("[PacketLogger] Wrote meta for %s, %i." % (client.myUsername, client.connTimestamp))
