@@ -402,7 +402,7 @@ class Profiler(Command):
             return "[Profiling] Profiling has been enabled."
         else:
             profile.disable()
-            out = open("latest_profile_%s.txt" % calendar.timegm(datetime.datetime.utcnow().utctimetuple()))
+            out = open("latest_profile_%s.txt" % calendar.timegm(datetime.datetime.utcnow().utctimetuple()), 'w')
             sort_by = 'ncalls'
             ps = pstats.Stats(profile, stream=out).sort_stats(sort_by)
             ps.print_stats()
