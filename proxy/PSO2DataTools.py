@@ -55,7 +55,7 @@ PSO2_IRC = [
 
 IRC_PSO2 = [
     # Color text on white background
-    ("\x03""00,,00", "{whi}"),  # white
+    ("\x03""00,00", "{whi}"),  # white
     ("\x03""01,00", "{blk}"),  # black
     ("\x03""02,00", "{blu}"),  # blue (navy)
     ("\x03""03,00", "{gre}"),  # green
@@ -73,7 +73,7 @@ IRC_PSO2 = [
     ("\x03""15,00", ""),  # light grey (silver)
     ("\x03""99,00", ""),  # transparent
     # Color text on black background
-    ("\x03""00,,01", "{whi}"),  # white
+    ("\x03""00,01", "{whi}"),  # white
     ("\x03""01,01", "{blk}"),  # black
     ("\x03""02,01", "{blu}"),  # blue (navy)
     ("\x03""03,01", "{gre}"),  # green
@@ -91,7 +91,7 @@ IRC_PSO2 = [
     ("\x03""15,01", ""),  # light grey (silver)
     ("\x03""99,01", ""),  # transparent
     # Color text on blue background
-    ("\x03""00,,02", "{whi}"),  # white
+    ("\x03""00,02", "{whi}"),  # white
     ("\x03""01,02", "{blk}"),  # black
     ("\x03""02,02", "{blu}"),  # blue (navy)
     ("\x03""03,02", "{gre}"),  # green
@@ -109,7 +109,7 @@ IRC_PSO2 = [
     ("\x03""15,02", ""),  # light grey (silver)
     ("\x03""99,02", ""),  # transparent
     # Color text on green background
-    ("\x03""00,,03", "{whi}"),  # white
+    ("\x03""00,03", "{whi}"),  # white
     ("\x03""01,03", "{blk}"),  # black
     ("\x03""02,03", "{blu}"),  # blue (navy)
     ("\x03""03,03", "{gre}"),  # green
@@ -127,7 +127,7 @@ IRC_PSO2 = [
     ("\x03""15,03", ""),  # light grey (silver)
     ("\x03""99,03", ""),  # transparent
     # Color text on red background
-    ("\x03""00,,04", "{whi}"),  # white
+    ("\x03""00,04", "{whi}"),  # white
     ("\x03""01,04", "{blk}"),  # black
     ("\x03""02,04", "{blu}"),  # blue (navy)
     ("\x03""03,04", "{gre}"),  # green
@@ -145,7 +145,7 @@ IRC_PSO2 = [
     ("\x03""15,04", ""),  # light grey (silver)
     ("\x03""99,04", ""),  # transparent
     # Color text on brown background
-    ("\x03""00,,05", "{whi}"),  # white
+    ("\x03""00,05", "{whi}"),  # white
     ("\x03""01,05", "{blk}"),  # black
     ("\x03""02,05", "{blu}"),  # blue (navy)
     ("\x03""03,05", "{gre}"),  # green
@@ -163,7 +163,7 @@ IRC_PSO2 = [
     ("\x03""15,05", ""),  # light grey (silver)
     ("\x03""99,05", ""),  # transparent
     # Color text on purple background
-    ("\x03""00,,06", "{whi}"),  # white
+    ("\x03""00,06", "{whi}"),  # white
     ("\x03""01,06", "{blk}"),  # black
     ("\x03""02,06", "{blu}"),  # blue (navy)
     ("\x03""03,06", "{gre}"),  # green
@@ -181,7 +181,7 @@ IRC_PSO2 = [
     ("\x03""15,06", ""),  # light grey (silver)
     ("\x03""99,06", ""),  # transparent
     # Color text on orange background
-    ("\x03""00,,07", "{whi}"),  # white
+    ("\x03""00,07", "{whi}"),  # white
     ("\x03""01,07", "{blk}"),  # black
     ("\x03""02,07", "{blu}"),  # blue (navy)
     ("\x03""03,07", "{gre}"),  # green
@@ -199,7 +199,7 @@ IRC_PSO2 = [
     ("\x03""15,07", ""),  # light grey (silver)
     ("\x03""99,07", ""),  # transparent
     # Color text on light yelll background
-    ("\x03""00,,08", "{whi}"),  # white
+    ("\x03""00,08", "{whi}"),  # white
     ("\x03""01,08", "{blk}"),  # black
     ("\x03""02,08", "{blu}"),  # blue (navy)
     ("\x03""03,08", "{gre}"),  # green
@@ -217,7 +217,7 @@ IRC_PSO2 = [
     ("\x03""15,08", ""),  # light grey (silver)
     ("\x03""99,08", ""),  # transparent
     # Color text on light green background
-    ("\x03""00,,09", "{whi}"),  # white
+    ("\x03""00,09", "{whi}"),  # white
     ("\x03""01,09", "{blk}"),  # black
     ("\x03""02,09", "{blu}"),  # blue (navy)
     ("\x03""03,09", "{gre}"),  # green
