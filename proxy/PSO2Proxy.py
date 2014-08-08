@@ -308,11 +308,12 @@ def main():
     profile.enable()
     reactor.run()
     profile.disable()
-    s = StringIO.StringIO()
+    s = open("latest_profile.txt", "w")
     sort_by = 'cumulative'
     ps = pstats.Stats(profile, stream=s).sort_stats(sort_by)
     ps.print_stats()
-    print s.getvalue()
+    s.close()
+    print("Stats saved to file.")
 
 
 if __name__ == "__main__":
