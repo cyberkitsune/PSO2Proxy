@@ -395,6 +395,10 @@ class Profiler(Command):
         if profile is None:
             profile = cProfile.Profile()
             profile.enable()
+            for client in data.clients.connectedClients.values():
+                if client.get_handle() is not None:
+                    client.get_handle().send_crypto_packet(
+                        packetFactory.SystemMessagePacket("[Proxy NOTICE] Profiling mode has now been enabled. This may cause lag until it has been disabled.", 0x1).build())
             return "[Profiling] Profiling has been enabled."
         else:
             profile.disable()
@@ -404,4 +408,8 @@ class Profiler(Command):
             ps.print_stats()
             out.close()
             profile = None
+            for client in data.clients.connectedClients.values():
+                if client.get_handle() is not None:
+                    client.get_handle().send_crypto_packet(
+                        packetFactory.SystemMessagePacket("[Proxy NOTICE] Profiling mode has now been disabled. Any lag caused by this should subside.", 0x1).build())
             print("[Profiling] Profiling has been disabled, results written to disk.")
