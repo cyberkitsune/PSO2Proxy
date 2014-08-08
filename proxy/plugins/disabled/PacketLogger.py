@@ -1,11 +1,9 @@
 import exceptions
-import shutil
 from commands import Command
 from config import YAMLConfig
 import plugins as plugins
 import struct
 import packetFactory
-import tarfile
 import json
 import os
 
