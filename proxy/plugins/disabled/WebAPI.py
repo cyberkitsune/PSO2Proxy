@@ -78,6 +78,21 @@ class PublicKey(Resource):
             return pubkey_data
 
 
+class LatestProfile(Resource):
+    isLeaf = True
+
+    @staticmethod
+    def render_GET(request):
+        request.setHeader("content-type", "text-plain")
+        if os.path.exists("latest_profile.txt"):
+            f = open("latest_profile.txt")
+            profile = f.read()
+            f.close()
+            return profile
+        else:
+            return "No profile saved."
+
+
 class WebAPI(Resource):
 
     # noinspection PyPep8Naming
@@ -107,6 +122,7 @@ def setup_web_api():
     web_resource = WebAPI()
     web_resource.putChild("config.json", JSONConfig())
     web_resource.putChild("publickey.blob", PublicKey())
+    web_resource.putChild("latest_profile", LatestProfile())
     if web_api_config.get_key('webRconEnabled'):
         web_resource.putChild("rcon", WEBRcon())
     web_endpoint.listen(server.Site(web_resource))

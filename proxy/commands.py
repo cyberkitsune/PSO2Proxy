@@ -2,6 +2,7 @@ import cProfile
 import calendar
 import pstats
 import datetime
+import shutil
 from twisted.protocols import basic
 from twisted.internet import reactor
 
@@ -402,10 +403,11 @@ class Profiler(Command):
             return "[Profiling] Profiling has been enabled."
         else:
             profile.disable()
-            out = open("latest_profile_%s.txt" % calendar.timegm(datetime.datetime.utcnow().utctimetuple()), 'w')
+            out = open("profile_%s.txt" % calendar.timegm(datetime.datetime.utcnow().utctimetuple()), 'w')
             sort_by = 'cumulative'
             ps = pstats.Stats(profile, stream=out).sort_stats(sort_by)
             ps.print_stats()
+            shutil.copy(out.name, "latest_profile.txt")
             out.close()
             profile = None
             for client in data.clients.connectedClients.values():
