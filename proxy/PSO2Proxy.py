@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import pstats
 
 import struct
 import time
@@ -7,7 +8,9 @@ import datetime
 import os
 import sys
 import traceback
+import StringIO
 import config
+import cProfile
 
 from twisted.internet import protocol, reactor, stdio
 from twisted.protocols import basic
@@ -301,7 +304,15 @@ def main():
         __import__(plug)
     for f in plugin_manager.onStart:
         f()
+    profile = cProfile.Profile()
+    profile.enable()
     reactor.run()
+    profile.disable()
+    s = StringIO.StringIO()
+    sort_by = 'cumulative'
+    ps = pstats.Stats(profile, stream=s).sort_stats(sort_by)
+    ps.print_stats()
+    print s.getvalue()
 
 
 if __name__ == "__main__":
