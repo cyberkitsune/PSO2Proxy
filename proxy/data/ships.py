@@ -71,9 +71,11 @@ def scrape_block_packet(ship_ip, ship_port, destination_ip):
         from ShipProxy import ProxyFactory
         log.msg("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (name, ip_string, port))
         blocks.blockList[port] = (ip_string, name)
-        block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
-        block_endpoint.listen(ProxyFactory())
-        print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
+        if port not in blocks.listeningPorts:
+            block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
+            block_endpoint.listen(ProxyFactory())
+            print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
+            blocks.listeningPorts.append(port)
     o1, o2, o3, o4 = destination_ip.split(".")
     struct.pack_into('BBBB', data, 0x64, int(o1), int(o2), int(o3), int(o4))
     return str(data)

@@ -1,2 +1,3 @@
 # Temporary
 blockList = {}
+listeningPorts = []
