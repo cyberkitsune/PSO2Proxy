@@ -1,4 +1,6 @@
 #!/usr/bin/python
+from twisted.internet import epollreactor
+epollreactor.install()
 
 import time
 import os
