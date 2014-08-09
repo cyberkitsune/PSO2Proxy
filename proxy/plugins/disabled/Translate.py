@@ -88,5 +88,5 @@ def generate_google_translate_message(player_id, channel_id, message, end_lang, 
     if end_lang == "ja":
         message_string = "%s" % translator.translate(message, end_lang, start_lang)
     else:
-        message_string = "%s (%s)" % (translator.translate(message, end_lang, start_lang), message)
+        message_string = "%s {def}(%s)" % (translator.translate(message, end_lang, start_lang), message)
     return packetFactory.ChatPacket(player_id, message_string, channel_id).build()
