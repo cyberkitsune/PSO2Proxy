@@ -171,7 +171,7 @@ class MuteSomebody(Command):
             if player_data[0].rstrip("\0") == user_to_mute:
                 if player_id in data.clients.connectedClients:
                     data.clients.connectedClients[player_id].preferences['chatMuted'] = True
-                    client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {grn}Muted %s." % player_data[0].rstrip("\0"), 0x3).build())
+                    client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Muted %s." % player_data[0].rstrip("\0"), 0x3).build())
                 else:
                     client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0"), 0x3).build())
 
@@ -202,7 +202,7 @@ class UnmuteSomebody(Command):
             if player_data[0].rstrip("\0") == user_to_mute:
                 if player_id in data.clients.connectedClients:
                     data.clients.connectedClients[player_id].preferences['chatMuted'] = False
-                    client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {grn}Unmuted %s." % player_data[0].rstrip("\0"), 0x3).build())
+                    client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Unmuted %s." % player_data[0].rstrip("\0"), 0x3).build())
                 else:
                     client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0"), 0x3).build())
 
@@ -214,7 +214,7 @@ class UnmuteSomebody(Command):
             if player_data[0].rstrip("\0") == user_to_mute:
                 if player_id in data.clients.connectedClients:
                     data.clients.connectedClients[player_id].preferences['chatMuted'] = False
-                    return "[Command] Unuted %s." % player_data[0].rstrip("\0")
+                    return "[Command] Unmuted %s." % player_data[0].rstrip("\0")
                 else:
                     return "[Command] %s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0")
 
