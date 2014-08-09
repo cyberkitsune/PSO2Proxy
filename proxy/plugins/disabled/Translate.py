@@ -9,7 +9,7 @@ from commands import Command
 import plugins as p
 
 # How to know it had already been translated
-en_magic = "{def}{red}{whi}{blue}{def}"
+gt_magic = "{def}{red}{whi}{blue}{def}"
 
 translator = goslate.Goslate()
 
@@ -59,7 +59,7 @@ def get_chat_packet(context, packet):
             return
         channel_id = struct.unpack_from("I", packet, 0x14)[0]
         message = packet[0x1C:].decode('utf-16').rstrip("\0")
-        if message.find(en_magic):
+        if message.find(gt_magic):
              return packet
         d = threads.deferToThread(generate_google_translate_message, player_id, channel_id, message, "ja", "en")
         d.addCallback(context.peer.send_crypto_packet)
@@ -75,7 +75,7 @@ def get_chat_packet(context, packet):
         message = packet[0x1C:].decode('utf-16').rstrip("\0")
         if message.startswith("/"):
             return packet  # Command
-        if message.find(en_magic):
+        if message.find(gt_magic):
              return packet
         japanese = False
         for char in message:
@@ -92,5 +92,5 @@ def get_chat_packet(context, packet):
 
 
 def generate_google_translate_message(player_id, channel_id, message, end_lang, start_lang):
-    message_string = "%s {def}{red}{whi}{blue}{def}(%s)" % (translator.translate(message, end_lang, start_lang), message)
+    message_string = "%s %s(%s)" % (translator.translate(message, end_lang, start_lang), gt_magic, message)
     return packetFactory.ChatPacket(player_id, message_string, channel_id).build()
