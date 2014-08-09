@@ -18,6 +18,7 @@ from twisted.python import log, logfile
 from twisted.internet.endpoints import TCP4ServerEndpoint
 
 from commands import commandList
+import data
 import packets
 import data.blocks as blocks
 import data.clients as clients
@@ -305,6 +306,7 @@ def main():
     for f in plugin_manager.onStart:
         f()
     reactor.run()
+    data.clients.dbManager.close_db()
 
 
 if __name__ == "__main__":
