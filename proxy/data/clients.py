@@ -1,3 +1,5 @@
+import sqlite3
+import yaml
 import blocks
 import config
 import packetFactory
@@ -30,31 +32,74 @@ class ClientData(object):
         self.handle = handle
 
 
+class SQLitePreferenceManager():
+
+    user_preference_cache = {}
+
+    def __init__(self):
+        self._db_connection = sqlite3.connect("cfg/pso2proxy.userprefs.db")
+        setup_cursor = self._db_connection.cursor()
+        setup_cursor.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, sega_id TEXT, data TEXT)")
+        self._db_connection.row_factory = sqlite3.Row
+        setup_cursor.close()
+
+    def get_data_for_sega_id(self, sega_id):
+        if not sega_id in self.user_preference_cache:
+            self.user_preference_cache[sega_id] = self._get_user_data_from_db(sega_id)
+        return self.user_preference_cache[sega_id]
+
+    def _get_user_data_from_db(self, segaid):
+        user_data = {}
+        local_cursor = self._db_connection.cursor()
+        local_cursor.execute("SELECT data FROM users WHERE sega_id = ?", (segaid, ))
+        user_row = local_cursor.fetchone()
+        if user_row is not None:
+            user_data = yaml.load(user_row['data'])
+        else:
+            local_cursor.execute("INSERT INTO users (sega_id, data) VALUES  (?,?)", (segaid, yaml.dump({})))
+        local_cursor.close()
+        return user_data
+
+    def _update_user_data_in_db(self, sega_id):
+        if sega_id not in self.user_preference_cache:
+            raise KeyError("User data isn't even cached, can't update data!")
+        local_cursor = self._db_connection.cursor()
+        local_cursor.execute("UPDATE users SET data = ? WHERE sega_id = ?", (yaml.dump(self.user_preference_cache[sega_id]), sega_id))
+        local_cursor.close()
+
+    def update_user_cache(self, sega_id, new_config):
+        self.user_preference_cache[sega_id] = new_config
+        self._update_user_data_in_db(sega_id)
+
+    def close_db(self):
+        self._db_connection.close()
+
+    def __del__(self):
+        self._db_connection.close()
+
+dbManager = SQLitePreferenceManager()
+
+
 class ClientPreferences():
     def __init__(self, segaid):
-        self._config = config.YAMLConfig("cfg/user.preferences.yml")
+        self._config = dbManager.get_data_for_sega_id(segaid)
         self.segaid = segaid
-        if not self._config.key_exists(segaid):
-            self._config.set_key(segaid, {})
 
     def has_preference(self, preference):
-        my_preferences = self._config.get_key(self.segaid)
-        if preference in my_preferences:
+        if preference in self._config:
             return True
         else:
             return False
 
     def get_preference(self, preference):
-        my_preferences = self._config.get_key(self.segaid)
-        if self.has_preference(preference):
-            return my_preferences[preference]
+        if preference in self._config:
+            return self._config[preference]
         else:
             return None
 
     def set_preference(self, preference, value):
-        my_preferences = self._config.get_key(self.segaid)
-        my_preferences[preference] = value
-        self._config.set_key(self.segaid, my_preferences)
+        self._config[preference] = value
+        dbManager.update_user_cache(self.segaid, self._config)
 
     def __getitem__(self, item):
         return self.get_preference(item)
