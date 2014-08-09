@@ -370,10 +370,10 @@ class GlobalMessage(Command):
 
         if message is None:
             message = self.args.split(' ', 2)[2]
+        SMPacket = packetFactory.SystemMessagePacket("[Proxy Global Message] %s" % message, mode).build();
         for client in data.clients.connectedClients.values():
             if client.get_handle() is not None:
-                client.get_handle().send_crypto_packet(
-                    packetFactory.SystemMessagePacket("[Proxy Global Message] %s" % message, mode).build())
+                client.get_handle().send_crypto_packet(SMPacket)
         return "[ShipProxy] Sent global message!"
 
 
