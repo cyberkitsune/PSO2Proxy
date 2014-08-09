@@ -386,44 +386,54 @@ IRC_PSO2 = [
     ("\x0F", "{def}"),  # colour reset
     ("\x16", ""),  # reverse colour
     ("\x1F", ""),  # underlined text
+    # drop other control chars
+    ("\x04", ""),
+    ("\x05", ""),
+    ("\x06", ""),
+    ("\x07", ""),
+    ("\x08", ""),
+    ("\x09", ""),
+    ("\x0A", ""),
+    ("\x0B", ""),
+    ("\x0C", ""),
+    ("\x0D", ""),
+    ("\x0E", ""),
+    ("\x10", ""),
+    ("\x11", ""),
+    ("\x12", ""),
+    ("\x13", ""),
+    ("\x14", ""),
+    ("\x15", ""),
+    ("\x17", ""),
+    ("\x18", ""),
+    ("\x19", ""),
+    ("\x1A", ""),
+    ("\x1B", ""),
+    ("\x1C", ""),
+    ("\x1E", ""),
 ]
 
+def replace_with_table(pIncoming, table, debug=0):
+    lIncoming = unicode(pIncoming, 'utf-8-sig', 'replace')
+
+    if debug > 0 :
+        print "Incoming object:  {}".format(repr(pIncoming))
+        print "Incoming unicode: {}".format(repr(lIncoming))
+
+    for i, o in table:
+        outtext = lIncoming.replace(i, o)
+        lIncoming = outtext
+
+    outtext = lIncoming.encode('utf-8', 'replace')
+
+    if debug > 0 :
+        print "Outgoing replace: {}".format(repr(lIncoming))
+        print "Outgoing string:  {}".format(repr(outtext))
+
+    return outtext
 
 def replace_pso2_with_irc(pIncoming, debug=0):
-    lIncoming = unicode(pIncoming, 'utf-8-sig')
-
-    if debug > 0 :
-        print "Incoming object:  {}".format(repr(pIncoming))
-        print "Incoming unicode: {}".format(repr(lIncoming))
-
-    for couple in PSO2_IRC:
-        outtext = lIncoming.replace(couple[0], couple[1])
-        lIncoming = outtext
-
-    outtext = lIncoming.encode('utf-8')
-
-    if debug > 0 :
-        print "Outgoing replace: {}".format(repr(lIncoming))
-        print "Outgoing string:  {}".format(repr(outtext))
-
-    return outtext
-
+    return replace_with_table(pIncoming, PSO2_IRC, debug)
 
 def replace_irc_with_pso2(pIncoming, debug=0):
-    lIncoming = unicode(pIncoming, 'utf-8-sig')
-
-    if debug > 0 :
-        print "Incoming object:  {}".format(repr(pIncoming))
-        print "Incoming unicode: {}".format(repr(lIncoming))
-
-    for couple in IRC_PSO2:
-        outtext = lIncoming.replace(couple[0], couple[1])
-        lIncoming = outtext
-
-    outtext = lIncoming.encode('utf-8')
-
-    if debug > 0 :
-        print "Outgoing replace: {}".format(repr(lIncoming))
-        print "Outgoing string:  {}".format(repr(outtext))
-
-    return outtext
+    return replace_with_table(pIncoming, IRC_PSO2, debug)
