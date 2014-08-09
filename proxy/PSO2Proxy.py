@@ -288,12 +288,6 @@ def main():
         query_endpoint = TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=interface_ip)
         query_endpoint.listen(BlockScraperFactory())
         print("[ShipProxy] Bound port %i for ship %i query server!" % ((12000 + (100 * shipNum)), shipNum))
-        # bound = 0
-        # for blockNum in xrange(1, 99):
-        #     endpoint = TCP4ServerEndpoint(reactor, 12000 + (shipNum * 100) + blockNum, interface=interface_ip)
-        #     endpoint.listen(ProxyFactory())
-        #     bound += 1
-        # print("[ShipProxy] Bound to %i ports for all blocks on ship %i!" % (bound, shipNum))
     stdio.StandardIO(ServerConsole())
     print("[ShipProxy] Loading plugins...")
     import glob
