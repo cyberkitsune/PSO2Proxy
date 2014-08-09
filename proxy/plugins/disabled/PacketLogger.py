@@ -28,7 +28,7 @@ def notify_and_config(client):
     :type client: ShipProxy.ShipProxy
     """
     client_config = dbManager.get_data_for_sega_id(client.myUsername)
-    if 'logPackets' not in dbManager:
+    if 'logPackets' not in client_config:
         client_config['logPackets'] = False
     if client_config['logPackets']:
         client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have opted-in to packet logging, Thank you! View your contributions on http://pso2proxy.cyberkitsune.net/redpill/ or use !optout to opt out", 0x3).build())
@@ -62,7 +62,8 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
         client_config = dbManager.get_data_for_sega_id(context.myUsername)
         if 'logPackets' not in client_config:
             client_config['logPackets'] = False
-        elif not client_config['logPackets']:
+            return packet
+        if not client_config['logPackets']:
             if 'orphans' in context.extendedData:
                 print("[PacketLogger] %s has opted out of packet logging. Deleting orphans..." % context.myUsername)
                 del context.extendedData['orphans']
