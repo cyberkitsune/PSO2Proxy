@@ -399,10 +399,10 @@ class Profiler(Command):
         if profile is None:
             profile = cProfile.Profile()
             profile.enable()
+            SMPacket = packetFactory.SystemMessagePacket("[Proxy NOTICE] Profiling mode has now been enabled. This may cause lag until it has been disabled.", 0x0).build()
             for client in data.clients.connectedClients.values():
                 if client.get_handle() is not None:
-                    client.get_handle().send_crypto_packet(
-                        packetFactory.SystemMessagePacket("[Proxy NOTICE] Profiling mode has now been enabled. This may cause lag until it has been disabled.", 0x0).build())
+                    client.get_handle().send_crypto_packet(SMPacket)
             return "[Profiling] Profiling has been enabled."
         else:
             profile.disable()
@@ -413,8 +413,8 @@ class Profiler(Command):
             shutil.copy(out.name, "latest_profile.txt")
             out.close()
             profile = None
+            SMPacket = packetFactory.SystemMessagePacket("[Proxy NOTICE] Profiling mode has now been disabled. Any lag caused by this should subside.", 0x0).build()
             for client in data.clients.connectedClients.values():
                 if client.get_handle() is not None:
-                    client.get_handle().send_crypto_packet(
-                        packetFactory.SystemMessagePacket("[Proxy NOTICE] Profiling mode has now been disabled. Any lag caused by this should subside.", 0x0).build())
+                    client.get_handle().send_crypto_packet(SMPacket)
             print("[Profiling] Profiling has been disabled, results written to disk.")
