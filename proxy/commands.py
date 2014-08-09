@@ -33,6 +33,9 @@ class Command(object):
         self.args = args
 
     def call_from_client(self, client):
+        """
+        :param client: ShipProxy.ShipProxy
+        """
         client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}This command can not be run from the console.", 0x3).build())
 
     def call_from_console(self):

@@ -157,6 +157,69 @@ class DisableGChat(Command):
             packetFactory.SystemMessagePacket("[GlobalChat] Global chat disabled for you.", 0x3).build())
 
 
+@plugins.CommandHook("gmute", "Mutes or somebody in gchat. Admin Only!", True)
+class MuteSomebody(Command):
+    def call_from_client(self, client):
+        """
+        :param client: ShipProxy.ShipProxy
+        """
+        if len(self.args.split(" ", 1)) < 2:
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. gmute <Player Name>").build())
+            return
+        user_to_mute = self.args.split(" ", 1)[1]
+        for player_id, player_data in data.players.playerList.iteritems():
+            if player_data[0].rstrip("\0") == user_to_mute:
+                if player_id in data.clients.connectedClients:
+                    data.clients.connectedClients[player_id].preferences['chatMuted'] = True
+                    client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {grn}Muted %s." % player_data[0].rstrip("\0"), 0x3).build())
+                else:
+                    client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0"), 0x3).build())
+
+    def call_from_console(self):
+        if len(self.args.split(" ", 1)) < 2:
+            return "[Command] Invalid usage. gmute <Player Name>"
+        user_to_mute = self.args.split(" ", 1)[1]
+        for player_id, player_data in data.players.playerList.iteritems():
+            if player_data[0].rstrip("\0") == user_to_mute:
+                if player_id in data.clients.connectedClients:
+                    data.clients.connectedClients[player_id].preferences['chatMuted'] = True
+                    return "[Command] Muted %s." % player_data[0].rstrip("\0")
+                else:
+                    return "[Command] %s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0")
+
+
+@plugins.CommandHook("gunmute", "Mutes or unmutes somebody in gchat. Admin Only!", True)
+class UnmuteSomebody(Command):
+    def call_from_client(self, client):
+        """
+        :param client: ShipProxy.ShipProxy
+        """
+        if len(self.args.split(" ", 1)) < 2:
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. gmute <Player Name>").build())
+            return
+        user_to_mute = self.args.split(" ", 1)[1]
+        for player_id, player_data in data.players.playerList.iteritems():
+            if player_data[0].rstrip("\0") == user_to_mute:
+                if player_id in data.clients.connectedClients:
+                    data.clients.connectedClients[player_id].preferences['chatMuted'] = False
+                    client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {grn}Unmuted %s." % player_data[0].rstrip("\0"), 0x3).build())
+                else:
+                    client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0"), 0x3).build())
+
+    def call_from_console(self):
+        if len(self.args.split(" ", 1)) < 2:
+            return "[Command] Invalid usage. gmute <Player Name>"
+        user_to_mute = self.args.split(" ", 1)[1]
+        for player_id, player_data in data.players.playerList.iteritems():
+            if player_data[0].rstrip("\0") == user_to_mute:
+                if player_id in data.clients.connectedClients:
+                    data.clients.connectedClients[player_id].preferences['chatMuted'] = False
+                    return "[Command] Unuted %s." % player_data[0].rstrip("\0")
+                else:
+                    return "[Command] %s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0")
+
+
+
 @plugins.CommandHook("g", "Chat in global chat.")
 class GChat(Command):
     def call_from_client(self, client):
@@ -164,6 +227,9 @@ class GChat(Command):
         if not data.clients.connectedClients[client.playerId].preferences.get_preference('globalChat'):
             client.send_crypto_packet(packetFactory.SystemMessagePacket(
                 "[GlobalChat] You do not have global chat enabled, and can not send a global message.", 0x3).build())
+            return
+        if data.clients.connectedClients[client.playerId].preferences.has_preference("chatMuted") and data.clients.connectedClients[client.playerId].preferences['chatMuted']:
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[GChat] {red}You have been muted from GChat and can not talk in it. :(", 0x3).build())
             return
         print("[GlobalChat] <%s> %s" % (data.players.playerList[client.playerId][0], self.args[3:]))
         if ircMode:
