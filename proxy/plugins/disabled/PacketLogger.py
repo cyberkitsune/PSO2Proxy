@@ -1,13 +1,17 @@
 import exceptions
+from twisted.internet import reactor
 from commands import Command
-from config import YAMLConfig
 import plugins as plugins
+from data.clients import dbManager
 import struct
 import packetFactory
 import json
 import os
 
-logging_config = YAMLConfig("cfg/packetlogging.prefs.yml", {}, False)
+
+def write_file(filename, data, mode='wb'):
+    with open(filename, mode) as f:
+        f.write(data)
 
 @plugins.on_start_hook
 def on_start():
@@ -21,11 +25,12 @@ def on_start():
 @plugins.on_initial_connect_hook
 def notify_and_config(client):
     """
-    :type client: ShipProxy
+    :type client: ShipProxy.ShipProxy
     """
-    if not logging_config.key_exists(client.myUsername):
-        logging_config[client.myUsername] = False
-    if logging_config[client.myUsername]:
+    client_config = dbManager.get_data_for_sega_id(client.myUsername)
+    if 'logPackets' not in dbManager:
+        client_config['logPackets'] = False
+    if client_config['logPackets']:
         client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have opted-in to packet logging, Thank you! View your contributions on http://pso2proxy.cyberkitsune.net/redpill/ or use !optout to opt out", 0x3).build())
     else:
         client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have not opted-in to packet logging, and it has been disabled. Use !optin to opt in.", 0x3).build())
@@ -34,7 +39,8 @@ def notify_and_config(client):
 @plugins.CommandHook("optin", "Opts you into packet logging for the redpill project.")
 class OptIn(Command):
     def call_from_client(self, client):
-        logging_config[client.myUsername] = True
+        client_config = dbManager.get_data_for_sega_id(client.myUsername)
+        client_config['logPackets'] = True
         client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have enabled packet logging! Thank you! Track your data at http://pso2proxy.cyberkitsune.net/redpill/", 0x3).build())
 
 
@@ -42,22 +48,25 @@ class OptIn(Command):
 class OptOut(Command):
     def call_from_client(self, client):
         archive_packets(client)
-        logging_config[client.myUsername] = False
+        client_config = dbManager.get_data_for_sega_id(client.myUsername)
+        client_config['logPackets'] = True
         client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have disabled packet logging! :( If you change your mind, please use !optin to rejoin!", 0x3).build())
 
 
 @plugins.raw_packet_hook
 def on_packet_received(context, packet, packet_type, packet_subtype):
     """
-    :type context: ShipProxy
+    :type context: ShipProxy.ShipProxy
     """
-    if context.myUsername is not None and not logging_config.key_exists(context.myUsername):
-        logging_config[context.myUsername] = False
-    if context.myUsername is not None and not logging_config[context.myUsername]:
-        if 'orphans' in context.extendedData:
-            print("[PacketLogger] %s has opted out of packet logging. Deleting orphans..." % context.myUsername)
-            del context.extendedData['orphans']
-        return packet
+    if context.myUsername is not None:
+        client_config = dbManager.get_data_for_sega_id(context.myUsername)
+        if 'logPackets' not in client_config:
+            client_config['logPackets'] = False
+        elif not client_config['logPackets']:
+            if 'orphans' in context.extendedData:
+                print("[PacketLogger] %s has opted out of packet logging. Deleting orphans..." % context.myUsername)
+                del context.extendedData['orphans']
+            return packet
     if packet_type == 0x11 and packet_subtype == 0x0:
         packet_data = bytearray(packet)
         struct.pack_into("64x", packet_data, 0x48)
@@ -76,8 +85,7 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
             os.makedirs(os.path.dirname(path))
         except exceptions.OSError:
             pass
-        with open(path, 'wb') as f:
-            f.write(packet_data)
+        reactor.callInThread(write_file, path, packet_data)
     else:
         if 'orphans' not in context.extendedData:
             context.extendedData['orphans'] = []
@@ -95,8 +103,7 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
                 os.makedirs(os.path.dirname(path))
             except exceptions.OSError:
                 pass
-            with open(path, 'wb') as f:
-                f.write(orphan_packet['data'])
+            reactor.callInThread(write_file, path, orphan_packet['data'])
             count += 1
         print('[ShipProxy] Flushed %i orphan packets for %s.' % (count, context.myUsername))
 
@@ -106,9 +113,11 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
 @plugins.on_connection_lost_hook
 def archive_packets(client):
     """
-    :type client: ShipProxy
+    :type client: ShipProxy.ShipProxy
     """
-    if logging_config[client.myUsername]:
+    user_config = dbManager.get_data_for_sega_id(client.myUsername)
+    if user_config['logPackets']:
         metadata = {'sega_id': client.myUsername, 'player_id': client.playerId, 'timestamp': client.connTimestamp}
-        json.dump(metadata, open("packets/%s/%s/metadata.json" % (client.myUsername, client.connTimestamp), 'w'))
+        json_string = json.dumps(metadata)
+        reactor.callInThread(write_file, "packets/%s/%s/metadata.json" % (client.myUsername, client.connTimestamp), json_string, 'w')
         print("[PacketLogger] Wrote meta for %s, %i." % (client.myUsername, client.connTimestamp))
