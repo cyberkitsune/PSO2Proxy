@@ -5,7 +5,6 @@ from twisted.internet import reactor
 from twisted.internet.endpoints import TCP4ServerEndpoint
 
 from twisted.python import log
-from PSO2Proxy import ProxyFactory
 
 import data.blocks as blocks
 import data.players as players
@@ -106,6 +105,7 @@ def team_room_info_packet(context, data):
     ip_string = "%i.%i.%i.%i" % (o1, o2, o3, o4)
     port = struct.unpack_from('H', buffer(data), 0x28)[0]
     if port not in blocks.blockList:
+        from ShipProxy import ProxyFactory
         if verbose:
             print("[BlockPacket] Discovered a 'Team Room' block at %s:%i!" % (ip_string, port))
         blocks.blockList[port] = (ip_string, "Team Room", port)
@@ -124,6 +124,7 @@ def my_room_info_packet(context, data):
     ip_string = "%i.%i.%i.%i" % (o1, o2, o3, o4)
     port = struct.unpack_from('H', buffer(data), 0x28)[0]
     if port not in blocks.blockList:
+        from ShipProxy import ProxyFactory
         if verbose:
             print("[BlockPacket] Discovered a 'My Room' block at %s:%i!" % (ip_string, port))
         blocks.blockList[port] = (ip_string, "My Room", port)
@@ -229,6 +230,7 @@ def block_reply_packet(context, data):
     struct.pack_into('BBBB', data, 0x14, int(i0), int(i1), int(i2), int(i3))
     port = struct.unpack_from("H", buffer(data), 0x18)[0]
     if port in blocks.blockList:
+        from ShipProxy import ProxyFactory
         block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)

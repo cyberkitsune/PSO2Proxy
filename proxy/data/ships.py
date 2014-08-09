@@ -6,7 +6,6 @@ from twisted.internet import reactor
 from twisted.internet.endpoints import TCP4ServerEndpoint
 
 from twisted.python import log
-from PSO2Proxy import ProxyFactory
 
 from config import bindIp as interface_ip
 
@@ -69,6 +68,7 @@ def scrape_block_packet(ship_ip, ship_port, destination_ip):
     o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), 0x64)
     ip_string = '%i.%i.%i.%i' % (o1, o2, o3, o4)
     if port not in blocks.blockList:
+        from ShipProxy import ProxyFactory
         log.msg("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (name, ip_string, port))
         blocks.blockList[port] = (ip_string, name)
         block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
