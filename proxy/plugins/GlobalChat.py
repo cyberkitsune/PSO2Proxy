@@ -251,12 +251,13 @@ class GChat(Command):
             global ircBot
             if ircBot is not None:
                 ircBot.send_global_message(0, "Console", self.args[:2].encode('utf-8'))
+        TCPacket = packetFactory.TeamChatPacket(0x999, "[GCONSOLE]", self.args[2:]).build()
+        SMPacket = packetFactory.SystemMessagePacket("[GCONSOLE] %s%s" % (gchatSettings['prefix'], self.args[2:]), 0x3).build()
         for client in data.clients.connectedClients.values():
             if client.preferences.get_preference("globalChat") and client.get_handle() is not None:
                 if gchatSettings['displayMode'] == 0:
-                    client.get_handle().send_crypto_packet(
-                        packetFactory.TeamChatPacket(0x999, "[GCONSOLE]", self.args[2:]).build())
+                    client.get_handle().send_crypto_packet(TCPacket)
                 else:
-                    client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GCONSOLE] %s%s" % (gchatSettings['prefix'], self.args[2:]), 0x3).build())
+                    client.get_handle().send_crypto_packet(SMPacket)
         return "[GlobalChat] <Console> %s" % self.args[2:]
 
