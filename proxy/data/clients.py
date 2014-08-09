@@ -42,6 +42,7 @@ class SQLitePreferenceManager():
         setup_cursor.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, sega_id TEXT, data TEXT)")
         self._db_connection.row_factory = sqlite3.Row
         setup_cursor.close()
+        print("[Database] User preference database created!")
 
     def get_data_for_sega_id(self, sega_id):
         if not sega_id in self.user_preference_cache:
@@ -73,9 +74,11 @@ class SQLitePreferenceManager():
 
     def close_db(self):
         self._db_connection.close()
+        print("[Database] Connection closed!")
 
     def __del__(self):
         self._db_connection.close()
+        print("[Database] Connection closed!")
 
 dbManager = SQLitePreferenceManager()
 
