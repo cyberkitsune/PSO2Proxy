@@ -67,6 +67,7 @@ class SQLitePreferenceManager():
         local_cursor = self._db_connection.cursor()
         local_cursor.execute("UPDATE users SET data = ? WHERE sega_id = ?", (yaml.dump(self.user_preference_cache[sega_id]), sega_id))
         local_cursor.close()
+        self._db_connection.commit()
 
     def update_user_cache(self, sega_id, new_config):
         self.user_preference_cache[sega_id] = new_config
@@ -77,8 +78,7 @@ class SQLitePreferenceManager():
         print("[Database] Connection closed!")
 
     def __del__(self):
-        self._db_connection.close()
-        print("[Database] Connection closed!")
+        self.close_db()
 
 dbManager = SQLitePreferenceManager()
 
