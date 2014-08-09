@@ -41,7 +41,6 @@ class SQLitePreferenceManager():
         setup_cursor = self._db_connection.cursor()
         setup_cursor.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, sega_id TEXT, data TEXT)")
         self._db_connection.row_factory = sqlite3.Row
-        setup_cursor.close()
         print("[Database] User preference database created!")
 
     def get_data_for_sega_id(self, sega_id):
@@ -58,7 +57,6 @@ class SQLitePreferenceManager():
             user_data = yaml.load(user_row['data'])
         else:
             local_cursor.execute("INSERT INTO users (sega_id, data) VALUES  (?,?)", (segaid, yaml.dump({})))
-        local_cursor.close()
         return user_data
 
     def _update_user_data_in_db(self, sega_id):
@@ -66,7 +64,6 @@ class SQLitePreferenceManager():
             raise KeyError("User data isn't even cached, can't update data!")
         local_cursor = self._db_connection.cursor()
         local_cursor.execute("UPDATE users SET data = ? WHERE sega_id = ?", (yaml.dump(self.user_preference_cache[sega_id]), sega_id))
-        local_cursor.close()
         self._db_connection.commit()
 
     def update_user_cache(self, sega_id, new_config):
