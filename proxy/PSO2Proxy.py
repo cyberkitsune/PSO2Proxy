@@ -1,32 +1,23 @@
 #!/usr/bin/python
-import pstats
 
-import struct
 import time
-import calendar
-import datetime
 import os
 import sys
 import traceback
-import StringIO
 import config
-import cProfile
 
-from twisted.internet import protocol, reactor, stdio
+from twisted.internet import reactor, stdio
 from twisted.protocols import basic
 from twisted.python import log, logfile
 from twisted.internet.endpoints import TCP4ServerEndpoint
 
 from commands import commandList
 import data
-import packets
-import data.blocks as blocks
 import data.clients as clients
 import plugins.plugins as plugin_manager
 from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
 from config import myIpAddress as myIp
 from config import bindIp
-from config import noisy as verbose  # // Do this better
 
 
 class ServerConsole(basic.LineReceiver):

@@ -9,6 +9,7 @@ from data import blocks
 
 from config import noisy as verbose
 
+
 class ShipProxy(protocol.Protocol):
     def __init__(self):
         pass
