@@ -195,7 +195,7 @@ class UnmuteSomebody(Command):
         :param client: ShipProxy.ShipProxy
         """
         if len(self.args.split(" ", 1)) < 2:
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. gmute <Player Name>").build())
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. gunmute <Player Name>").build())
             return
         user_to_mute = self.args.split(" ", 1)[1]
         for player_id, player_data in data.players.playerList.iteritems():
@@ -208,7 +208,7 @@ class UnmuteSomebody(Command):
 
     def call_from_console(self):
         if len(self.args.split(" ", 1)) < 2:
-            return "[Command] Invalid usage. gmute <Player Name>"
+            return "[Command] Invalid usage. gunmute <Player Name>"
         user_to_mute = self.args.split(" ", 1)[1]
         for player_id, player_data in data.players.playerList.iteritems():
             if player_data[0].rstrip("\0") == user_to_mute:
@@ -217,7 +217,6 @@ class UnmuteSomebody(Command):
                     return "[Command] Unuted %s." % player_data[0].rstrip("\0")
                 else:
                     return "[Command] %s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0")
-
 
 
 @plugins.CommandHook("g", "Chat in global chat.")
