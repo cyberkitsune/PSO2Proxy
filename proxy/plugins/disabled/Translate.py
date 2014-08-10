@@ -9,7 +9,10 @@ from commands import Command
 import plugins as p
 
 plugin_config = YAMLConfig("cfg/translator.config.yml", {"translationService": 0, "msTranslateID": '', "msTranslateSecret": ''})
-
+if plugin_config['translationService'] == 1:
+    provider = "Bing"
+else:
+    provider = "Google"
 
 @p.on_initial_connect_hook
 def create_preferences(client):
@@ -23,7 +26,7 @@ def create_preferences(client):
             user_prefs.set_preference('translate_out', False)
 
 
-@p.CommandHook("jpin", "Toggles proxy-end chat translation. (Powered by Google Translate, Incoming only.)")
+@p.CommandHook("jpin", "Toggles proxy-end chat translation. (Powered by %s Translate, Incoming only.)" % provider)
 class ToggleTranslate(Command):
     def call_from_client(self, client):
         if client.playerId in data.clients.connectedClients:
@@ -34,7 +37,7 @@ class ToggleTranslate(Command):
             else:
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled incoming chat translation.", 0x3).build())
 
-@p.CommandHook("jpout", "Toggles outbound chat translation to japanese. (Powered by Google Translate, Outgoing only.)")
+@p.CommandHook("jpout", "Toggles outbound chat translation to japanese. (Powered by %s Translate, Outgoing only.)" % provider)
 class ToggleTranslate(Command):
     def call_from_client(self, client):
         if client.playerId in data.clients.connectedClients:
