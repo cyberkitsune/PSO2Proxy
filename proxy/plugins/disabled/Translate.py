@@ -10,7 +10,7 @@ from commands import Command
 import plugins as p
 
 plugin_config = YAMLConfig("cfg/translator.config.yml", {"translationService": 0, "msTranslateID": '', "msTranslateSecret": ''})
-if plugin_config['translationService'] == 1 and plugin_config['msTranslateID'] != '' and plugin_config['msTranslateSecret' != '']:
+if plugin_config['translationService'] == 1 and plugin_config['msTranslateID'] != '' and plugin_config['msTranslateSecret'] != '':
     import microsofttranslator
     provider = "Bing"
     translator = microsofttranslator.Translator(plugin_config['msTranslateID'], plugin_config['msTranslateSecret'])
