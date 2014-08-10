@@ -1,14 +1,15 @@
 from twisted.internet import threads
+from config import YAMLConfig
 import data.clients
 import packetFactory
 import struct
-import goslate
 from unicodescript import script
 from commands import Command
 
 import plugins as p
 
-translator = goslate.Goslate()
+plugin_config = YAMLConfig("cfg/translator.config.yml", {"translationService": 0, "msTranslateID": '', "msTranslateSecret": ''})
+
 
 @p.on_initial_connect_hook
 def create_preferences(client):
@@ -48,7 +49,7 @@ class ToggleTranslate(Command):
 @p.PacketHook(0x7, 0x0)
 def get_chat_packet(context, packet):
     """
-    :type context: ShipProxy
+    :type context: ShipProxy.ShipProxy
     """
     if context.psoClient and context.playerId and data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out'):
         player_id = struct.unpack_from("I", packet, 0x8)[0]
@@ -56,7 +57,10 @@ def get_chat_packet(context, packet):
             return
         channel_id = struct.unpack_from("I", packet, 0x14)[0]
         message = packet[0x1C:].decode('utf-16').rstrip("\0")
-        d = threads.deferToThread(generate_google_translate_message, player_id, channel_id, message, "ja", "en")
+        if plugin_config['translationService'] == 1 and plugin_config['msTranslateID'] != '' and plugin_config['msTranslateSecret'] != '':
+            d = threads.deferToThread(generate_microsoft_translate_message, player_id, channel_id, message, "ja", "en")
+        else:
+            d = threads.deferToThread(generate_google_translate_message, player_id, channel_id, message, "ja", "en")
         d.addCallback(context.peer.send_crypto_packet)
         return None
     if context.peer.psoClient and context.peer.playerId in data.clients.connectedClients:
@@ -78,13 +82,28 @@ def get_chat_packet(context, packet):
                 break
         if not japanese:
             return packet
-        d = threads.deferToThread(generate_google_translate_message, player_id, channel_id, message, "en", "ja")
+        if plugin_config['translationService'] == 1 and plugin_config['msTranslateID'] != '' and plugin_config['msTranslateSecret'] != '':
+            d = threads.deferToThread(generate_microsoft_translate_message, player_id, channel_id, message, "en", "ja")
+        else:
+            d = threads.deferToThread(generate_google_translate_message, player_id, channel_id, message, "en", "ja")
         d.addCallback(context.peer.send_crypto_packet)
         return None
     return packet
 
 
 def generate_google_translate_message(player_id, channel_id, message, end_lang, start_lang):
+    import goslate
+    translator = goslate.Goslate()
+    if end_lang == "ja":
+        message_string = "%s" % translator.translate(message, end_lang, start_lang)
+    else:
+        message_string = "%s {def}(%s)" % (translator.translate(message, end_lang, start_lang), message)
+    return packetFactory.ChatPacket(player_id, message_string, channel_id).build()
+
+
+def generate_microsoft_translate_message(player_id, channel_id, message, end_lang, start_lang):
+    import microsofttranslator
+    translator = microsofttranslator.Translator(plugin_config['msTranslateID'], plugin_config['msTranslateSecret'])
     if end_lang == "ja":
         message_string = "%s" % translator.translate(message, end_lang, start_lang)
     else:
