@@ -7,6 +7,7 @@ import os
 import sys
 import traceback
 import config
+import faulthandler
 
 from twisted.internet import reactor, stdio
 from twisted.protocols import basic
@@ -111,4 +112,5 @@ def main():
 
 
 if __name__ == "__main__":
+    faulthandler.enable()
     main()
