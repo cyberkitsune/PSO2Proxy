@@ -105,10 +105,9 @@ def EQBody(body, ship): # 0 is ship1
     load_eqJP_names() # Reload file
     eqJPd = dict(eqJP).get(data_eq[ship])
     if eqJPd is not None: # Is there a mapping?
-        msg = u'{} (JP: {})'.format(eqJPd, data_eq[ship])
+        msg = u'{} (JP: {}@{}:{} JST)'.format(eqJPd, data_eq[ship], hour_eq[ship], mins_eq[ship])
     else:
-        msg = data_eq[ship];
-        print u'Unlisted EQ, \"{}\"'.format(msg)
+        msg = u'JP: {}@{}:{} JST'.format(data_eq[ship], hour_eq[ship], mins_eq[ship])
 
     print("[EQ_Notice] Ship %02d : %s" % (ship+1, msg))
     SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (msg), 0x0).build()
