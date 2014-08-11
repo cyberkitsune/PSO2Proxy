@@ -42,11 +42,11 @@ agent = Agent(reactor)
 
 def cutup_EQ(message):
     cutstr = u"分【PSO2】"
-    print u"Incoming message:  {}".format(message)
+    #print u"Incoming message:  {}".format(message)
     cutlen = message.rfind(cutstr)
     if (cutlen is not -1):
        message = message[cutlen+7:len(message)]
-    print u"Outgoing message:  {}".format(message)
+    #print u"Outgoing message:  {}".format(message)
     return message
 
 def cleanup_EQ(message):
@@ -62,8 +62,13 @@ def EQBody(body, ship = 0):
 
 def EQResponse(response, ship = -1):
     #print pformat(list(response.headers.getAllRawHeaders()))
-    ETag_Headers[ship-1] = response.headers.getRawHeaders('ETag')
-    Modified_Headers[ship-1] = response.headers.getRawHeaders('Last-Modified')
+    if response.code != 200:
+       return
+    #print response.code
+    if response.headers.hasHeader('ETag'):
+       ETag_Headers[ship-1] = response.headers.getRawHeaders('ETag')[0]
+    if response.headers.hasHeader('Last-Modified'):
+       Modified_Headers[ship-1] = response.headers.getRawHeaders('Last-Modified')[0]
     d = readBody(response)
     d.addCallback(EQBody, ship+1)
     return d
@@ -79,6 +84,7 @@ def CheckupURL():
             HTTPHeaderX.addRawHeader('If-None-Match', ETag_Headers[shipNum-1])
           if Modified_Headers[shipNum-1]:
             HTTPHeaderX.addRawHeader('If-Modified-Since', Modified_Headers[shipNum-1])
+          #print pformat(list(HTTPHeaderX.getAllRawHeaders()))
           EQ0 = agent.request('GET', eq_URL, HTTPHeaderX, None)
           EQ0.addCallback(EQResponse, shipNum)
 
