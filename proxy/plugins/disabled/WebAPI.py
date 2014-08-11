@@ -60,7 +60,7 @@ class JSONConfig(Resource):
     @staticmethod
     def render_GET(request):
         request.setHeader("content-type", "application/json")
-        config_json = {'version': 1, "name": web_api_config.get_key('ServerName'), "publickeyurl": "http://%s:8080/publickey.blob" % hostName, "host": hostName}
+        config_json = {'version': 1, "name": web_api_config.get_key('ServerName'), "publickeyurl": "http://%s:%i/publickey.blob" % (hostName, web_api_config.get_key('port')), "host": hostName}
         return json.dumps(config_json)
 
 
