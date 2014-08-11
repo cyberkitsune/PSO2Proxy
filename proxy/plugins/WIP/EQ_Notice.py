@@ -4,6 +4,8 @@ import config
 import data.clients
 import plugins
 import packetFactory
+import json
+import os.path
 from pprint import pformat
 from twisted.internet import task
 from twisted.internet import reactor
@@ -26,9 +28,21 @@ eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True
 ,'9': ""
 },  True)
 
-
-ETag_Headers = ['','','','','','','','','','']
+#HTTP Headers
+ETag_Headers     = ['','','','','','','','','','']
 Modified_Headers = ['','','','','','','','','','']
+#HTTP Data
+HTTP_Data        = ['','','','','','','','','','']
+#was "【1時間前】" in the data?
+ishour_eq =          [0,0,0,0,0,0,0,0,0,0]
+#Hour of EQ
+hour_eq        = ['','','','','','','','','','']
+#Mins of EQ
+mins_eq        = ['','','','','','','','','','']
+#EQ Data
+data_eq        = ['','','','','','','','','','']
+
+eqJP           = []
 
 eq_mode = eqnotice_config.get_key('enabled')
 tasksec = eqnotice_config.get_key('timer')
@@ -40,37 +54,79 @@ agent = Agent(reactor)
 #Sample:	【1時間前】 Ship02 11時00分【PSO2】旧マザーシップ　作戦予告
 #Sample:	Ship02 11時00分【PSO2】旧マザーシップ　作戦予告
 
-def cutup_EQ(message):
+def load_eqJP_names():
+    global eqJP
+    if os.path.exists("cfg/eqJP.resources.json"):
+        f = open("cfg/eqJP.resources.json", 'r')
+        eqJP = json.load(f, "utf-8")
+        f.close()
+
+
+def cutup_EQ(message, ship = 0):
     cutstr = u"分【PSO2】"
-    #print u"Incoming message:  {}".format(message)
     cutlen = message.rfind(cutstr)
     if (cutlen is not -1):
        message = message[cutlen+7:len(message)]
-    #print u"Outgoing message:  {}".format(message)
     return message
 
-def cleanup_EQ(message):
-    return cutup_EQ(message)
+def ishour_EQ(message):
+    hourstr = u"【1時間前】 Ship"
+    if message.find(hourstr) is not -1:
+        return 1
+    return 0
 
-def EQBody(body, ship = 0):
-    body_utf8 = cleanup_EQ(unicode(body, 'utf-8-sig', 'replace'))
-    print("[EQ_Notice] Ship %02d : %s" % (ship, body_utf8))
-    SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (body_utf8), 0x0).build()
+def findhour_EQ(message):
+    hrstr = u"時"
+    hridx = message.find(hrstr)
+    if hridx is -1:
+       return ""
+    return message[hridx-2:hridx]
+
+def findmins_EQ(message):
+    hrstr = u"分"
+    hridx = message.find(hrstr)
+    if hridx is -1:
+       return ""
+    return message[hridx-2:hridx]
+
+def cleanup_EQ(message, ship): # 0 is ship1
+    ishour_eq[ship] = ishour_EQ(message)
+    hour_eq[ship] = findhour_EQ(message)
+    mins_eq[ship] = findmins_EQ(message)
+    return cutup_EQ(message).rstrip("\n")
+
+def EQBody(body, ship): # 0 is ship1
+    if HTTP_Data[ship] == body:
+       return; # same data, do not react on it
+    HTTP_Data[ship] == body
+
+    data_eq[ship] = cleanup_EQ(unicode(body, 'utf-8-sig', 'replace'), ship)
+
+    load_eqJP_names() # Reload file
+    eqJPd = dict(eqJP).get(data_eq[ship])
+    if eqJPd is not None: # Is there a mapping?
+        msg = u'{} (JP: {})'.format(eqJPd, data_eq[ship])
+    else:
+        msg = data_eq[ship];
+        print u'Unlisted EQ, \"{}\"'.format(msg)
+
+    print("[EQ_Notice] Ship %02d : %s" % (ship+1, msg))
+    SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (msg), 0x0).build()
     for client in data.clients.connectedClients.values():
        if client.preferences.get_preference('eqnotice') and client.get_handle() is not None and (ship == 0 or ship == data.clients.get_ship_from_port(cleint.transport.getHost().port)):
            client.get_handle().send_crypto_packet(SMPacket)
 
-def EQResponse(response, ship = -1):
+def EQResponse(response, ship = -1): # 0 is ship1
     #print pformat(list(response.headers.getAllRawHeaders()))
     if response.code != 200:
        return
     #print response.code
     if response.headers.hasHeader('ETag'):
-       ETag_Headers[ship-1] = response.headers.getRawHeaders('ETag')[0]
+       ETag_Headers[ship] = response.headers.getRawHeaders('ETag')[0]
     if response.headers.hasHeader('Last-Modified'):
-       Modified_Headers[ship-1] = response.headers.getRawHeaders('Last-Modified')[0]
+       Modified_Headers[ship] = response.headers.getRawHeaders('Last-Modified')[0]
     d = readBody(response)
-    d.addCallback(EQBody, ship+1)
+    d.addCallback(EQBody, ship)
     return d
 
 def CheckupURL():
@@ -80,10 +136,10 @@ def CheckupURL():
        eq_URL = eqnotice_config.get_key(str(shipNum))
        if eq_URL:
           HTTPHeaderX = HTTPHeader0.copy()
-          if ETag_Headers[shipNum-1]:
-            HTTPHeaderX.addRawHeader('If-None-Match', ETag_Headers[shipNum-1])
-          if Modified_Headers[shipNum-1]:
-            HTTPHeaderX.addRawHeader('If-Modified-Since', Modified_Headers[shipNum-1])
+          if ETag_Headers[shipNum]:
+            HTTPHeaderX.addRawHeader('If-None-Match', ETag_Headers[shipNum])
+          if Modified_Headers[shipNum]:
+            HTTPHeaderX.addRawHeader('If-Modified-Since', Modified_Headers[shipNum])
           #print pformat(list(HTTPHeaderX.getAllRawHeaders()))
           EQ0 = agent.request('GET', eq_URL, HTTPHeaderX, None)
           EQ0.addCallback(EQResponse, shipNum)
