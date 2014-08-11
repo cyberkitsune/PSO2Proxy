@@ -6,6 +6,8 @@ import plugins
 import packetFactory
 import json
 import os.path
+import time
+from datetime import datetime, timedelta
 from pprint import pformat
 from twisted.internet import task
 from twisted.internet import reactor
@@ -31,6 +33,8 @@ eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True
 #HTTP Headers
 ETag_Headers     = ['','','','','','','','','','']
 Modified_Headers = ['','','','','','','','','','']
+#HTTP Modified in time
+Modified_time    = ['','','','','','','','','','']
 #HTTP Data
 HTTP_Data        = ['','','','','','','','','','']
 #was "【1時間前】" in the data?
@@ -60,7 +64,6 @@ def load_eqJP_names():
         f = open("cfg/eqJP.resources.json", 'r')
         eqJP = json.load(f, "utf-8")
         f.close()
-
 
 def cutup_EQ(message, ship = 0):
     cutstr = u"分【PSO2】"
@@ -95,12 +98,32 @@ def cleanup_EQ(message, ship): # 0 is ship1
     mins_eq[ship] = findmins_EQ(message)
     return cutup_EQ(message).rstrip("\n")
 
+def checkold_EQ(ship):
+    if not Modified_Headers[ship] :
+      return False
+    timediff = (datetime.utcnow() - Modified_time[ship]).total_seconds()
+    print "\n  EQ", datetime.ctime(Modified_time[ship])
+    print  " DIFF", (datetime.utcnow() - Modified_time[ship]).total_seconds()
+    print  "  NOW", datetime.utcnow().ctime()
+    if ishour_eq[ship] :
+      if timediff > timedelta(minutes=55).total_seconds():
+          print "EQ is 55 mins old"
+          return True
+    else:
+      if timediff >  timedelta(minutes=10).total_seconds():
+          print "Short EQ is 15 mins old"
+          return True
+    return False
+
 def EQBody(body, ship): # 0 is ship1
     if HTTP_Data[ship] == body:
        return; # same data, do not react on it
     HTTP_Data[ship] == body
 
     data_eq[ship] = cleanup_EQ(unicode(body, 'utf-8-sig', 'replace'), ship)
+
+    if checkold_EQ(ship):
+        return
 
     load_eqJP_names() # Reload file
     eqJPd = dict(eqJP).get(data_eq[ship])
@@ -122,8 +145,14 @@ def EQResponse(response, ship = -1): # 0 is ship1
     #print response.code
     if response.headers.hasHeader('ETag'):
        ETag_Headers[ship] = response.headers.getRawHeaders('ETag')[0]
+    else:
+        ETag_Headers[ship] = None
     if response.headers.hasHeader('Last-Modified'):
        Modified_Headers[ship] = response.headers.getRawHeaders('Last-Modified')[0]
+       Modified_time[ship] = datetime.strptime(Modified_Headers[ship], "%a, %d %b %Y %H:%M:%S %Z")
+    else:
+       Modified_Headers[ship] = None
+       Modified_time[ship] = None
     d = readBody(response)
     d.addCallback(EQBody, ship)
     return d
