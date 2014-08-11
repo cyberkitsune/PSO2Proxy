@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import config
 import data.clients
 import plugins
@@ -21,16 +23,21 @@ tasksec = eqnotice_config.get_key('timer')
 
 agent = Agent(reactor)
 
+#Sample: Ship02 08時00分【PSO2】第三採掘基地ダーカー接近予告
+#Sample 【1時間前】 Ship02 05時00分【PSO2】惑星リリーパ　作戦予告
+
+def cleanup_EQ(message):
+    return message
+
 def EQBody(body, ship = 0):
-    print 'Response body:'
-    print body
+    body_utf8 = unicode(body, 'utf-8-sig', 'replace')
+    print("[EQ_Notice] %s" % (cleanup_EQ(body_utf8)))
+    SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (cleanup_EQ(body_utf8)), 0x0).build()
+    for client in data.clients.connectedClients.values():
+       if client.preferences.get_preference('eqnotice') and client.get_handle() is not None:
+           client.get_handle().send_crypto_packet(SMPacket)
 
 def EQResponse(response, ship = 0):
-    print 'Response version:', response.version
-    print 'Response code:', response.code
-    print 'Response phrase:', response.phrase
-    print 'Response headers:'
-    print pformat(list(response.headers.getAllRawHeaders()))
     d = readBody(response)
     d.addCallback(EQBody, 0)
     return d
