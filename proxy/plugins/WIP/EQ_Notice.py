@@ -77,7 +77,7 @@ def ishour_EQ(message):
 
 def findhour_EQ(message):
     hrstr = u"時"
-    hridx = message.find(hrstr)
+    hridx = message.rfind(hrstr)
     if hridx is -1:
        return ""
     return message[hridx-2:hridx]
