@@ -72,8 +72,7 @@ def CheckupURL():
    HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']})
 
    for shipNum in config.globalConfig.get_key('enabledShips'):
-       #eq_URL = eqnotice_config.get_key(shipNum)
-       eq_URL = "http://acf.me.uk/Public/PSO2EQ/pso2eq.txt"
+       eq_URL = eqnotice_config.get_key(str(shipNum))
        if eq_URL:
           HTTPHeaderX = HTTPHeader0.copy()
           if ETag_Headers[shipNum-1]:
