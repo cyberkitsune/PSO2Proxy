@@ -1,10 +1,9 @@
 {
-  "第三採掘基地ダーカー接近予告": "Tower Defence 3",
-  "旧マザーシップ　作戦予告": "Beckoning Darkness",
-  "アークス船団航行物体接近予告": "Ebon-Winged Vanguard",
-  "第一採掘基地ダーカー接近予告": "Primary Mining Base",
-  "アークス船団ＤＦ接近予告": "Dark Falz Elder",
-  "第一採掘基地ダーカー接近予告": "Tower Defence 1",
-  "アークス船団ＤＦ接近予告": " Dark Falz Elder",
-  " ": "Blank"
+  "第一採掘基地ダーカー接近予告"  	:	"Tower Defence 1",
+  "第三採掘基地ダーカー接近予告"  	:	"Tower Defence 3",
+  "旧マザーシップ　作戦予告"    	:	"Beckoning Darkness",
+  "アークス船団航行物体接近予告"  	:	"Ebon-Winged Vanguard",
+  "第一採掘基地ダーカー接近予告"  	:	"Primary Mining Base",
+  "アークス船団ＤＦ接近予告"    	:	"Dark Falz Elder",
+  " "                           :	"Blank"
 }
