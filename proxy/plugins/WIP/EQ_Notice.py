@@ -131,4 +131,4 @@ class ToggleTranslate(Command):
             #stored_Last-Modified = ""
             taskrun.start(tasksec)
             print("[EQ] Started EQ Notice Ticker")
-        
+
