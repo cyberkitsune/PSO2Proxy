@@ -182,6 +182,7 @@ def CheckupURL():
 
 @plugins.on_start_hook
 def on_start():
+    global taskrun
     taskrun = task.LoopingCall(CheckupURL)
     print("!!! WARNING !!!")
     print("You have EQ_Notice.py outside of the WIP plugins folder! This means it is ON!")
