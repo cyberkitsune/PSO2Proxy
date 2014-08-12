@@ -63,7 +63,17 @@ If you would like to enable a plugin already in the disabled folder, use the fol
     ln -s disabled/DisabledPluginName.py .
 ```
 ## Getting clients to connect
-### Rebind hosts file
+### Automatic configuration
+For automatic configuration using PSO2Tweaker, simply enable WebAPI.py and point the tweaker to http://your.ip.addr.here:8080/config.json
+
+To enable WebAPI...
+```
+    cd ~/PSO2Proxy/proxy/plugins
+    ln -s disabled/WebAPI.py .
+```
+Be sure that publickey.blob is in your keys/ folder.
+### Manual Mode
+#### Rebind hosts file
 To get clients to connect to your proxy, they need to think SEGA's servers are your servers. An easy way to do this is to modify Windows's hosts file, add the following code below to the hosts file in `c:\Windows\System32\Drivers\etc\hosts`, replacing 0.0.0.0 with the proxy's **IP address**.
 ```
 0.0.0.0 gs001.pso2gs.net #Also ship 1
@@ -77,6 +87,6 @@ To get clients to connect to your proxy, they need to think SEGA's servers are y
 0.0.0.0 gs121.pso2gs.net #Also ship 9
 0.0.0.0 gs136.pso2gs.net #Also ship 10
 ```
-### Use your RSA keys
+#### Use your RSA keys
 To get the proxy to decrypt the client's packets, place the publickey.blob you generated in the same folder as PSO2.exe, and rename the RSAKeyInjector.dll to ddraw.dll in that same folder. **If you use PSO2Tweaker to launch PSO2**, enable the item translation patch and rename ddraw.dll to rsainject.dll instead.
 
