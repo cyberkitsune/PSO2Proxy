@@ -106,16 +106,19 @@ def cleanup_EQ(message, ship): # 0 is ship1
     mins_eq[ship] = findmins_EQ(message)
     return cutup_EQ(message).rstrip("\n")
 
+def old_seconds(td):
+    return (td.seconds + td.days * 24 * 3600)
+
 def checkold_EQ(ship):
     if not Modified_Headers[ship] :
       return False
     timediff = (datetime.utcnow() - Modified_time[ship])
     if ishour_eq[ship]:
-      if timediff > 55*60:
+      if old_seconds(timediff) > 55*60:
           #print "EQ is 55 mins old"
           return True
     else:
-      if timediff > 10*60:
+      if old_seconds(timediff) > 10*60:
           #print "Short EQ is 15 mins old"
           return True
     return False
