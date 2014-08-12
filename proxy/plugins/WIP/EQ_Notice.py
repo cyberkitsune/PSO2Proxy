@@ -45,6 +45,8 @@ hour_eq        = ['','','','','','','','','','']
 mins_eq        = ['','','','','','','','','','']
 #EQ Data
 data_eq        = ['','','','','','','','','','']
+#EQ Data
+msg_eq         = ['','','','','','','','','','']
 
 eqJP           = []
 
@@ -130,12 +132,12 @@ def EQBody(body, ship): # 0 is ship1
     load_eqJP_names() # Reload file
     eqJPd = dict(eqJP).get(data_eq[ship])
     if eqJPd is not None: # Is there a mapping?
-        msg = u'{} (JP: {}@{}:{} JST)'.format(eqJPd, data_eq[ship], hour_eq[ship], mins_eq[ship])
+        msg_eq[ship] = u'{} (JP: {}@{}:{} JST)'.format(eqJPd, data_eq[ship], hour_eq[ship], mins_eq[ship])
     else:
-        msg = u'JP: {}@{}:{} JST'.format(data_eq[ship], hour_eq[ship], mins_eq[ship])
+        msg_eq[ship] = u'JP: {}@{}:{} JST'.format(data_eq[ship], hour_eq[ship], mins_eq[ship])
 
-    print("[EQ_Notice] Ship %02d : %s" % (ship+1, msg))
-    SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (msg), 0x0).build()
+    print("[EQ_Notice] Ship %02d : %s" % (ship+1, msg_eq[ship]))
+    SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (msg_eq[ship]), 0x0).build()
     for client in data.clients.connectedClients.values():
        if client.preferences.get_preference('eqnotice') and client.get_handle() is not None and (ship == 0 or ship == data.clients.get_ship_from_port(cleint.transport.getHost().port)):
            client.get_handle().send_crypto_packet(SMPacket)
