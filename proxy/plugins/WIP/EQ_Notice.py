@@ -10,9 +10,10 @@ import time
 import data.clients as clients
 from datetime import datetime, timedelta
 from pprint import pformat
-from twisted.internet import task
-from twisted.internet import reactor
-from twisted.web.client import Agent, readBody
+from twisted.internet import task, reactor, defer, protocol
+from twisted.internet.protocol import Protocol
+from twisted.web.client import Agent
+# Do not use twisted.web.client.readBody, we need 13.2.0 for that
 from twisted.web.http_headers import Headers
 from config import globalConfig
 
@@ -118,7 +119,7 @@ def checkold_EQ(ship):
           #print "EQ is 55 mins old"
           return True
     else:
-      if old_seconds(timediff) > 10*60:
+      if old_seconds(timediff) > 100*60:
           #print "Short EQ is 15 mins old"
           return True
     return False
@@ -146,6 +147,23 @@ def EQBody(body, ship): # 0 is ship1
        if client.preferences.get_preference('eqnotice') and client.get_handle() is not None and (ship == data.clients.get_ship_from_port(client.get_handle().transport.getHost().port)-1):
            client.get_handle().send_crypto_packet(SMPacket)
 
+
+class SimpleBodyProtocol(protocol.Protocol):
+    def __init__(self, status, message, deferred):
+        self.deferred = deferred
+        self.dataBuffer = []
+
+    def dataReceived(self, data):
+        self.dataBuffer.append(data)
+
+    def connectionLost(self, reason):
+        self.deferred.callback( b''.join(self.dataBuffer))
+
+def SimplereadBody(response):
+    d = defer.Deferred()
+    response.deliverBody(SimpleBodyProtocol(response.code, response.phrase, d))
+    return d
+
 def EQResponse(response, ship = -1): # 0 is ship1
     #print pformat(list(response.headers.getAllRawHeaders()))
     if response.code != 200:
@@ -161,7 +179,7 @@ def EQResponse(response, ship = -1): # 0 is ship1
     else:
        Modified_Headers[ship] = None
        Modified_time[ship] = None
-    d = readBody(response)
+    d = SimplereadBody(response)
     d.addCallback(EQBody, ship)
     return d
 
