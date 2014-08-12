@@ -68,11 +68,21 @@ def load_eqJP_names():
         f = open("cfg/eqJP_custom.resources.json", 'r')
         eqJP = json.load(f, "utf-8")
         f.close()
-        return
     if os.path.exists("cfg/eqJP.resources.json"):
         f = open("cfg/eqJP.resources.json", 'r')
         eqJP = json.load(f, "utf-8")
         f.close()
+    if not eqJP:
+        return
+    eqJPl = dict(eqJP)
+    for ship in config.globalConfig.get_key('enabledShips'):
+        eqJPd = eqJPl.get(data_eq[ship])
+        if eqJPd is not None: # Is there a mapping?
+            msg_eq[ship] = "%s (JP: %s@%s:%s JST)" % (eqJPd, data_eq[ship], hour_eq[ship], mins_eq[ship])
+        else:
+            msg_eq[ship] = "JP: %s@%s:%s JST" % (data_eq[ship], hour_eq[ship], mins_eq[ship])
+
+
 
 def cutup_EQ(message, ship = 0):
     cutstr = u"分【PSO2】"
@@ -135,11 +145,6 @@ def EQBody(body, ship): # 0 is ship1
         return
 
     load_eqJP_names() # Reload file
-    eqJPd = dict(eqJP).get(data_eq[ship])
-    if eqJPd is not None: # Is there a mapping?
-        msg_eq[ship] = "%s (JP: %s@%s:%s JST)" % (eqJPd, data_eq[ship], hour_eq[ship], mins_eq[ship])
-    else:
-        msg_eq[ship] = "JP: %s@%s:%s JST" % (data_eq[ship], hour_eq[ship], mins_eq[ship])
 
     print("[EQ_Notice] Ship %02d : %s" % (ship+1, msg_eq[ship]))
     SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (msg_eq[ship]), 0x0).build()
@@ -185,7 +190,7 @@ def EQResponse(response, ship = -1): # 0 is ship1
 
 def CheckupURL():
    HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']})
-
+   load_eqJP_names() # Reload file
    for shipNum in config.globalConfig.get_key('enabledShips'):
        eq_URL = eqnotice_config.get_key(str(shipNum))
        if eq_URL:
