@@ -143,7 +143,7 @@ def EQBody(body, ship): # 0 is ship1
     print("[EQ_Notice] Ship %02d : %s" % (ship+1, msg_eq[ship]))
     SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (msg_eq[ship]), 0x0).build()
     for client in data.clients.connectedClients.values():
-       if client.preferences.get_preference('eqnotice') and client.get_handle() is not None and (ship == 0 or ship == data.clients.get_ship_from_port(client.transport.getHost().port)):
+       if client.preferences.get_preference('eqnotice') and client.get_handle() is not None and (ship == 0 or ship == data.clients.get_ship_from_port(client.get_handle().transport.getHost().port)):
            client.get_handle().send_crypto_packet(SMPacket)
 
 def EQResponse(response, ship = -1): # 0 is ship1
