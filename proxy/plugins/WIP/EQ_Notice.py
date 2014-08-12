@@ -142,6 +142,17 @@ def EQBody(body, ship): # 0 is ship1
        if client.preferences.get_preference('eqnotice') and client.get_handle() is not None and (ship == 0 or ship == data.clients.get_ship_from_port(cleint.transport.getHost().port)):
            client.get_handle().send_crypto_packet(SMPacket)
 
+
+def EQReplay(client):
+    if client.preferences.get_preference('eqnotice') and client.get_handle() is not None:
+        ship = data.clients.get_ship_from_port(cleint.transport.getHost().port)
+        if checkold_EQ(ship):
+            return
+        SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (msg_eq[ship]), 0x0).build()
+        client.get_handle().send_crypto_packet(SMPacket)
+
+
+
 def EQResponse(response, ship = -1): # 0 is ship1
     #print pformat(list(response.headers.getAllRawHeaders()))
     if response.code != 200:
@@ -198,6 +209,8 @@ def create_preferences(client):
         user_prefs = data.clients.connectedClients[client.playerId].preferences
         if not user_prefs.has_preference('eqnotice'):
             user_prefs.set_preference('eqnotice', True)
+        if user_prefs.get_preference('eqnotice'):
+            EQReplay(client)
 
 @plugins.CommandHook("eqnotice", "Toggles display of EQ notices from PSO2es source")
 class ToggleTranslate(Command):
