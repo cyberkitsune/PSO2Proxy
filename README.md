@@ -32,8 +32,8 @@ If you have a git commandline client, setuptools and pip installed, you can inst
 
 ## Configuring the Server
 To configure the server, run it once to generate the pso2proxy.config.yml, then edit that. You need at least your Public IP address set and your adapter IP set if it's different from your public ip. If unsure, leave the bindIp `0.0.0.0`.
-## RSA Keys
-### Your private / public keypair
+### RSA Keys
+#### Your private / public keypair
 You'll need to generate a RSA public and private keypair for your server and your proxy's clients for the proxy to work. You can use OpenSSL to do this.
 
 First, change into the keys folder.
@@ -48,13 +48,20 @@ Generate the private key:
 Generate a compatible publickey.blob for your clients:
 
 `openssl rsa -in myKey.pem -outform MS\ PUBLICKEYBLOB -pubout -out publickey.blob`
-### SEGA's Public key
+#### SEGA's Public key
 You'll ALSO need to import SEGA's RSA public keys from the PSO2 client. For instructions on how to get SEGAKey.blob, see [this wiki page](https://github.com/cyberkitsune/PSO2Proxy/wiki/Getting-SEGA's-RSA-Keys).
 
 To convert SEGAKey.blob to SEGAKey.pem, use this OpenSSL command:
 
 `openssl rsa -pubin -inform MS\ PUBLICKEYBLOB -in SEGAKey.blob -outform PEM -out SEGAKey.pem`
+### Plugins
+PSO2Proxy has several plugins that come bundled in to make the experience better. Most of them are disabed by default, with the exception of `LoginMessage` and `GlobalChat`. To disable a plugin that is not in the disabled folder, simply delete it.
 
+If you would like to enable a plugin already in the disabled folder, use the following command to make symlinks so they get updated.
+```
+    cd ~/PSO2Proxy/proxy/plugins
+    ln -s disabled/DisabledPluginName.py .
+```
 ## Getting clients to connect
 ### Rebind hosts file
 To get clients to connect to your proxy, they need to think SEGA's servers are your servers. An easy way to do this is to modify Windows's hosts file, add the following code below to the hosts file in `c:\Windows\System32\Drivers\etc\hosts`, replacing 0.0.0.0 with the proxy's **IP address**.
