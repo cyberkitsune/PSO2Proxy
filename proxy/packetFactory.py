@@ -72,6 +72,19 @@ class SystemMessagePacket(object):
         return Packet(0x19, 0x01, 0x4, 0x0, buf).build()
 
 
+class UnknownPacket1902(object):
+
+    def __init__(self, string, number=0x0):
+        self.string = string
+        self.number = number
+
+    def build(self):
+        buf = bytearray()
+        buf += encode_string_utf16(self.string, 0xFEB4, 0xED)
+        buf += struct.pack('<I', self.number)
+        return Packet(0x19, 0x02, 0x4, 0x0, buf).build()
+
+
 class TeamChatPacket(object):
     """docstring for TeamChatPacket"""
 
