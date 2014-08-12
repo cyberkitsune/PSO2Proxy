@@ -60,6 +60,11 @@ agent = Agent(reactor)
 
 def load_eqJP_names():
     global eqJP
+    if os.path.exists("cfg/eqJP_custom.resources.json"):
+        f = open("cfg/eqJP_custom.resources.json", 'r')
+        eqJP = json.load(f, "utf-8")
+        f.close()
+        return
     if os.path.exists("cfg/eqJP.resources.json"):
         f = open("cfg/eqJP.resources.json", 'r')
         eqJP = json.load(f, "utf-8")
@@ -102,10 +107,7 @@ def checkold_EQ(ship):
     if not Modified_Headers[ship] :
       return False
     timediff = (datetime.utcnow() - Modified_time[ship]).total_seconds()
-    print "\n  EQ", datetime.ctime(Modified_time[ship])
-    print  " DIFF", (datetime.utcnow() - Modified_time[ship]).total_seconds()
-    print  "  NOW", datetime.utcnow().ctime()
-    if ishour_eq[ship] :
+    if ishour_eq[ship]:
       if timediff > timedelta(minutes=55).total_seconds():
           print "EQ is 55 mins old"
           return True
