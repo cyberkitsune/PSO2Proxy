@@ -129,7 +129,7 @@ def checkold_EQ(ship):
           #print "EQ is 55 mins old"
           return True
     else:
-      if old_seconds(timediff) > 100*60:
+      if old_seconds(timediff) > 10*60:
           #print "Short EQ is 15 mins old"
           return True
     return False
