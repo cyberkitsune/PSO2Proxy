@@ -7,6 +7,7 @@ import packetFactory
 import json
 import os.path
 import time
+import data.clients as clients
 from datetime import datetime, timedelta
 from pprint import pformat
 from twisted.internet import task
@@ -108,7 +109,7 @@ def cleanup_EQ(message, ship): # 0 is ship1
 def checkold_EQ(ship):
     if not Modified_Headers[ship] :
       return False
-    timediff = (datetime.utcnow() - Modified_time[ship]).total_seconds()
+    timediff = (datetime.utcnow() - Modified_time[ship])
     if ishour_eq[ship]:
       if timediff > 55*60:
           #print "EQ is 55 mins old"
@@ -139,19 +140,8 @@ def EQBody(body, ship): # 0 is ship1
     print("[EQ_Notice] Ship %02d : %s" % (ship+1, msg_eq[ship]))
     SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (msg_eq[ship]), 0x0).build()
     for client in data.clients.connectedClients.values():
-       if client.preferences.get_preference('eqnotice') and client.get_handle() is not None and (ship == 0 or ship == data.clients.get_ship_from_port(cleint.transport.getHost().port)):
+       if client.preferences.get_preference('eqnotice') and client.get_handle() is not None and (ship == 0 or ship == data.clients.get_ship_from_port(client.transport.getHost().port)):
            client.get_handle().send_crypto_packet(SMPacket)
-
-
-def EQReplay(client):
-    if client.preferences.get_preference('eqnotice') and client.get_handle() is not None:
-        ship = data.clients.get_ship_from_port(cleint.transport.getHost().port)
-        if checkold_EQ(ship):
-            return
-        SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (msg_eq[ship]), 0x0).build()
-        client.get_handle().send_crypto_packet(SMPacket)
-
-
 
 def EQResponse(response, ship = -1): # 0 is ship1
     #print pformat(list(response.headers.getAllRawHeaders()))
@@ -201,16 +191,17 @@ def on_start():
         print("EQ Notice is disabled by config")
 
 @plugins.on_initial_connect_hook
-def create_preferences(client):
+def notify_and_config(client):
     """
-    :type client: ShipProxy
+    :type client: ShipProxy.ShipProxy
     """
-    if client.playerId in data.clients.connectedClients:
-        user_prefs = data.clients.connectedClients[client.playerId].preferences
-        if not user_prefs.has_preference('eqnotice'):
-            user_prefs.set_preference('eqnotice', True)
-        if user_prefs.get_preference('eqnotice'):
-            EQReplay(client)
+    client_preferences = data.clients.connectedClients[client.playerId].preferences
+    if not client_preferences.has_preference("eqnotice"):
+        client_preferences.set_preference("eqnotice", True)
+    ship = data.clients.get_ship_from_port(client.transport.getHost().port)
+    if client_preferences.get_preference('eqnotice') and data_eq[ship] and not checkold_EQ(ship):
+        SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (msg_eq[ship]), 0x0).build()
+        client.send_crypto_packet(SMPacket)
 
 @plugins.CommandHook("eqnotice", "Toggles display of EQ notices from PSO2es source")
 class ToggleTranslate(Command):
