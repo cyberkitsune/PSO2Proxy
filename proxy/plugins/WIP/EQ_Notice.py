@@ -10,9 +10,10 @@ import time
 import data.clients as clients
 from datetime import datetime, timedelta
 from pprint import pformat
-from twisted.internet import task
-from twisted.internet import reactor
-from twisted.web.client import Agent, readBody
+from twisted.internet import task, reactor, defer, protocol
+from twisted.internet.protocol import Protocol
+from twisted.web.client import Agent
+# Do not use twisted.web.client.readBody, we need 13.2.0 for that
 from twisted.web.http_headers import Headers
 from config import globalConfig
 
@@ -67,11 +68,21 @@ def load_eqJP_names():
         f = open("cfg/eqJP_custom.resources.json", 'r')
         eqJP = json.load(f, "utf-8")
         f.close()
-        return
     if os.path.exists("cfg/eqJP.resources.json"):
         f = open("cfg/eqJP.resources.json", 'r')
         eqJP = json.load(f, "utf-8")
         f.close()
+    if not eqJP:
+        return
+    eqJPl = dict(eqJP)
+    for ship in config.globalConfig.get_key('enabledShips'):
+        eqJPd = eqJPl.get(data_eq[ship])
+        if eqJPd is not None: # Is there a mapping?
+            msg_eq[ship] = "%s (JP: %s@%s:%s JST)" % (eqJPd, data_eq[ship], hour_eq[ship], mins_eq[ship])
+        else:
+            msg_eq[ship] = "JP: %s@%s:%s JST" % (data_eq[ship], hour_eq[ship], mins_eq[ship])
+
+
 
 def cutup_EQ(message, ship = 0):
     cutstr = u"分【PSO2】"
@@ -134,17 +145,29 @@ def EQBody(body, ship): # 0 is ship1
         return
 
     load_eqJP_names() # Reload file
-    eqJPd = dict(eqJP).get(data_eq[ship])
-    if eqJPd is not None: # Is there a mapping?
-        msg_eq[ship] = "%s (JP: %s@%s:%s J?T)" % (eqJPd, data_eq[ship], hour_eq[ship], mins_eq[ship])
-    else:
-        msg_eq[ship] = "JP: %s@%s:%s J?T" % (data_eq[ship], hour_eq[ship], mins_eq[ship])
 
     print("[EQ_Notice] Ship %02d : %s" % (ship+1, msg_eq[ship]))
     SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (msg_eq[ship]), 0x0).build()
     for client in data.clients.connectedClients.values():
        if client.preferences.get_preference('eqnotice') and client.get_handle() is not None and (ship == data.clients.get_ship_from_port(client.get_handle().transport.getHost().port)-1):
            client.get_handle().send_crypto_packet(SMPacket)
+
+
+class SimpleBodyProtocol(protocol.Protocol):
+    def __init__(self, status, message, deferred):
+        self.deferred = deferred
+        self.dataBuffer = []
+
+    def dataReceived(self, data):
+        self.dataBuffer.append(data)
+
+    def connectionLost(self, reason):
+        self.deferred.callback( b''.join(self.dataBuffer))
+
+def SimplereadBody(response):
+    d = defer.Deferred()
+    response.deliverBody(SimpleBodyProtocol(response.code, response.phrase, d))
+    return d
 
 def EQResponse(response, ship = -1): # 0 is ship1
     #print pformat(list(response.headers.getAllRawHeaders()))
@@ -161,13 +184,13 @@ def EQResponse(response, ship = -1): # 0 is ship1
     else:
        Modified_Headers[ship] = None
        Modified_time[ship] = None
-    d = readBody(response)
+    d = SimplereadBody(response)
     d.addCallback(EQBody, ship)
     return d
 
 def CheckupURL():
    HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']})
-
+   load_eqJP_names() # Reload file
    for shipNum in config.globalConfig.get_key('enabledShips'):
        eq_URL = eqnotice_config.get_key(str(shipNum))
        if eq_URL:
