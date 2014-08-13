@@ -20,16 +20,7 @@ from config import globalConfig
 from commands import Command
 
 eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True, 'timer' : 60
-,'0': ""
 ,'1': "http://acf.me.uk/Public/PSO2EQ/pso2eq.txt"
-,'2': ""
-,'3': ""
-,'4': ""
-,'5': ""
-,'6': ""
-,'7': ""
-,'8': ""
-,'9': ""
 },  True)
 
 #HTTP Headers
@@ -198,16 +189,19 @@ def CheckupURL():
    HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']})
    load_eqJP_names() # Reload file
    for shipNum in config.globalConfig.get_key('enabledShips'):
-       eq_URL = eqnotice_config.get_key(str(shipNum))
-       if eq_URL:
-          HTTPHeaderX = HTTPHeader0.copy()
-          if ETag_Headers[shipNum]:
-            HTTPHeaderX.addRawHeader('If-None-Match', ETag_Headers[shipNum])
-          if Modified_Headers[shipNum]:
-            HTTPHeaderX.addRawHeader('If-Modified-Since', Modified_Headers[shipNum])
-          #print pformat(list(HTTPHeaderX.getAllRawHeaders()))
-          EQ0 = agent.request('GET', eq_URL, HTTPHeaderX, None)
-          EQ0.addCallback(EQResponse, shipNum)
+        if eqnotice_config.key_exists(str(shipNum)):
+            eq_URL = eqnotice_config.get_key(str(shipNum))
+        else:
+            eq_URL = None
+        if eq_URL:
+            HTTPHeaderX = HTTPHeader0.copy()
+            if ETag_Headers[shipNum]:
+                HTTPHeaderX.addRawHeader('If-None-Match', ETag_Headers[shipNum])
+            if Modified_Headers[shipNum]:
+                HTTPHeaderX.addRawHeader('If-Modified-Since', Modified_Headers[shipNum])
+            #print pformat(list(HTTPHeaderX.getAllRawHeaders()))
+            EQ0 = agent.request('GET', eq_URL, HTTPHeaderX, None)
+            EQ0.addCallback(EQResponse, shipNum)
 
 @plugins.on_start_hook
 def on_start():
