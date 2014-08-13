@@ -66,11 +66,17 @@ def load_eqJP_names():
     global eqJP
     if os.path.exists("cfg/eqJP_custom.resources.json"):
         f = open("cfg/eqJP_custom.resources.json", 'r')
-        eqJP = json.load(f, "utf-8")
+        try:
+            eqJP = json.load(f, "utf-8")
+        except ValueError:
+            print "[EQ_Notice] Bad custom respource file, falling back"
         f.close()
     if os.path.exists("cfg/eqJP.resources.json"):
         f = open("cfg/eqJP.resources.json", 'r')
-        eqJP = json.load(f, "utf-8")
+        try:
+            eqJP = json.load(f, "utf-8")
+        except ValueError:
+            print "[EQ_Notice] Bad respource file, falling back"
         f.close()
     if not eqJP:
         return
