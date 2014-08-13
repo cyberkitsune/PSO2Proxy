@@ -19,7 +19,7 @@ from config import globalConfig
 
 from commands import Command
 
-eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True, 'timer' : 600
+eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True, 'timer' : 60
 ,'0': ""
 ,'1': "http://acf.me.uk/Public/PSO2EQ/pso2eq.txt"
 ,'2': ""
