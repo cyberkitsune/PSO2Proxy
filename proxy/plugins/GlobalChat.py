@@ -254,7 +254,7 @@ class GChat(Command):
         if ircMode:
             global ircBot
             if ircBot is not None:
-                ircBot.send_global_message(0, "Console", self.args[:2].encode('utf-8'))
+                ircBot.send_global_message(0, "Console", self.args[2:].encode('utf-8'))
         TCPacket = packetFactory.TeamChatPacket(0x999, "[GCONSOLE]", self.args[2:]).build()
         SMPacket = packetFactory.SystemMessagePacket("[GCONSOLE] %s%s" % (gchatSettings['prefix'], self.args[2:]), 0x3).build()
         for client in data.clients.connectedClients.values():
