@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 // Constant variable(s):
-const unsigned char* RSAaddr = (unsigned char*)0x02FBDBE0;
+const unsigned char* RSAaddr = (unsigned char*)0x2FBDBE0;
 
 // Text to Inject failed to open publickey.blob
 LPCTSTR InjectText = "Failed to open publickey.blob";
