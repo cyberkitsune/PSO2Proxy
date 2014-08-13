@@ -123,11 +123,11 @@ def checkold_EQ(ship):
     timediff = (datetime.utcnow() - Modified_time[ship])
     if ishour_eq[ship]:
       if old_seconds(timediff) > 55*60:
-          #print "EQ is 55 mins old"
+          #print "EQ is 55 mins too old"
           return True
     else:
       if old_seconds(timediff) > 10*60:
-          #print "Short EQ is 15 mins old"
+          #print "Short EQ is 10 mins too old"
           return True
     return False
 
