@@ -73,7 +73,7 @@ def load_eqJP_names():
         return
     for ship in config.globalConfig.get_key('enabledShips'):
         eqJPd = eqJP.get(data_eq[ship])
-        if eqJPd is not None: # Is there a mapping?
+        if eqJPd: # Is there a mapping?
             msg_eq[ship] = "%s (JP: %s@%s:%s JST)" % (eqJPd, data_eq[ship], hour_eq[ship], mins_eq[ship])
         else:
             msg_eq[ship] = "JP: %s@%s:%s JST" % (data_eq[ship], hour_eq[ship], mins_eq[ship])
