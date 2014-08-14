@@ -55,19 +55,22 @@ agent = Agent(reactor)
 
 def load_eqJP_names():
     global eqJP
+    RESloaded = False
     if os.path.exists("cfg/eqJP_custom.resources.json"):
+        RESloaded = True
         f = open("cfg/eqJP_custom.resources.json", 'r')
         try:
             eqJP = json.load(f, "utf-8")
         except ValueError:
             print "[EQ Notice] Bad custom resource file, falling back"
+            RESloaded = False
         f.close()
-    if os.path.exists("cfg/eqJP.resources.json"):
+    if not RESloaded and os.path.exists("cfg/eqJP.resources.json"):
         f = open("cfg/eqJP.resources.json", 'r')
         try:
             eqJP = json.load(f, "utf-8")
         except ValueError:
-            print "[EQ Notice] Bad resources file, falling back"
+            print "[EQ Notice] Bad resources file, blank mapping"
         f.close()
     if not eqJP:
         return
