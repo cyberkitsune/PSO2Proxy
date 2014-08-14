@@ -31,7 +31,7 @@ Modified_time    = ['','','','','','','','','','']
 #HTTP Data
 HTTP_Data        = ['','','','','','','','','','']
 #was "【1時間前】" in the data?
-ishour_eq =          [0,0,0,0,0,0,0,0,0,0]
+ishour_eq        = [False,False,False,False,False,False,False,False,False,False]
 #Hour of EQ
 hour_eq        = ['','','','','','','','','','']
 #Mins of EQ
@@ -142,7 +142,7 @@ def EQBody(body, ship): # 0 is ship1
 
     load_eqJP_names() # Reload file
 
-    print("[EQ Notice] Ship %02d : %s" % (ship+1, msg_eq[ship]))
+    print("[EQ Notice] Sending players MSG on Ship %02d : %s" % (ship+1, msg_eq[ship]))
     SMPacket = packetFactory.SystemMessagePacket("[EQ Notice] %s" % (msg_eq[ship]), 0x0).build()
     for client in data.clients.connectedClients.values():
         chandle = client.get_handle()
@@ -246,8 +246,5 @@ class ToggleTranslate(Command):
             taskrun.stop()
             print("[EQ] Stop EQ Notice Ticker")
         else:
-            #stored_ETag = ""
-            #stored_Last-Modified = ""
             taskrun.start(tasksec)
             print("[EQ] Started EQ Notice Ticker")
-
