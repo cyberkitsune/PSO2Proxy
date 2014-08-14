@@ -1,6 +1,6 @@
-.\PacketLogger.py
-.\redpill.py
-.\Translate.py
-.\WebAPI.py
-.\whitelist.py
-.\EQ_Notice.py
+PacketLogger.py
+redpill.py
+Translate.py
+WebAPI.py
+whitelist.py
+EQ_Notice.py
