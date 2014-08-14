@@ -77,6 +77,7 @@ class ShipProxy(protocol.Protocol):
             #If the packets reported size is less than a normal packet header, wrap it up to 8 as it should NEVER be that way.
             #This prevents an infinite loop.
             if packet_size < 8:
+                print("[ShipProxy] Warning! Got invalid packet size %i. Resetting to 8 to prevent infinite loop..." % packet_size)
                 packet_size = 8
 
             if verbose:
