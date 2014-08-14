@@ -60,14 +60,14 @@ def load_eqJP_names():
         try:
             eqJP = json.load(f, "utf-8")
         except ValueError:
-            print "[EQ_Notice] Bad custom respource file, falling back"
+            print "[EQ Notice] Bad custom respource file, falling back"
         f.close()
     if os.path.exists("cfg/eqJP.resources.json"):
         f = open("cfg/eqJP.resources.json", 'r')
         try:
             eqJP = json.load(f, "utf-8")
         except ValueError:
-            print "[EQ_Notice] Bad respource file, falling back"
+            print "[EQ Notice] Bad respource file, falling back"
         f.close()
     if not eqJP:
         return
@@ -142,8 +142,8 @@ def EQBody(body, ship): # 0 is ship1
 
     load_eqJP_names() # Reload file
 
-    print("[EQ_Notice] Ship %02d : %s" % (ship+1, msg_eq[ship]))
-    SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (msg_eq[ship]), 0x0).build()
+    print("[EQ Notice] Ship %02d : %s" % (ship+1, msg_eq[ship]))
+    SMPacket = packetFactory.SystemMessagePacket("[EQ Notice] %s" % (msg_eq[ship]), 0x0).build()
     for client in data.clients.connectedClients.values():
         chandle = client.get_handle()
         if client.preferences.get_preference('eqnotice') and chandle and (ship == data.clients.get_ship_from_port(chandle.transport.getHost().port)-1):
@@ -227,7 +227,7 @@ def notify_and_config(client):
         client_preferences.set_preference("eqnotice", True)
     ship = data.clients.get_ship_from_port(client.transport.getHost().port)-1
     if client_preferences.get_preference('eqnotice') and data_eq[ship] and not checkold_EQ(ship):
-        SMPacket = packetFactory.SystemMessagePacket("[EQ_Notice] %s" % (msg_eq[ship]), 0x0).build()
+        SMPacket = packetFactory.SystemMessagePacket("[EQ Notice] %s" % (msg_eq[ship]), 0x0).build()
         client.send_crypto_packet(SMPacket)
 
 @plugins.CommandHook("eqnotice", "Toggles display of EQ notices from PSO2es source")
