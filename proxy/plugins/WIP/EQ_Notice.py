@@ -60,14 +60,14 @@ def load_eqJP_names():
         try:
             eqJP = json.load(f, "utf-8")
         except ValueError:
-            print "[EQ Notice] Bad custom respource file, falling back"
+            print "[EQ Notice] Bad custom resource file, falling back"
         f.close()
     if os.path.exists("cfg/eqJP.resources.json"):
         f = open("cfg/eqJP.resources.json", 'r')
         try:
             eqJP = json.load(f, "utf-8")
         except ValueError:
-            print "[EQ Notice] Bad respource file, falling back"
+            print "[EQ Notice] Bad resources file, falling back"
         f.close()
     if not eqJP:
         return
