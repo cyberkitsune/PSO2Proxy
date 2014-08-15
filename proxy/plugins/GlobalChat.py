@@ -105,6 +105,12 @@ if ircMode:
             connector.connect()
 
 
+def lookup_gchatmode(client_preferences):
+    if client_preferences['gchatMode'] is not -1:
+        return client_preferences['gchatMode']
+    return gchatSettings['displayMode']
+
+
 @plugins.on_start_hook
 def create_preferences():
     global ircMode
@@ -132,7 +138,7 @@ def check_config(user):
                 "[Proxy] {red}Global chat is disabled, use %sgon to enable it and use %sg <Message> to chat." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
                 0x3).build())
         if not client_preferences.has_preference("gchatMode"):
-            client_preferences['gchatMode'] = gchatSettings['displayMode']
+            client_preferences['gchatMode'] = -1
 
 
 @plugins.CommandHook("gchatmode", "Sets your global chat display mode")
@@ -140,12 +146,18 @@ class GChatModeCommand(Command):
     def call_from_client(self, client):
         if client.playerId is not None:
             client_preferences = data.clients.connectedClients[client.playerId].preferences
-            if client_preferences['gchatMode'] == 0:
-                client_preferences['gchatMode'] = 1
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Global chat will now come through system chat.", 0x3).build())
-            else:
+            if client_preferences['gchatMode'] == -1:
                 client_preferences['gchatMode'] = 0
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Global chat will now come through team chat.", 0x3).build())
+            elif client_preferences['gchatMode'] == 0:
+                client_preferences['gchatMode'] = 1
+                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Global chat will now come through system chat.", 0x3).build())
+            elif client_preferences['gchatMode'] == 1:
+                client_preferences['gchatMode'] = -1
+                if gchatSettings['displayMode'] == 0:
+                    client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Global chat will now come through team chat. (Default)", 0x3).build())
+                else:
+                    client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Global chat will now come through system chat. (Default)", 0x3).build())
 
 @plugins.CommandHook("irc")
 class IRCCommand(Command):
@@ -258,7 +270,7 @@ class GChat(Command):
         SCPacket = packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0], "%s%s" % (gchatSettings['prefix'], self.args[3:])), 0x3).build()
         for client_data in data.clients.connectedClients.values():
             if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
-                if client_data.preferences['gchatMode'] == 0:
+                if lookup_gchatmode(client_data.preferences) == 0:
                     client_data.get_handle().send_crypto_packet(TCPacket)
                 else:
                     client_data.get_handle().send_crypto_packet(SCPacket)
@@ -273,7 +285,7 @@ class GChat(Command):
         SMPacket = packetFactory.SystemMessagePacket("[GCONSOLE] %s%s" % (gchatSettings['prefix'], self.args[2:]), 0x3).build()
         for client in data.clients.connectedClients.values():
             if client.preferences.get_preference("globalChat") and client.get_handle() is not None:
-                if client.preferences['gchatMode'] == 0:
+                if lookup_gchatmode(client.preferences) == 0:
                     client.get_handle().send_crypto_packet(TCPacket)
                 else:
                     client.get_handle().send_crypto_packet(SMPacket)
