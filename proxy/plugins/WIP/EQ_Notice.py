@@ -4,6 +4,7 @@ import config
 import data.clients
 import plugins
 import packetFactory
+from ShipProxy import ShipProxy
 import json
 import os.path
 import time
@@ -151,7 +152,8 @@ def EQBody(body, ship): # 0 is ship1
     SMPacket = packetFactory.SystemMessagePacket("[EQ Notice] %s" % (msg_eq[ship]), 0x0).build()
     for client in data.clients.connectedClients.values():
         chandle = client.get_handle()
-        if client.preferences.get_preference('eqnotice') and chandle and (ship == data.clients.get_ship_from_port(chandle.transport.getHost().port)-1):
+        if isinstance(chandle, ShipProxy) and client.preferences.get_preference('eqnotice') \
+            and (ship == data.clients.get_ship_from_port(chandle.transport.getHost().port)-1):
             client.get_handle().send_crypto_packet(SMPacket)
 
 
