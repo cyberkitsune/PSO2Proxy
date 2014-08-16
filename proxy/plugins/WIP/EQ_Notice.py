@@ -4,6 +4,7 @@ import config
 import data.clients
 import plugins
 import packetFactory
+import ShipProxy
 import json
 import os.path
 import time
