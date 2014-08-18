@@ -149,7 +149,7 @@ def EQBody(body, ship): # 0 is ship1
     load_eqJP_names() # Reload file
 
     print("[EQ Notice] Sending players MSG on Ship %02d : %s" % (ship+1, msg_eq[ship]))
-    SMPacket = packetFactory.SystemMessagePacket("[EQ Notice] %s" % (msg_eq[ship]), 0x0).build()
+    SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
     for client in data.clients.connectedClients.values():
         chandle = client.get_handle()
         if isinstance(chandle, ShipProxy) and client.preferences.get_preference('eqnotice') \
@@ -234,10 +234,10 @@ def notify_and_config(client):
         client_preferences.set_preference("eqnotice", True)
     ship = data.clients.get_ship_from_port(client.transport.getHost().port)-1
     if client_preferences.get_preference('eqnotice') and data_eq[ship] and not checkold_EQ(ship):
-        SMPacket = packetFactory.SystemMessagePacket("[EQ Notice] %s" % (msg_eq[ship]), 0x0).build()
+        SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
         client.send_crypto_packet(SMPacket)
 
-@plugins.CommandHook("eqnotice", "Toggles display of EQ notices from PSO2es source")
+@plugins.CommandHook("eqnotice", "Toggles display of EQ notices from PSO2es sources")
 class ToggleTranslate(Command):
     def call_from_client(self, client):
         if client.playerId in data.clients.connectedClients:
@@ -246,12 +246,12 @@ class ToggleTranslate(Command):
             if user_prefs.get_preference('eqnotice'):
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[EQ Notice] Enabled EQ notices.", 0x3).build())
             else:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[EQ Notice] Disabled Eq notices.", 0x3).build())
+                client.send_crypto_packet(packetFactory.SystemMessagePacket("[EQ Notice] Disabled EQ notices.", 0x3).build())
 
     def call_from_console(self):
         if taskrun.running:
             taskrun.stop()
-            print("[EQ] Stop EQ Notice Ticker")
+            print("[EQ Notice] Stop EQ Notice Ticker")
         else:
             taskrun.start(tasksec)
-            print("[EQ] Started EQ Notice Ticker")
+            print("[EQ Notice] Started EQ Notice Ticker")
