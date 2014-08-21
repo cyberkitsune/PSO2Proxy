@@ -3,6 +3,8 @@ import calendar
 import pstats
 import datetime
 import shutil
+from ShipProxy import ShipProxy
+
 from twisted.protocols import basic
 from twisted.internet import reactor
 
@@ -311,13 +313,13 @@ class ListClients(Command):
                 client_player_name = data.players.playerList[client_player_id][0].rstrip('\0')
             else:
                 client_player_name = None
-            block_number = client_handle.transport.getHost().port
-            if block_number in data.blocks.blockList:
-                client_ship = data.clients.get_ship_from_port(block_number)
-                client_block = data.blocks.blockList[block_number][1].rstrip('\0')
-            else:
-                client_ship = None
-                client_block = None
+            client_ship = None
+            client_block = None
+            if isinstance(client_handle, ShipProxy):
+                block_number = client_handle.transport.getHost().port
+                if block_number in data.blocks.blockList:
+                    client_ship = data.clients.get_ship_from_port(block_number)
+                    client_block = data.blocks.blockList[block_number][1].rstrip('\0')
             string += "[ClientList] IP: %s SEGA ID: %s Player ID: %s Player Name: %s Ship: %s Block: %s\n" % (
                 client_host, client_segaid, client_player_id, client_player_name, client_ship, client_block)
         pclient.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
@@ -336,13 +338,13 @@ class ListClients(Command):
                 client_player_name = data.players.playerList[client_player_id][0].rstrip('\0')
             else:
                 client_player_name = None
-            block_number = client_handle.transport.getHost().port
-            if block_number in data.blocks.blockList:
-                client_ship = data.clients.get_ship_from_port(block_number)
-                client_block = data.blocks.blockList[block_number][1].rstrip('\0')
-            else:
-                client_ship = None
-                client_block = None
+            client_ship = None
+            client_block = None
+            if isinstance(client_handle, ShipProxy):
+                block_number = client_handle.transport.getHost().port
+                if block_number in data.blocks.blockList:
+                    client_ship = data.clients.get_ship_from_port(block_number)
+                    client_block = data.blocks.blockList[block_number][1].rstrip('\0')
             string += "[ClientList] IP: %s SEGA ID: %s Player ID: %s Player Name: %s Ship: %s Block: %s\n" % (
                 client_host, client_segaid, client_player_id, client_player_name, client_ship, client_block)
         return string
