@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from pprint import pformat
 from twisted.internet import task, reactor, defer, protocol
 from twisted.internet.protocol import Protocol
-from twisted.web.client import Agent
+from twisted.web.client import Agent, HTTPConnectionPool
 # Do not use twisted.web.client.readBody, we need 13.2.0 for that
 from twisted.web.http_headers import Headers
 from config import globalConfig
@@ -47,7 +47,8 @@ eqJP             = []
 eq_mode = eqnotice_config.get_key('enabled')
 tasksec = eqnotice_config.get_key('timer')
 
-agent = Agent(reactor)
+pool = HTTPConnectionPool(reactor)
+agent = Agent(reactor, pool=pool)
 
 #Sample:        Ship02 08時00分【PSO2】第三採掘基地ダーカー接近予告
 #Sample:        【1時間前】 Ship02 05時00分【PSO2】惑星リリーパ　作戦予告
@@ -207,13 +208,16 @@ def CheckupURL():
             if Modified_Headers[shipNum]:
                 HTTPHeaderX.addRawHeader('If-Modified-Since', Modified_Headers[shipNum])
             #print pformat(list(HTTPHeaderX.getAllRawHeaders()))
-            EQ0 = agent.request('GET', eq_URL, HTTPHeaderX, None)
+            EQ0 = agent.request('GET', eq_URL, HTTPHeaderX)
             EQ0.addCallback(EQResponse, shipNum)
 
 @plugins.on_start_hook
 def on_start():
     global taskrun
     taskrun = task.LoopingCall(CheckupURL)
+    pool.cachedConnectionTimeout = (tasksec/2)+tasksec+1
+    pool.retryAutomatically = False
+
     if eq_mode:
         taskrun.start(tasksec) # call every 60 seconds
     else:
