@@ -214,11 +214,6 @@ def CheckupURL():
 def on_start():
     global taskrun
     taskrun = task.LoopingCall(CheckupURL)
-    print("!!! WARNING !!!")
-    print("You have EQ_Notice.py outside of the WIP plugins folder! This means it is ON!")
-    print("This plugin is still a work in progress!")
-    print("Please be careful!")
-    print("!!! WARNING !!!")
     if eq_mode:
         taskrun.start(tasksec) # call every 60 seconds
     else:
