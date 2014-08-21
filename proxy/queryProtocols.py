@@ -17,6 +17,7 @@ class BlockScraper(protocol.Protocol):
 
 class BlockScraperFactory(protocol.Factory):
     def __init__(self):
+        self.noisy = False
         pass
 
     def buildProtocol(self, address):
@@ -37,6 +38,7 @@ class ShipAdvertiser(protocol.Protocol):
 
 class ShipAdvertiserFactory(protocol.Factory):
     def __init__(self):
+        self.noisy = False
         pass
 
     def buildProtocol(self, address):
