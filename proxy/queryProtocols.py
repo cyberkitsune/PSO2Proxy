@@ -2,6 +2,7 @@ from twisted.internet import protocol
 import data.ships as ships
 from config import myIpAddress
 import plugins.plugins
+from config import noisy as verbose
 
 
 class BlockScraper(protocol.Protocol):
@@ -17,6 +18,7 @@ class BlockScraper(protocol.Protocol):
 
 class BlockScraperFactory(protocol.Factory):
     def __init__(self):
+        self.noisy = verbose
         pass
 
     def buildProtocol(self, address):
@@ -37,6 +39,7 @@ class ShipAdvertiser(protocol.Protocol):
 
 class ShipAdvertiserFactory(protocol.Factory):
     def __init__(self):
+        self.noisy = verbose
         pass
 
     def buildProtocol(self, address):

@@ -197,6 +197,7 @@ class ProxyFactory(protocol.Factory):
     """Factory for port forwarder."""
 
     def __init__(self):
+        self.noisy = verbose
         self.protocol = ProxyServer
 
     def buildProtocol(self, address):
