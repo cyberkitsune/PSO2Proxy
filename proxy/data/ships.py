@@ -12,7 +12,7 @@ from config import bindIp as interface_ip
 import blocks
 
 
-shipList = {
+blockShipList = {
     12100: "210.189.208.1",
     12200: "210.189.208.16",
     12300: "210.189.208.31",
@@ -24,6 +24,18 @@ shipList = {
     12900: "210.189.208.121",
     12000: "210.189.208.136",
 }
+
+queryShipArr = [(12199, "210.189.208.1"),
+                (12299, "210.189.208.16"),
+                (12399, "210.189.208.31"),
+                (12499, "210.189.208.46"),
+                (12599, "210.189.208.61"),
+                (12699, "210.189.208.76"),
+                (12799, "210.189.208.91"),
+                (12899, "210.189.208.106"),
+                (12999, "210.189.208.121"),
+                (12099, "210.189.208.136")]
+curShipIndex = 0
 
 
 def get_ship_from_port(port):
@@ -37,20 +49,30 @@ cachedBlocks = {}
 
 
 def get_first_block(ship_port, destination_ip):
-    if ship_port not in shipList:
+    if ship_port not in blockShipList:
         return None
 
     if ship_port not in cachedBlocks:
-        cachedBlocks[ship_port] = {'time_scraped': time.time(), 'data': scrape_block_packet(shipList[ship_port], ship_port, destination_ip)}
+        cachedBlocks[ship_port] = {'time_scraped': time.time(), 'data': scrape_block_packet(blockShipList[ship_port], ship_port, destination_ip)}
         print("[BlockCache] Cached new block for ship %i, Holding onto it for a minute..." % ship_port)
         return cachedBlocks[ship_port]['data']
 
     last_time = cachedBlocks[ship_port]['time_scraped']
     current_time = time.time()
     if current_time > last_time + 60:
-        cachedBlocks[ship_port] = {'time_scraped': time.time(), 'data': scrape_block_packet(shipList[ship_port], ship_port, destination_ip)}
+        cachedBlocks[ship_port] = {'time_scraped': time.time(), 'data': scrape_block_packet(blockShipList[ship_port], ship_port, destination_ip)}
         print("[BlockCache] Cached new block for ship %i, Holding onto it for a minute..." % ship_port)
     return cachedBlocks[ship_port]['data']
+
+
+def get_ship_query(my_ip_address):
+    global curShipIndex, queryShipArr
+    ship_port, ship_address = queryShipArr[curShipIndex]
+    data = scrape_ship_packet(ship_address, ship_port, my_ip_address)
+    curShipIndex += 1
+    if curShipIndex > len(queryShipArr):
+        curShipIndex = 0
+    return data
 
 
 def scrape_block_packet(ship_ip, ship_port, destination_ip):
