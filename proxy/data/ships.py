@@ -70,7 +70,7 @@ def get_ship_query(my_ip_address):
     ship_port, ship_address = queryShipArr[curShipIndex]
     data = scrape_ship_packet(ship_address, ship_port, my_ip_address)
     curShipIndex += 1
-    if curShipIndex > len(queryShipArr):
+    if curShipIndex >= len(queryShipArr):
         curShipIndex = 0
     return data
 
