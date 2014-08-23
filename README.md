@@ -13,6 +13,7 @@ If you have a Debian based system, you can install via apt-get for the depends
 ```
     sudo apt-get install -y python-twisted python-crypto python-yaml python-faulthandler openssl git
     echo deb http://http.debian.net/debian wheezy-backports main|sudo tee /etc/apt/sources.list.d/wheezy-backports.list>/dev/null
+    sudo apt-get update
     sudo apt-get -t wheezy-backports install -y python-twisted
     git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
 ```
