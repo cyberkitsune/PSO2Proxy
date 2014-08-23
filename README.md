@@ -11,8 +11,9 @@ PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyC
 If you have a Debian based system, you can install via apt-get for the depends
 
 ```
-    (note: you may need to run apt-get as root, prefix the command with sudo)
-    apt-get install python-twisted python-crypto python-yaml python-faulthandler openssl git
+    sudo apt-get install -y python-twisted python-crypto python-yaml python-faulthandler openssl git
+    echo deb http://http.debian.net/debian wheezy-backports main|sudo tee /etc/apt/sources.list.d/wheezy-backports.list>/dev/null
+    sudo apt-get -t wheezy-backports install -y python-twisted
     git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
 ```
 
