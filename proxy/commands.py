@@ -274,12 +274,15 @@ class Kick(Command):
                                                   0x3).build())
             return
         if int(args[1]) in data.clients.connectedClients:
-            data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet(
-                packetFactory.SystemMessagePacket("You have been kicked from the proxy by %s." % client.myUsername,
-                                                  0x2).build())
-            data.clients.connectedClients[int(args[1])].get_handle().transport.loseConnection()
-            client.send_crypto_packet(
-                packetFactory.SystemMessagePacket("[Command] {gre}Kicked %s." % args[1], 0x3).build())
+            if data.clients.connectedClients[int(args[1])].get_handle() is not None:
+                data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet(
+                    packetFactory.SystemMessagePacket("You have been kicked from the proxy by %s." % client.myUsername,
+                                                      0x2).build())
+                data.clients.connectedClients[int(args[1])].get_handle().transport.loseConnection()
+                client.send_crypto_packet(
+                    packetFactory.SystemMessagePacket("[Command] {gre}Kicked %s." % args[1], 0x3).build())
+            else:
+                 return "[Command] {red}I cound't find %s's handle." % args[1]
         else:
             client.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Command] {red}I couldn't find %s!" % args[1], 0x3).build())
@@ -289,10 +292,13 @@ class Kick(Command):
         if len(args) < 2:
             return "[Command] Invalid usage! Proper usage: >>> kick <playerId>"
         if int(args[1]) in data.clients.connectedClients:
-            data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet(
-                packetFactory.SystemMessagePacket("You have been kicked from the proxy from the console.", 0x1).build())
-            data.clients.connectedClients[int(args[1])].get_handle().transport.loseConnection()
-            return "[Command] Kicked %s." % args[1]
+            if data.clients.connectedClients[int(args[1])].get_handle() is not None:
+                data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet(
+                    packetFactory.SystemMessagePacket("You have been kicked from the proxy from the console.", 0x1).build())
+                data.clients.connectedClients[int(args[1])].get_handle().transport.loseConnection()
+                return "[Command] Kicked %s." % args[1]
+            else:
+                return "[Command] I cound't find %s's handle." % args[1]
         else:
             return "[Command] I couldn't find %s!" % args[1]
 
@@ -303,6 +309,8 @@ class ListClients(Command):
         string = "[ClientList] === Connected Clients (%i total) ===\n" % len(data.clients.connectedClients)
         for ip, client in data.clients.connectedClients.iteritems():
             client_handle = client.get_handle()
+            if client_handle is None:
+                continue
             client_host = client_handle.transport.getPeer().host
             client_segaid = client_handle.myUsername
             if client_segaid is None:
@@ -315,11 +323,10 @@ class ListClients(Command):
                 client_player_name = None
             client_ship = None
             client_block = None
-            if isinstance(client_handle, ShipProxy):
-                block_number = client_handle.transport.getHost().port
-                if block_number in data.blocks.blockList:
-                    client_ship = data.clients.get_ship_from_port(block_number)
-                    client_block = data.blocks.blockList[block_number][1].rstrip('\0')
+            block_number = client_handle.transport.getHost().port
+            if block_number in data.blocks.blockList:
+                client_ship = data.clients.get_ship_from_port(block_number)
+                client_block = data.blocks.blockList[block_number][1].rstrip('\0')
             string += "[ClientList] IP: %s SEGA ID: %s Player ID: %s Player Name: %s Ship: %s Block: %s\n" % (
                 client_host, client_segaid, client_player_id, client_player_name, client_ship, client_block)
         pclient.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
@@ -328,6 +335,8 @@ class ListClients(Command):
         string = "[ClientList] === Connected Clients (%i total) ===\n" % len(data.clients.connectedClients)
         for ip, client in data.clients.connectedClients.iteritems():
             client_handle = client.get_handle()
+            if client_handle is None:
+                continue
             client_host = client_handle.transport.getPeer().host
             client_segaid = client_handle.myUsername
             if client_segaid is None:
