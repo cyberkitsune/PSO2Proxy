@@ -90,7 +90,7 @@ def scrape_block_packet(ship_ip, ship_port, destination_ip):
     o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), 0x64)
     ip_string = '%i.%i.%i.%i' % (o1, o2, o3, o4)
     if port not in blocks.blockList:
-        log.msg("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (name.encode('ascii', errors='xmlcharrefreplace'), ip_string, port))
+        log.msg("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (name, ip_string, port))
         blocks.blockList[port] = (ip_string, name)
     if port not in blocks.listeningPorts:
         from ShipProxy import ProxyFactory
