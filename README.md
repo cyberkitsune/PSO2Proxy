@@ -23,6 +23,10 @@ if your server are on Debian Wheezy, you need to get a more up to date version o
     sudo apt-get -t wheezy-backports install -y python-twisted
 ```
 
+If your server is running on a Azamon AWS ES2 setup, get ready to have some fun
+```
+
+
 
 If you have a git commandline client, setuptools and pip installed, you can install it like this:
 

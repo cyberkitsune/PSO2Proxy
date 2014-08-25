@@ -23,21 +23,15 @@ class ClientData(object):
         self.ship = ship
         self.preferences = ClientPreferences(segaid)
 
-    def check_client(handle):
-        if handle is None:
-            return False
-        if isinstance(client_handle, Protocol):
-            return True
-        return False
-
     def get_handle(self):
         """
         :rtype : ShipProxy
         """
-        if check_client(handle):
-            return self.handle
-        else:
+        if handle is None:
             return None
+        if isinstance(client_handle, Protocol):
+            return self.handle
+        return None
 
     def set_handle(self, handle):
         self.handle = handle
