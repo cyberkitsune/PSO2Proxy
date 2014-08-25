@@ -27,9 +27,9 @@ class ClientData(object):
         """
         :rtype : ShipProxy
         """
-        if handle is None:
+        if self.handle is None:
             return None
-        if isinstance(client_handle, Protocol):
+        if isinstance(self.handle, Protocol):
             return self.handle
         return None
 
