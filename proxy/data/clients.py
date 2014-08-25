@@ -3,6 +3,7 @@ import yaml
 import blocks
 import config
 import packetFactory
+from twisted.internet.protocol import Protocol
 
 from ships import get_ship_from_port
 
@@ -26,7 +27,11 @@ class ClientData(object):
         """
         :rtype : ShipProxy
         """
-        return self.handle
+        if self.handle is None:
+            return None
+        if isinstance(self.handle, Protocol):
+            return self.handle
+        return None
 
     def set_handle(self, handle):
         self.handle = handle
@@ -107,7 +112,6 @@ class ClientPreferences():
 
     def __setitem__(self, key, value):
         self.set_preference(key, value)
-
 
 def add_client(handle):
     connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, handle.myUsername.rstrip('\0'), get_ship_from_port(handle.transport.getHost().port), handle)

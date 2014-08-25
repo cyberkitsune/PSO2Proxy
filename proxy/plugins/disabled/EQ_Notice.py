@@ -4,7 +4,6 @@ import config
 import data.clients
 import plugins
 import packetFactory
-from ShipProxy import ShipProxy
 import json
 import os.path
 import time
@@ -13,8 +12,7 @@ from datetime import datetime, timedelta
 from pprint import pformat
 from twisted.internet import task, reactor, defer, protocol
 from twisted.internet.protocol import Protocol
-from twisted.web.client import Agent
-# Do not use twisted.web.client.readBody, we need 13.2.0 for that
+from twisted.web.client import Agent, HTTPConnectionPool, readBody
 from twisted.web.http_headers import Headers
 from config import globalConfig
 
@@ -47,7 +45,8 @@ eqJP             = []
 eq_mode = eqnotice_config.get_key('enabled')
 tasksec = eqnotice_config.get_key('timer')
 
-agent = Agent(reactor)
+pool = HTTPConnectionPool(reactor)
+agent = Agent(reactor, pool=pool)
 
 #Sample:        Ship02 08時00分【PSO2】第三採掘基地ダーカー接近予告
 #Sample:        【1時間前】 Ship02 05時00分【PSO2】惑星リリーパ　作戦予告
@@ -152,26 +151,9 @@ def EQBody(body, ship): # 0 is ship1
     SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
     for client in data.clients.connectedClients.values():
         chandle = client.get_handle()
-        if isinstance(chandle, ShipProxy) and client.preferences.get_preference('eqnotice') \
+        if chandle is not None and client.preferences.get_preference('eqnotice') \
             and (ship == data.clients.get_ship_from_port(chandle.transport.getHost().port)-1):
-            client.get_handle().send_crypto_packet(SMPacket)
-
-
-class SimpleBodyProtocol(protocol.Protocol):
-    def __init__(self, status, message, deferred):
-        self.deferred = deferred
-        self.dataBuffer = []
-
-    def dataReceived(self, data):
-        self.dataBuffer.append(data)
-
-    def connectionLost(self, reason):
-        self.deferred.callback( b''.join(self.dataBuffer))
-
-def SimplereadBody(response):
-    d = defer.Deferred()
-    response.deliverBody(SimpleBodyProtocol(response.code, response.phrase, d))
-    return d
+            chandle.send_crypto_packet(SMPacket)
 
 def EQResponse(response, ship = -1): # 0 is ship1
     #print pformat(list(response.headers.getAllRawHeaders()))
@@ -188,7 +170,7 @@ def EQResponse(response, ship = -1): # 0 is ship1
     else:
         Modified_Headers[ship] = None
         Modified_time[ship] = None
-    d = SimplereadBody(response)
+    d = readBody(response)
     d.addCallback(EQBody, ship)
     return d
 
@@ -207,18 +189,16 @@ def CheckupURL():
             if Modified_Headers[shipNum]:
                 HTTPHeaderX.addRawHeader('If-Modified-Since', Modified_Headers[shipNum])
             #print pformat(list(HTTPHeaderX.getAllRawHeaders()))
-            EQ0 = agent.request('GET', eq_URL, HTTPHeaderX, None)
+            EQ0 = agent.request('GET', eq_URL, HTTPHeaderX)
             EQ0.addCallback(EQResponse, shipNum)
 
 @plugins.on_start_hook
 def on_start():
     global taskrun
     taskrun = task.LoopingCall(CheckupURL)
-    print("!!! WARNING !!!")
-    print("You have EQ_Notice.py outside of the WIP plugins folder! This means it is ON!")
-    print("This plugin is still a work in progress!")
-    print("Please be careful!")
-    print("!!! WARNING !!!")
+    pool.cachedConnectionTimeout = (tasksec/2)+tasksec+1
+    pool.retryAutomatically = False
+
     if eq_mode:
         taskrun.start(tasksec) # call every 60 seconds
     else:

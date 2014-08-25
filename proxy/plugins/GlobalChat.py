@@ -104,6 +104,9 @@ if ircMode:
         def clientConnectionLost(self, connector, reason):
             connector.connect()
 
+        def clientConnectionFailed(self, connector, reason):
+            connector.connect()
+
 
 def lookup_gchatmode(client_preferences):
     if client_preferences['gchatMode'] is not -1:
