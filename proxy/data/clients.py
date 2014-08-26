@@ -29,7 +29,7 @@ class ClientData(object):
         """
         if self.handle is None:
             return None
-        if isinstance(self.handle, Protocol):
+        if isinstance(self.handle, Protocol) and hasattr(self.handle.transport, 'socket'):
             return self.handle
         return None
 
