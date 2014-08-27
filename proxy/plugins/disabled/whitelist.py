@@ -59,7 +59,8 @@ class Whitelist(Command):
 @plugins.PacketHook(0x11, 0x0)
 def whitelist_check(context, data):
     global whitelist
-    username = data[0x8:0x48].decode('utf-8')
+    start = len(data) - 132  # Skip password
+    username = data[start:start + 0x40].decode('utf-8')
     username = username.rstrip('\0')
     if username not in whitelist:
         print("[Whitelist] %s is not in the whitelist, hanging up!" % username)
