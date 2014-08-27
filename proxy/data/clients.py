@@ -29,7 +29,7 @@ class ClientData(object):
         """
         if self.handle is None:
             return None
-        if isinstance(self.handle, Protocol):
+        if isinstance(self.handle, Protocol) and hasattr(self.handle.transport, 'socket'):
             return self.handle
         return None
 
@@ -114,10 +114,15 @@ class ClientPreferences():
         self.set_preference(key, value)
 
 def add_client(handle):
-    connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, handle.myUsername.rstrip('\0'), get_ship_from_port(handle.transport.getHost().port), handle)
-    print('[Clients] Registered client %s (ID:%i) in online clients' % (handle.myUsername, handle.playerId))
+    try:
+        lmyUsername = handle.myUsername.rstrip('\0');
+    except AttributeError:
+        lmyUsername = handle.myUsername
+
+    connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, lmyUsername, get_ship_from_port(handle.transport.getHost().port), handle)
+    print('[Clients] Registered client %s (ID:%i) in online clients' % (lmyUsername, handle.playerId))
     if config.is_player_id_banned(handle.playerId):
-        print('[Bans] Player %s (ID:%i) is banned!' % (handle.myUsername, handle.playerId))
+        print('[Bans] Player %s (ID:%i) is banned!' % (lmyUsername, handle.playerId))
         handle.send_crypto_packet(packetFactory.SystemMessagePacket("You are banned from connecting to this PSO2Proxy.", 0x1).build())
         handle.transport.loseConnection()
 
