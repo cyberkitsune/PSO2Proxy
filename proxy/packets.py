@@ -16,7 +16,8 @@ import plugins.plugins as plugin_manager
 from config import myIpAddress as ipAddress
 from config import blockNameMode as bNameMode
 from config import noisy as verbose
-from config import bindIp as interface_ip
+from config import myIpAddress as myIp
+from config import bindIp
 import config
 
 
@@ -111,6 +112,10 @@ def team_room_info_packet(context, data):
         blocks.blockList[port] = (ip_string, "Team Room", port)
     if port not in blocks.listeningPorts:
         from ShipProxy import ProxyFactory
+        if bindIp == "0.0.0.0":
+            interface_ip = myIp
+        else:
+            interface_ip = bindIp
         block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
@@ -132,6 +137,10 @@ def my_room_info_packet(context, data):
         blocks.blockList[port] = (ip_string, "My Room", port)
     if port not in blocks.listeningPorts:
         from ShipProxy import ProxyFactory
+        if bindIp == "0.0.0.0":
+            interface_ip = myIp
+        else:
+            interface_ip = bindIp
         block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
@@ -236,6 +245,10 @@ def block_reply_packet(context, data):
     port = struct.unpack_from("H", buffer(data), 0x18)[0]
     if port in blocks.blockList and port not in blocks.listeningPorts:
         from ShipProxy import ProxyFactory
+        if bindIp == "0.0.0.0":
+            interface_ip = myIp
+        else:
+            interface_ip = bindIp
         block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
