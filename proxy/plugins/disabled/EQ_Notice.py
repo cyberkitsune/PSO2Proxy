@@ -18,7 +18,8 @@ from config import globalConfig
 
 from commands import Command
 
-eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True, 'timer' : 60
+eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {
+'enabled': True, 'timer' : 60, 'debug': False
 ,'1': "http://acf.me.uk/Public/PSO2EQ/pso2eq.txt"
 },  True)
 
@@ -44,14 +45,14 @@ eqJP             = []
 
 eq_mode = eqnotice_config.get_key('enabled')
 tasksec = eqnotice_config.get_key('timer')
+debug = eqnotice_config.get_key('debug')
 
 pool = HTTPConnectionPool(reactor)
 agent = Agent(reactor, pool=pool)
 
-#Sample:        Ship02 08時00分【PSO2】第三採掘基地ダーカー接近予告
-#Sample:        【1時間前】 Ship02 05時00分【PSO2】惑星リリーパ　作戦予告
-#Sample:        【1時間前】 Ship02 11時00分【PSO2】旧マザーシップ　作戦予告
-#Sample:        Ship02 11時00分【PSO2】旧マザーシップ　作戦予告
+def logdebug(message):
+    if debug:
+        print "[EQ Notice] Debug: %s"% message
 
 def load_eqJP_names():
     global eqJP
@@ -80,8 +81,6 @@ def load_eqJP_names():
             msg_eq[ship] = "%s (JP: %s@%s:%s JST)" % (eqJPd, data_eq[ship], hour_eq[ship], mins_eq[ship])
         else:
             msg_eq[ship] = "JP: %s@%s:%s JST" % (data_eq[ship], hour_eq[ship], mins_eq[ship])
-
-
 
 def cutup_EQ(message, ship = 0):
     cutstr = u"分【PSO2】"
@@ -119,47 +118,65 @@ def cleanup_EQ(message, ship): # 0 is ship1
 def old_seconds(td):
     return (td.seconds + td.days * 24 * 3600)
 
-def checkold_EQ(ship):
-    if not Modified_Headers[ship] :
+def check_if_EQ_old(ship):
+    logdebug("Checking time for Ship %d" %(ship+1))
+    if not Modified_Headers[ship]:
+        logdebug("no Headers for Ship %d" %(ship+1))
         return False
     timediff = (datetime.utcnow() - Modified_time[ship])
     if ishour_eq[ship]:
         if old_seconds(timediff) > 55*60:
-            #print "EQ is 55 mins too old"
+            logdebug("EQ is 55 mins too old")
             return True
     else:
         # Short EQ notice is no good
+        logdebug("short EQ on Ship %d" %(ship+1))
         return True
         if old_seconds(timediff) > 10*60:
-            #print "Short EQ is 10 mins too old"
+            logdebug("Short EQ is 10 mins too old")
             return True
     return False
 
 def EQBody(body, ship): # 0 is ship1
+    old_eq = True
+    logdebug("%s" % (body))
     if HTTP_Data[ship] == body:
+        logdebug("Ship %d still have the same data" % (ship+1))
         return; # same data, do not react on it
+    logdebug("Ship %d have the new data" % (ship+1))
     HTTP_Data[ship] == body
 
     data_eq[ship] = cleanup_EQ(unicode(body, 'utf-8-sig', 'replace'), ship)
 
-    if checkold_EQ(ship):
+    logdebug("Ship %d: %s@%s:%s JST" % (ship+1,  data_eq[ship], hour_eq[ship], mins_eq[ship]))
+
+    old_eq = check_if_EQ_old(ship)
+    if old_eq:
+        logdebug("Ship %d EQ is old"% (ship+1))
         return
+    logdebug("Ship %d: EQ is new" % (ship+1))
 
     load_eqJP_names() # Reload file
 
     print("[EQ Notice] Sending players MSG on Ship %02d : %s" % (ship+1, msg_eq[ship]))
     SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
     for client in data.clients.connectedClients.values():
-        chandle = client.get_handle()
-        if chandle is not None and client.preferences.get_preference('eqnotice') \
-            and (ship == data.clients.get_ship_from_port(chandle.transport.getHost().port)-1):
-            chandle.send_crypto_packet(SMPacket)
+        try:
+            chandle = client.get_handle()
+            if chandle is not None and client.preferences.get_preference('eqnotice') \
+                and (ship+1 == data.clients.get_ship_from_port(chandle.transport.getHost().port)):
+                chandle.send_crypto_packet(SMPacket)
+        except AttributeError:
+            logdebug("Got a dead cleint, skipping")
 
 def EQResponse(response, ship = -1): # 0 is ship1
-    #print pformat(list(response.headers.getAllRawHeaders()))
+    if response.code == 304:
+        return
+    logdebug("HTTP Status %d" % response.code)
     if response.code != 200:
         return
-    #print response.code
+    logdebug("Checking URL Header")
+    logdebug(pformat(list(response.headers.getAllRawHeaders())))
     if response.headers.hasHeader('ETag'):
         ETag_Headers[ship] = response.headers.getRawHeaders('ETag')[0]
     else:
@@ -175,6 +192,7 @@ def EQResponse(response, ship = -1): # 0 is ship1
     return d
 
 def CheckupURL():
+    #logdebug("Checking URL")
     HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']})
     load_eqJP_names() # Reload file
     for shipNum in config.globalConfig.get_key('enabledShips'):
@@ -188,7 +206,7 @@ def CheckupURL():
                 HTTPHeaderX.addRawHeader('If-None-Match', ETag_Headers[shipNum])
             if Modified_Headers[shipNum]:
                 HTTPHeaderX.addRawHeader('If-Modified-Since', Modified_Headers[shipNum])
-            #print pformat(list(HTTPHeaderX.getAllRawHeaders()))
+            #logdebug(pformat(list(HTTPHeaderX.getAllRawHeaders())))
             EQ0 = agent.request('GET', eq_URL, HTTPHeaderX)
             EQ0.addCallback(EQResponse, shipNum)
 
@@ -213,7 +231,7 @@ def notify_and_config(client):
     if not client_preferences.has_preference("eqnotice"):
         client_preferences.set_preference("eqnotice", True)
     ship = data.clients.get_ship_from_port(client.transport.getHost().port)-1
-    if client_preferences.get_preference('eqnotice') and data_eq[ship] and not checkold_EQ(ship):
+    if client_preferences.get_preference('eqnotice') and data_eq[ship] and not check_if_EQ_old(ship):
         SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
         client.send_crypto_packet(SMPacket)
 
