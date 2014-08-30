@@ -129,7 +129,10 @@ def add_client(handle):
 
 def remove_client(handle):
     print("[Clients] Removing client %s (ID:%i) from online clients" % (handle.myUsername, handle.playerId))
-    del connectedClients[handle.playerId]
+    if handle.playerId in connectedClients:
+        del connectedClients[handle.playerId]
+    else:
+        print("[Clients] client %s (ID:%i) is not in list" % (handle.myUsername, handle.playerId))
 
 
 def populate_data(handle):
