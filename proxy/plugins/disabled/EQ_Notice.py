@@ -12,11 +12,36 @@ from datetime import datetime, timedelta
 from pprint import pformat
 from twisted.internet import task, reactor, defer, protocol
 from twisted.internet.protocol import Protocol
-from twisted.web.client import Agent, HTTPConnectionPool, readBody
 from twisted.web.http_headers import Headers
 from config import globalConfig
 
 from commands import Command
+
+try:
+    from twisted.web.client import readBody
+except ImportError:
+    class SimpleBodyProtocol(protocol.Protocol):
+        def __init__(self, status, message, deferred):
+            self.deferred = deferred
+            self.dataBuffer = []
+
+        def dataReceived(self, data):
+            self.dataBuffer.append(data)
+
+        def connectionLost(self, reason):
+            self.deferred.callback( b''.join(self.dataBuffer))
+
+    def readBody(response):
+        d = defer.Deferred()
+        response.deliverBody(SimpleBodyProtocol(response.code, response.phrase, d))
+        return d
+
+try:
+    from twisted.web.client import Agent, HTTPConnectionPool
+    pool = HTTPConnectionPool(reactor)
+    agent = Agent(reactor, pool=pool)
+except ImportError:
+    agent = Agent(reactor)
 
 eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {
 'enabled': True, 'timer' : 60, 'debug': False
@@ -47,12 +72,9 @@ eq_mode = eqnotice_config.get_key('enabled')
 tasksec = eqnotice_config.get_key('timer')
 debug = eqnotice_config.get_key('debug')
 
-pool = HTTPConnectionPool(reactor)
-agent = Agent(reactor, pool=pool)
-
 def logdebug(message):
     if debug:
-        print "[EQ Notice] Debug: %s"% message
+        print "[EQ Notice Debug] %s"% message
 
 def load_eqJP_names():
     global eqJP
@@ -90,6 +112,8 @@ def cutup_EQ(message, ship = 0):
     return message
 
 def ishour_EQ(message):
+    # Notices do have this string anymore
+    return True
     hourstr = u"【1時間前】 Ship"
     if message.find(hourstr) is not -1:
         return True
@@ -119,40 +143,43 @@ def old_seconds(td):
     return (td.seconds + td.days * 24 * 3600)
 
 def check_if_EQ_old(ship):
-    logdebug("Checking time for Ship %d" %(ship+1))
+    logdebug("Ship %d: Checking time" %(ship+1))
     if not Modified_Headers[ship]:
-        logdebug("no Headers for Ship %d" %(ship+1))
+        logdebug("Ship %d: no TimeStamp" %(ship+1))
         return False
     timediff = (datetime.utcnow() - Modified_time[ship])
     if ishour_eq[ship]:
         if old_seconds(timediff) > 55*60:
-            logdebug("EQ is 55 mins too old")
+            logdebug("Ship %d: EQ is 55 mins too old"%(ship+1))
             return True
     else:
         # Short EQ notice is no good
-        logdebug("short EQ on Ship %d" %(ship+1))
-        return True
+        logdebug("Ship %d: short EQ" %(ship+1))
+        #return True
         if old_seconds(timediff) > 10*60:
-            logdebug("Short EQ is 10 mins too old")
+            logdebug("Ship %d: Short EQ is older then 10 mins" %(ship+1))
             return True
     return False
 
 def EQBody(body, ship): # 0 is ship1
     old_eq = True
-    logdebug("%s" % (body))
+    logdebug("Ship %d's Body: %s" % (ship+1, body))
     if HTTP_Data[ship] == body:
-        logdebug("Ship %d still have the same data" % (ship+1))
+        logdebug("Ship %d: Still have the same data" % (ship+1))
         return; # same data, do not react on it
-    logdebug("Ship %d have the new data" % (ship+1))
+    logdebug("Ship %d: have the new data" % (ship+1))
     HTTP_Data[ship] == body
 
     data_eq[ship] = cleanup_EQ(unicode(body, 'utf-8-sig', 'replace'), ship)
 
     logdebug("Ship %d: %s@%s:%s JST" % (ship+1,  data_eq[ship], hour_eq[ship], mins_eq[ship]))
 
+    logdebug("Time  : %s" % (datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')))
+    logdebug("Ship %d: %s" %(ship+1, Modified_Headers[ship]))
+
     old_eq = check_if_EQ_old(ship)
     if old_eq:
-        logdebug("Ship %d EQ is old"% (ship+1))
+        #logdebug("Ship %d EQ is old"% (ship+1))
         return
     logdebug("Ship %d: EQ is new" % (ship+1))
 
@@ -167,15 +194,15 @@ def EQBody(body, ship): # 0 is ship1
                 and (ship+1 == data.clients.get_ship_from_port(chandle.transport.getHost().port)):
                 chandle.send_crypto_packet(SMPacket)
         except AttributeError:
-            logdebug("Got a dead cleint, skipping")
+            logdebug("Ship %d: Got a dead cleint, skipping" %(ship+1))
 
 def EQResponse(response, ship = -1): # 0 is ship1
     if response.code == 304:
         return
-    logdebug("HTTP Status %d" % response.code)
+    logdebug("Ship %d: HTTP Status %d" % (ship+1, response.code))
     if response.code != 200:
         return
-    logdebug("Checking URL Header")
+    logdebug("Ship %d: Checking URL Headers" % (ship+1))
     logdebug(pformat(list(response.headers.getAllRawHeaders())))
     if response.headers.hasHeader('ETag'):
         ETag_Headers[ship] = response.headers.getRawHeaders('ETag')[0]
@@ -201,6 +228,7 @@ def CheckupURL():
         else:
             eq_URL = None
         if eq_URL:
+            #logdebug("Ship %d: Checking URL %s" % (shipNum+1, eq_URL))
             HTTPHeaderX = HTTPHeader0.copy()
             if ETag_Headers[shipNum]:
                 HTTPHeaderX.addRawHeader('If-None-Match', ETag_Headers[shipNum])
@@ -236,7 +264,7 @@ def notify_and_config(client):
         client.send_crypto_packet(SMPacket)
 
 @plugins.CommandHook("eqnotice", "Toggles display of EQ notices from PSO2es sources")
-class ToggleTranslate(Command):
+class ToggleEQNoitce(Command):
     def call_from_client(self, client):
         if client.playerId in data.clients.connectedClients:
             user_prefs = data.clients.connectedClients[client.playerId].preferences
