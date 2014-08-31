@@ -4,6 +4,7 @@ import glob
 import pstats
 import datetime
 import shutil
+import sys
 from ShipProxy import ShipProxy
 
 from twisted.protocols import basic
@@ -436,16 +437,14 @@ class Profiler(Command):
             return "[Profiling] Profiling has been disabled, results written to disk."
 
 
-@CommandHandler("reloadplugins")
+@CommandHandler("reloadplugin")
 class ReloadPlugins(Command):
     def call_from_console(self):
-        output = "[ShipProxy] Reloading Plugins...\n"
-        for plug in glob.glob("plugins/*.py"):
-            plug = plug[:-3]
-            plug = plug.replace('/', '.')
-            output += "[ShipProxy] Reloading %s...\n" % plug
-            reload(plug)
-        for f in plugin_manager.onStart:
-            f()
-        output += "[ShipProxy] Reload complete!\n"
+        if len(self.args.split(' ')) < 2:
+            return "Incorrect usage. Usage: >>> reloadplugin <Module Name>"
+        if self.args[1] not in sys.modules:
+            return "That module / plugin is not loaded!"
+        output = "[ShipProxy] Reloading Plugin %s..." % self.args[1]
+        reload(sys.modules[self.args[1]])
+        output += "[ShipProxy] Plugin reloaded!\n"
         return output
