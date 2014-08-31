@@ -1,5 +1,6 @@
 import cProfile
 import calendar
+import glob
 import pstats
 import datetime
 import shutil
@@ -433,3 +434,18 @@ class Profiler(Command):
                 if client.get_handle() is not None:
                     client.get_handle().send_crypto_packet(SMPacket)
             return "[Profiling] Profiling has been disabled, results written to disk."
+
+
+@CommandHandler("reloadplugins")
+class ReloadPlugins(Command):
+    def call_from_console(self):
+        output = "[ShipProxy] Reloading Plugins...\n"
+        for plug in glob.glob("plugins/*.py"):
+            plug = plug[:-3]
+            plug = plug.replace('/', '.')
+            output += "[ShipProxy] Reloading %s...\n" % plug
+            reload(plug)
+        for f in plugin_manager.onStart:
+            f()
+        output += "[ShipProxy] Reload complete!\n"
+        return output
