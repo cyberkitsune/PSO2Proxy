@@ -113,16 +113,17 @@ class ClientPreferences():
     def __setitem__(self, key, value):
         self.set_preference(key, value)
 
+
 def add_client(handle):
     try:
-        lmyUsername = handle.myUsername.rstrip('\0');
+        l_my_username = handle.myUsername.rstrip('\0')
     except AttributeError:
-        lmyUsername = handle.myUsername
+        l_my_username = handle.myUsername
 
-    connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, lmyUsername, get_ship_from_port(handle.transport.getHost().port), handle)
-    print('[Clients] Registered client %s (ID:%i) in online clients' % (lmyUsername, handle.playerId))
+    connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, l_my_username, get_ship_from_port(handle.transport.getHost().port), handle)
+    print('[Clients] Registered client %s (ID:%i) in online clients' % (l_my_username, handle.playerId))
     if config.is_player_id_banned(handle.playerId):
-        print('[Bans] Player %s (ID:%i) is banned!' % (lmyUsername, handle.playerId))
+        print('[Bans] Player %s (ID:%i) is banned!' % (l_my_username, handle.playerId))
         handle.send_crypto_packet(packetFactory.SystemMessagePacket("You are banned from connecting to this PSO2Proxy.", 0x1).build())
         handle.transport.loseConnection()
 
