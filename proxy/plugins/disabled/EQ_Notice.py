@@ -143,21 +143,21 @@ def old_seconds(td):
     return (td.seconds + td.days * 24 * 3600)
 
 def check_if_EQ_old(ship):
-    logdebug("Ship %d: Checking time" %(ship+1))
+    #logdebug("Ship %d: Checking time" %(ship+1))
     if not Modified_Headers[ship]:
-        logdebug("Ship %d: no TimeStamp" %(ship+1))
+        #logdebug("Ship %d: no TimeStamp" %(ship+1))
         return False
     timediff = (datetime.utcnow() - Modified_time[ship])
     if ishour_eq[ship]:
         if old_seconds(timediff) > 55*60:
-            logdebug("Ship %d: EQ is 55 mins too old"%(ship+1))
+            #logdebug("Ship %d: EQ is 55 mins too old"%(ship+1))
             return True
     else:
         # Short EQ notice is no good
-        logdebug("Ship %d: short EQ" %(ship+1))
-        #return True
+        #logdebug("Ship %d: short EQ" %(ship+1))
+        return True
         if old_seconds(timediff) > 10*60:
-            logdebug("Ship %d: Short EQ is older then 10 mins" %(ship+1))
+            #logdebug("Ship %d: Short EQ is older then 10 mins" %(ship+1))
             return True
     return False
 
@@ -179,7 +179,7 @@ def EQBody(body, ship): # 0 is ship1
 
     old_eq = check_if_EQ_old(ship)
     if old_eq:
-        #logdebug("Ship %d EQ is old"% (ship+1))
+        logdebug("Ship %d EQ is old"% (ship+1))
         return
     logdebug("Ship %d: EQ is new" % (ship+1))
 
