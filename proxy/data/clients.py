@@ -57,19 +57,19 @@ class SQLitePreferenceManager():
     def _get_user_data_from_db(self, segaid):
         user_data = {}
         local_cursor = self._db_connection.cursor()
-        local_cursor.execute("SELECT data FROM users WHERE sega_id = ?", (segaid, ))
+        local_cursor.execute("SELECT data FROM users WHERE sega_id = ?", (str(segaid), ))
         user_row = local_cursor.fetchone()
         if user_row is not None:
             user_data = yaml.load(user_row['data'])
         else:
-            local_cursor.execute("INSERT INTO users (sega_id, data) VALUES  (?,?)", (segaid, yaml.dump({})))
+            local_cursor.execute("INSERT INTO users (sega_id, data) VALUES  (?,?)", (str(segaid), yaml.dump({})))
         return user_data
 
     def _update_user_data_in_db(self, sega_id):
         if sega_id not in self.user_preference_cache:
             raise KeyError("User data isn't even cached, can't update data!")
         local_cursor = self._db_connection.cursor()
-        local_cursor.execute("UPDATE users SET data = ? WHERE sega_id = ?", (yaml.dump(self.user_preference_cache[sega_id]), sega_id))
+        local_cursor.execute("UPDATE users SET data = ? WHERE sega_id = ?", (yaml.dump(self.user_preference_cache[sega_id]), str(sega_id)))
         self._db_connection.commit()
 
     def update_user_cache(self, sega_id, new_config):
