@@ -432,4 +432,4 @@ class Profiler(Command):
             for client in data.clients.connectedClients.values():
                 if client.get_handle() is not None:
                     client.get_handle().send_crypto_packet(SMPacket)
-            print("[Profiling] Profiling has been disabled, results written to disk.")
+            return "[Profiling] Profiling has been disabled, results written to disk."
