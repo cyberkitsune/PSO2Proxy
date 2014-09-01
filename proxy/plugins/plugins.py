@@ -69,6 +69,7 @@ def on_initial_connect_hook(f):
     onInitialConnection.append(f)
     return f
 
+
 def raw_packet_hook(f):
     global rawPacketFunctions
     rawPacketFunctions.append(f)

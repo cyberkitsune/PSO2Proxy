@@ -1,8 +1,10 @@
 import cProfile
 import calendar
+import glob
 import pstats
 import datetime
 import shutil
+import sys
 from ShipProxy import ShipProxy
 
 from twisted.protocols import basic
@@ -432,4 +434,17 @@ class Profiler(Command):
             for client in data.clients.connectedClients.values():
                 if client.get_handle() is not None:
                     client.get_handle().send_crypto_packet(SMPacket)
-            print("[Profiling] Profiling has been disabled, results written to disk.")
+            return "[Profiling] Profiling has been disabled, results written to disk."
+
+
+@CommandHandler("reloadplugin")
+class ReloadPlugins(Command):
+    def call_from_console(self):
+        if len(self.args.split(' ')) < 2:
+            return "Incorrect usage. Usage: >>> reloadplugin <Module Name>"
+        if self.args[1] not in sys.modules:
+            return "That module / plugin is not loaded!"
+        output = "[ShipProxy] Reloading Plugin %s..." % self.args[1]
+        reload(sys.modules[self.args[1]])
+        output += "[ShipProxy] Plugin reloaded!\n"
+        return output
