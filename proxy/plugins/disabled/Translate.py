@@ -32,27 +32,27 @@ def create_preferences(client):
             user_prefs.set_preference('translate_out', False)
 
 
-@p.CommandHook("jpin", "Toggles proxy-end chat translation. (Powered by %s Translate, Incoming only.)" % provider)
+@p.CommandHook("jpin", "Toggles the translation of incoming chat messages. (Powered by %s Translate, incoming only.)" % provider)
 class ToggleTranslate(Command):
     def call_from_client(self, client):
         if client.playerId in data.clients.connectedClients:
             user_prefs = data.clients.connectedClients[client.playerId].preferences
             user_prefs.set_preference('translate_chat', not user_prefs.get_preference('translate_chat'))
             if user_prefs.get_preference('translate_chat'):
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Enabled incoming chat translation.", 0x3).build())
+                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] {gre}Enabled incoming chat translation.", 0x3).build())
             else:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled incoming chat translation.", 0x3).build())
+                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] {red}Disabled incoming chat translation.", 0x3).build())
 
-@p.CommandHook("jpout", "Toggles outbound chat translation to japanese. (Powered by %s Translate, Outgoing only.)" % provider)
+@p.CommandHook("jpout", "Toggles the translation of outgoing chat messages to japanese. (Powered by %s Translate, outgoing only.)" % provider)
 class ToggleTranslate(Command):
     def call_from_client(self, client):
         if client.playerId in data.clients.connectedClients:
             user_prefs = data.clients.connectedClients[client.playerId].preferences
             user_prefs.set_preference('translate_out', not user_prefs.get_preference('translate_out'))
             if user_prefs.get_preference('translate_out'):
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Enabled outgoing chat translation.", 0x3).build())
+                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] {gre}Enabled outgoing chat translation.", 0x3).build())
             else:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled outgoing chat translation.", 0x3).build())
+                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] {red}Disabled outgoing chat translation.", 0x3).build())
 
 
 @p.PacketHook(0x7, 0x0)

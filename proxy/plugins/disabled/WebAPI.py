@@ -114,8 +114,8 @@ def setup_web_api():
     from twisted.web import server
     if not os.path.exists("keys/publickey.blob"):
         print("[WebAPI] === Error ===")
-        print("[WebAPI] Your public key is not in keys/publickey.blob !!")
-        print("[WebAPI] As a result, webapi will be disabled !!")
+        print("[WebAPI] Your public key is not in keys/publickey.blob!")
+        print("[WebAPI] As a result, webapi will be disabled!")
         print("[WebAPI] Please fix this and restart the proxy.")
         return
     web_endpoint = TCP4ServerEndpoint(reactor, web_api_config.get_key('port'), interface=interfaceIp)

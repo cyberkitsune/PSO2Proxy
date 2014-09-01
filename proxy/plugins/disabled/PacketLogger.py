@@ -15,11 +15,11 @@ def write_file(filename, data, mode='wb'):
 
 @plugins.on_start_hook
 def on_start():
-    print("!!! WARNING !!!")
-    print("You have PacketLogger.py outside of the disabled plugins folder! This means it is ON!")
+    print("=== PacketLogger Notice ===")
+    print("PacketLogger is enabled!")
     print("This plugin can log sensitive data!")
     print("Please be careful!")
-    print("!!! WARNING !!!")
+    print("=== PacketLogger Notice ===")
 
 
 @plugins.on_initial_connect_hook
@@ -31,26 +31,26 @@ def notify_and_config(client):
     if 'logPackets' not in client_config:
         client_config['logPackets'] = False
     if client_config['logPackets']:
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have opted-in to packet logging, Thank you! View your contributions on http://pso2proxy.cyberkitsune.net/redpill/ or use !optout to opt out", 0x3).build())
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have opted-in to packet logging, thank you! You can opt-out at any time by using !optout", 0x3).build())
     else:
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have not opted-in to packet logging, and it has been disabled. Use !optin to opt in.", 0x3).build())
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have opted-out of packet logging. You can opt-in at any time by using !optin", 0x3).build())
 
 
-@plugins.CommandHook("optin", "Opts you into packet logging for the redpill project.")
+@plugins.CommandHook("optin", "Opts you into packet logging.")
 class OptIn(Command):
     def call_from_client(self, client):
         client_config = dbManager.get_data_for_sega_id(client.myUsername)
         client_config['logPackets'] = True
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have enabled packet logging! Thank you! Track your data at http://pso2proxy.cyberkitsune.net/redpill/", 0x3).build())
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have enabled packet logging, thank you! You can opt-out at any time by using !optout", 0x3).build())
 
 
-@plugins.CommandHook("optout", "Opts you out of the packet logging for the redpill project.")
+@plugins.CommandHook("optout", "Opts you out of the packet logging.")
 class OptOut(Command):
     def call_from_client(self, client):
         archive_packets(client)
         client_config = dbManager.get_data_for_sega_id(client.myUsername)
         client_config['logPackets'] = True
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have disabled packet logging! :( If you change your mind, please use !optin to rejoin!", 0x3).build())
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have disabled packet logging. If you change your mind, you can opt-in by using !optin", 0x3).build())
 
 
 @plugins.raw_packet_hook
@@ -65,7 +65,7 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
             return packet
         if not client_config['logPackets']:
             if 'orphans' in context.extendedData:
-                print("[PacketLogger] %s has opted out of packet logging. Deleting orphans..." % context.myUsername)
+                print("[PacketLogger] %s has opted out of packet logging." % context.myUsername)
                 del context.extendedData['orphans']
             return packet
     if packet_type == 0x11 and packet_subtype == 0x0:
