@@ -143,7 +143,7 @@ def my_room_info_packet(context, data):
             interface_ip = bindIp
         block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
-        print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
+        print("[ShipProxy] Opened listen socket on port %i for new ship." % port)
         blocks.listeningPorts.append(port)
     struct.pack_into('BBBB', data, 0x20, int(i0), int(i1), int(i2), int(i3))
     context.peer.changingBlocks = True

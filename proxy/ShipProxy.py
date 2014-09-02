@@ -176,59 +176,41 @@ class ProxyClientFactory(protocol.ClientFactory):
 
 class ProxyServer(ShipProxy):
     reactor = None
+    
+    def proxyConnect(self):
+      #for now, but there should be a better way to do this.
+      self.transport.pauseProducing()
+      print("[ShipProxy] New client connected!")
+      port = self.transport.getHost().port
+      print("[ShipProxy] Client is looking for block on port %i..." % port)
+      
+      if port not in blocks.blockList:
+	print("[ShipProxy] Could not find a block for port %i in the cache! Defaulting to block 5..." % port)
+	port = 12205
+	address = "210.189.208.21"
+      else:
+	print("[ShipProxy] Found address %s for port %i, named %s" % (blocks.blockList[port][0], port, blocks.blockList[port][1]))
+	address = blocks.blockList[port][0]
+	self.set_is_client(True)
+	client = ProxyClientFactory()
+	client.set_server(self)
+
+	self.reactor = reactor
+	self.reactor.connectTCP(address, port, client)
 
     def connectionMade(self):
-	maxConnections = config.globalConfig.get_key('maxConnections')
+	# I have locked this to 10 for now.
+	# We need to check if the user was already connected to the proxy so that they do not disconnect if the server is full when changing blocks!
+	maxConnections = 0 #config.globalConfig.get_key('maxConnections')
 	currentCount = len(data.clients.connectedClients)
 	if maxConnections != 0: #0 allows the server to be unlimited.
-	  #print "Server is running on a limited setting... Checking client!" (JUST FOR DEBUG PURPOSES)
 	  if currentCount >= maxConnections:
 	    print("[ShipProxy] A client connected, but the server has reached max connections. Disconnecting...")
-	    string = "=== NOTICE - SERVER FULL ===\nThis proxy has reached the maximum number of active connections.\nPlease try again later."
-	    self.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x1).build()) #Currently, the client cannot see this message, but I will leave this here incase there are ways around this.
 	    self.transport.loseConnection()
 	  else:
-	    #for now, but there should be a better way to do this.
-	    self.transport.pauseProducing()
-	    print("[ShipProxy] New client connected!")
-	    port = self.transport.getHost().port
-	    print("[ShipProxy] Client is looking for block on port %i..." % port)
-	    if port not in blocks.blockList:
-		print("[ShipProxy] Could not find a block for port %i in the cache! Defaulting to block 5..." % port)
-		port = 12205
-		address = "210.189.208.21"
-	    else:
-		print("[ShipProxy] Found address %s for port %i, named %s" % (blocks.blockList[port][0], port, blocks.blockList[port][1]))
-		address = blocks.blockList[port][0]
-		self.set_is_client(True)
-		client = ProxyClientFactory()
-		client.set_server(self)
-
-		self.reactor = reactor
-		self.reactor.connectTCP(address, port, client)
+	    ProxyServer.proxyConnect(self)
 	else:
-	  #print "Server is running on an unlimited setting." (JUST FOR DEBUG PURPOSES)
-	  # Don't read anything from the connecting client until we have
-	  # somewhere to send it to.
-	  self.transport.pauseProducing()
-	  print("[ShipProxy] New client connected!")
-	  port = self.transport.getHost().port
-	  print("[ShipProxy] Client is looking for block on port %i..." % port)
-	  if port not in blocks.blockList:
-	      print("[ShipProxy] Could not find a block for port %i in the cache! Defaulting to block 5..." % port)
-	      port = 12205
-	      address = "210.189.208.21"
-	  else:
-	      print("[ShipProxy] Found address %s for port %i, named %s" % (
-		  blocks.blockList[port][0], port, blocks.blockList[port][1]))
-	      address = blocks.blockList[port][0]
-	  self.set_is_client(True)
-	  client = ProxyClientFactory()
-	  client.set_server(self)
-
-	  self.reactor = reactor
-	  self.reactor.connectTCP(address, port, client)
-
+	  ProxyServer.proxyConnect(self)
 
 class ProxyFactory(protocol.Factory):
     """Factory for port forwarder."""
