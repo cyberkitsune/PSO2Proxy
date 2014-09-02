@@ -4,11 +4,17 @@ import datetime
 from twisted.internet import protocol, reactor
 from data import clients
 import packets
+from twisted.protocols import basic
+from twisted.internet import reactor
 import plugins.plugins as plugin_manager
 from data import blocks
 
 from config import noisy as verbose
-
+import config
+import data.clients
+import data.players
+import data.blocks
+import packetFactory
 
 class ShipProxy(protocol.Protocol):
     def __init__(self):
@@ -169,29 +175,41 @@ class ProxyClientFactory(protocol.ClientFactory):
 
 class ProxyServer(ShipProxy):
     reactor = None
+    
+    def proxyConnect(self):
+      #for now, but there should be a better way to do this.
+      self.transport.pauseProducing()
+      print("[ShipProxy] New client connected!")
+      port = self.transport.getHost().port
+      print("[ShipProxy] Client is looking for block on port %i..." % port)
+      
+      if port not in blocks.blockList:
+	print("[ShipProxy] Could not find a block for port %i in the cache! Defaulting to block 5..." % port)
+	port = 12205
+	address = "210.189.208.21"
+      else:
+	print("[ShipProxy] Found address %s for port %i, named %s" % (blocks.blockList[port][0], port, blocks.blockList[port][1]))
+	address = blocks.blockList[port][0]
+	self.set_is_client(True)
+	client = ProxyClientFactory()
+	client.set_server(self)
+
+	self.reactor = reactor
+	self.reactor.connectTCP(address, port, client)
 
     def connectionMade(self):
-        # Don't read anything from the connecting client until we have
-        # somewhere to send it to.
-        self.transport.pauseProducing()
-        print("[ShipProxy] New client connected!")
-        port = self.transport.getHost().port
-        print("[ShipProxy] Client is looking for block on port %i..." % port)
-        if port not in blocks.blockList:
-            print("[ShipProxy] Could not find a block for port %i in the cache! Defaulting to block 5..." % port)
-            port = 12205
-            address = "210.189.208.21"
-        else:
-            print("[ShipProxy] Found address %s for port %i, named %s" % (
-                blocks.blockList[port][0], port, blocks.blockList[port][1]))
-            address = blocks.blockList[port][0]
-        self.set_is_client(True)
-        client = ProxyClientFactory()
-        client.set_server(self)
-
-        self.reactor = reactor
-        self.reactor.connectTCP(address, port, client)
-
+	# I have locked this to 10 for now.
+	# We need to check if the user was already connected to the proxy so that they do not disconnect if the server is full when changing blocks!
+	maxConnections = 0 #config.globalConfig.get_key('maxConnections')
+	currentCount = len(data.clients.connectedClients)
+	if maxConnections != 0: #0 allows the server to be unlimited.
+	  if currentCount >= maxConnections:
+	    print("[ShipProxy] A client connected, but the server has reached max connections. Disconnecting...")
+	    self.transport.loseConnection()
+	  else:
+	    ProxyServer.proxyConnect(self)
+	else:
+	  ProxyServer.proxyConnect(self)
 
 class ProxyFactory(protocol.Factory):
     """Factory for port forwarder."""

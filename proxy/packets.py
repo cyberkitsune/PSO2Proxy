@@ -20,13 +20,11 @@ from config import myIpAddress as myIp
 from config import bindIp
 import config
 
-
 i0, i1, i2, i3 = ipAddress.split(".")
 rsaDecrypter = PSO2RSADecrypt("keys/myKey.pem")
 rsaEncryptor = PSO2RSAEncrypt("keys/SEGAKey.pem")
 
 packetList = {}
-
 
 class PacketHandler(object):
     def __init__(self, packet_type, packet_subtype):
@@ -37,24 +35,22 @@ class PacketHandler(object):
         global packetList
         packetList[(self.pktType, self.pktSubtype)] = f
 
-
 @PacketHandler(0x11, 0x0)
 def login_packet(context, data):
     start = len(data) - 132  # Skip password
     username = data[start:start + 0x40].decode('utf-8')
     username = username.rstrip('\0')
-    print("[LoginPacket] Logging player %s in..." % username)
+    print("[LoginPacket] Logging player '%s' in..." % username)
     context.myUsername = username
     context.peer.myUsername = username
     if config.is_segaid_banned(username):
-        print("[Bans] %s is banned! Disconnecting..." % username)
+        print("[Bans] %s is banned! Disconnecting client..." % username)
         context.send_crypto_packet(
             packetFactory.SystemMessagePacket("You are banned from connecting to this PSO2Proxy.", 0x1).build())
         context.transport.loseConnection()
         context.peer.transport.loseConnection()
         return None
     return data
-
 
 @PacketHandler(0x11, 0xB)
 def key_packet(context, data):
@@ -64,7 +60,7 @@ def key_packet(context, data):
     decrypted = rsaDecrypter.decrypt(rsa_blob)
     if decrypted is None:
         print(
-            "[KeyPacket] Could not decrypt RSA for client %s, Perhaps their client's key is unmodified? Hanging up." % context.transport.getPeer().host)
+            "[KeyPacket] Could not decrypt RSA for client %s, Perhaps their client key is unmodified? Disconnecting client..." % context.transport.getPeer().host)
         context.transport.loseConnection()
         return None
     if verbose:
@@ -79,7 +75,6 @@ def key_packet(context, data):
     blob.write(data[0x88:len(data)])
     blob.flush()
     return blob.getvalue()
-
 
 @PacketHandler(0x11, 0x1)
 def block_info_packet(context, data):
@@ -99,7 +94,6 @@ def block_info_packet(context, data):
                 struct.pack_into('%ix' % (0x40 - len(address_string)), data, 0x1C + len(address_string))
     return str(data)
 
-
 @PacketHandler(0x11, 0x4f)
 def team_room_info_packet(context, data):
     data = bytearray(data)
@@ -118,12 +112,11 @@ def team_room_info_packet(context, data):
             interface_ip = bindIp
         block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
-        print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
+        print("[ShipProxy] Opened listen socket on port %i for new block." % port)
         blocks.listeningPorts.append(port)
     struct.pack_into('BBBB', data, 0x20, int(i0), int(i1), int(i2), int(i3))
     context.peer.changingBlocks = True
     return str(data)
-
 
 @PacketHandler(0x11, 0x17)
 def my_room_info_packet(context, data):
@@ -143,12 +136,11 @@ def my_room_info_packet(context, data):
             interface_ip = bindIp
         block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
-        print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
+        print("[ShipProxy] Opened listen socket on port %i for new block." % port)
         blocks.listeningPorts.append(port)
     struct.pack_into('BBBB', data, 0x20, int(i0), int(i1), int(i2), int(i3))
     context.peer.changingBlocks = True
     return str(data)
-
 
 @PacketHandler(0x11, 0x14)
 def block_switch_packet(context, data):
@@ -156,18 +148,16 @@ def block_switch_packet(context, data):
     player_id = struct.unpack_from('I', buffer(data), 0x8)[0]
     if player_id in clients.connectedClients:
         client_info = clients.connectedClients[player_id]
-        print("[ShipProxy] Got block change login from player %i, (SID: %s)" % (player_id, client_info.segaId))
+        print("[ShipProxy] Got block change login from player %i, (SegaID: %s)" % (player_id, client_info.segaId))
     else:
         print("[ShipProxy] Got block change login for unknown client?! (ID: %i)" % player_id)
     context.playerId = player_id
     return str(data)
 
-
 @PacketHandler(0x7, 0x0)
 def chat_packet(context, data):
     player_id = struct.unpack_from('I', data, 0x8)[0]
-    message = data[0x1C:].decode(
-        'utf-16')  # This is technically improper. Should use the xor byte to check string length (See packetReader)
+    message = data[0x1C:].decode('utf-16')  # This is technically improper. Should use the xor byte to check string length (See packetReader)
     if player_id == 0:  # Probably the wrong way to check, but check if a PSO2 client sent this packet
         message = message.rstrip('\0')
         if len(message) > 2 and message.startswith(config.globalConfig.get_key('commandPrefix')):
@@ -175,8 +165,7 @@ def chat_packet(context, data):
             if command in commands.commandList:
                 try:
                     if commands.commandList[command][2] and not config.is_admin(context.myUsername):
-                        context.send_crypto_packet(packetFactory.SystemMessagePacket(
-                            "[Proxy] {red}You do not have permission to run this command.", 0x3).build())
+                        context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.", 0x3).build())
                         return
                     cmd_class = commands.commandList[command][0]
                     cmd_class(message).call_from_client(context)  # Lazy...
@@ -187,15 +176,14 @@ def chat_packet(context, data):
             elif command in plugin_manager.commands:
                 try:
                     if plugin_manager.commands[command][2] and not config.is_admin(context.myUsername):
-                        context.send_crypto_packet(packetFactory.SystemMessagePacket(
-                            "[Proxy] {red}You do not have permission to run this command.", 0x3).build())
+                        context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.", 0x3).build())
                         return
                     cmd_class = plugin_manager.commands[command][0]
                     cmd_class(message).call_from_client(context)
                 except:
                     context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}An error occured when trying to run this command.", 0x3).build())
                     e = traceback.format_exc()
-                    context.send_crypto_packet(packetFactory.SystemMessagePacket("[{red}ERROR{def}] %s" % e, 0x3).build())
+                    context.send_crypto_packet(packetFactory.SystemMessagePacket("[{red}ERROR{def}] \n %s" % e, 0x3).build())
             else:
                 return data
             return None
@@ -206,7 +194,6 @@ def chat_packet(context, data):
         name = "ID:%i" % player_id
     #log.msg("[ChatPacket] <%s> %s" % (name, message.encode('ascii', errors='xmlcharrefreplace')))
     return data
-
 
 @PacketHandler(0x11, 0x10)
 def block_list_packet(context, data):
@@ -220,7 +207,7 @@ def block_list_packet(context, data):
         ip_string = "%i.%i.%i.%i" % (o1, o2, o3, o4)
         if port not in blocks.blockList:
             if verbose:
-                print("[BlockList] Discovered new block %s at address %s:%i! Recording..." % (name, ip_string, port))
+                print("[BlockList] Discovered new block '%s' at address %s:%i!" % (name, ip_string, port))
             blocks.blockList[port] = (ip_string, name)
         if bNameMode == 0:
             block_string = ("%s%s:%i" % (name[:6], ip_string, port)).encode('utf-16le')
@@ -234,9 +221,7 @@ def block_list_packet(context, data):
                 struct.pack_into('%ix' % (0x40 - len(block_string)), data, pos + len(block_string))
         struct.pack_into('BBBB', data, pos + 0x40, int(i0), int(i1), int(i2), int(i3))
         pos += 0x88
-
     return str(data)
-
 
 @PacketHandler(0x11, 0x13)
 def block_reply_packet(context, data):
@@ -251,13 +236,12 @@ def block_reply_packet(context, data):
             interface_ip = bindIp
         block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
-        print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
+        print("[ShipProxy] Opened listen socket on port %i for new ship." % port)
         blocks.listeningPorts.append(port)
     if verbose:
-        print("[ShipProxy] rewriting block ip address in query response.")
+        print("[ShipProxy] Rewriting block IP address in query response.")
     context.peer.changingBlocks = True
     return str(data)
-
 
 @PacketHandler(0xF, 0xD)
 def player_info_packet(context, data):
@@ -266,13 +250,12 @@ def player_info_packet(context, data):
         context.peer.playerId = player_id
     return data
 
-
 @PacketHandler(0x1c, 0x1f)
 def player_name_packet(context, data):
     player_id = struct.unpack_from('I', data, 0xC)[0]
     if player_id not in players.playerList:
         player_name = data[0x14:0x56].decode('utf-16').rstrip("\0")
         if verbose:
-            print("[PlayerData] Found new player %s with player ID %i" % (player_name, player_id))
+            print("[PlayerData] Found new player '%s' with PlayerID: %i" % (player_name, player_id))
         players.playerList[player_id] = (player_name,)  # For now
     return data

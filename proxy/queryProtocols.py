@@ -4,7 +4,6 @@ from config import myIpAddress
 import plugins.plugins
 from config import noisy as verbose
 
-
 class BlockScraper(protocol.Protocol):
     def __init__(self):
         pass
@@ -20,7 +19,6 @@ class BlockScraper(protocol.Protocol):
         self.transport.write(data)
         self.transport.loseConnection()
 
-
 class BlockScraperFactory(protocol.Factory):
     def __init__(self):
         self.noisy = verbose
@@ -28,7 +26,6 @@ class BlockScraperFactory(protocol.Factory):
 
     def buildProtocol(self, address):
         return BlockScraper()
-
 
 class ShipAdvertiser(protocol.Protocol):
     def __init__(self):
@@ -44,7 +41,6 @@ class ShipAdvertiser(protocol.Protocol):
     def send_ship_list(self, data):
         self.transport.write(data)
         self.transport.loseConnection()
-
 
 class ShipAdvertiserFactory(protocol.Factory):
     def __init__(self):

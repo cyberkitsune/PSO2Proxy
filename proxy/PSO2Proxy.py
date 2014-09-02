@@ -22,7 +22,6 @@ from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
 from config import myIpAddress as myIp
 from config import bindIp
 
-
 class ServerConsole(basic.LineReceiver):
     def __init__(self):
         self.delimiter = os.linesep
@@ -45,29 +44,28 @@ class ServerConsole(basic.LineReceiver):
                     if out is not None:
                         print(out)
                 else:
-                    print("[Command] Command %s not found!" % command)
+                    print("[Command] Command '%s' not found!" % command)
         except:
             e = traceback.format_exc()
             print("[ShipProxy] Error Occurred: %s" % e)
         self.transport.write('>>> ')
-
 
 def main():
     if not os.path.exists("log/"):
         os.makedirs("log/")
     log_file = logfile.LogFile.fromFullPath('log/serverlog.log')
     log.addObserver(log.FileLogObserver(log_file).emit)
+    
     print("===== PSO2Proxy vGIT %s =====" % config.proxy_ver)
     time_string = time.strftime("%a, %d %b %Y %H:%M:%S +0000", time.gmtime())
     print("[ServerStart] Trying to start server at %s" % time_string)
     if myIp == "0.0.0.0":
         print("==== ERROR 001 ====")
-        print("You have NOT configured the IP address for PSO2Proxy!")
-        print(
-            "Please edit cfg/pso2proxy.config.yml and change myIpAddr to your IP public IP address "
-            "(Not LAN address if you're on a LAN!) ")
-        print("After you fix this, please restart PSO2Proxy.")
+        print("You have not configured the IP address for PSO2Proxy!")
+        print("Please edit 'cfg/pso2proxy.config.yml' and change 'myIpAddr' to your IP public IP address.")
+        print("Use 'http://ipchicken.com' to find you public IP.\nAfter you fix this, please restart PSO2Proxy.")
         sys.exit(0)
+    
     if bindIp == "0.0.0.0":
         interface_ip = myIp
     else:
@@ -75,14 +73,14 @@ def main():
 
     if not os.path.isfile("keys/myKey.pem"):
         print("==== ERROR 002 ====")
-        print("You do NOT have your local RSA private key installed to 'keys/myKey.pem'!")
+        print("You do not have your local RSA private key installed to 'keys/myKey.pem'!")
         print("Please see README.md's section on RSA keys for more information.")
         print("After you fix this, please restart PSO2Proxy.")
         sys.exit(0)
 
     if not os.path.isfile("keys/SEGAKey.pem"):
         print("==== ERROR 003 ====")
-        print("You do NOT have a SEGA RSA public key installed to 'keys/SEGAKey.pem'!")
+        print("You do not have a SEGA RSA public key installed to 'keys/SEGAKey.pem'!")
         print("Please see README.md's section on RSA keys for more information.")
         print("After you fix this, please restart PSO2Proxy.")
         sys.exit(0)
@@ -96,7 +94,9 @@ def main():
         query_endpoint.listen(BlockScraperFactory())
         print("[ShipProxy] Bound port %i for ship %i query server!" % ((12000 + (100 * shipNum)), shipNum))
     stdio.StandardIO(ServerConsole())
+    
     print("[ShipProxy] Loading plugins...")
+    
     import glob
 
     for plug in glob.glob("plugins/*.py"):
@@ -109,7 +109,6 @@ def main():
     reactor.suggestThreadPoolSize(30)  # We got 2 cores, screw it!
     reactor.run()
     data.clients.dbManager.close_db()
-
 
 if __name__ == "__main__":
     faulthandler.enable()

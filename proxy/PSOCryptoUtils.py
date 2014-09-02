@@ -1,7 +1,6 @@
 from Crypto.Cipher import ARC4, PKCS1_v1_5
 from Crypto.PublicKey import RSA
 
-
 class PSO2RC4(object):
     """docstring for PSO2RC4Decrypter"""
 
@@ -15,7 +14,6 @@ class PSO2RC4(object):
 
     def encrypt(self, data):
         return self.rc4en.encrypt(data)
-
 
 class PSO2RSADecrypt(object):
     """docstring for PSO2RSADecrypt"""
@@ -31,7 +29,6 @@ class PSO2RSADecrypt(object):
     def decrypt(self, data):
         cipher = PKCS1_v1_5.new(self.key)
         return cipher.decrypt(''.join(reversed(data)), None)  # For now
-
 
 class PSO2RSAEncrypt(object):
     """docstring for PSO2RSAEncrypt"""
