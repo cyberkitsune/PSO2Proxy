@@ -24,7 +24,6 @@ web_api_config = ConfigModel("cfg/webapi.config.yml", {"port": 8080, "ServerName
 upStart = calendar.timegm(datetime.datetime.utcnow().utctimetuple())
 peakPlayers = 0
 
-
 class WEBRcon(Resource):
     isLeaf = True
 
@@ -51,8 +50,6 @@ class WEBRcon(Resource):
                     e = traceback.format_exc()
                     return json.dumps({'success': False, 'reason': "Error executing command\n%s" % e})
 
-
-
 class JSONConfig(Resource):
     isLeaf = True
 
@@ -62,7 +59,6 @@ class JSONConfig(Resource):
         request.setHeader("content-type", "application/json")
         config_json = {'version': 1, "name": web_api_config.get_key('ServerName'), "publickeyurl": "http://%s:%i/publickey.blob" % (hostName, web_api_config.get_key('port')), "host": hostName}
         return json.dumps(config_json)
-
 
 class PublicKey(Resource):
     isLeaf = True
@@ -76,7 +72,6 @@ class PublicKey(Resource):
             pubkey_data = f.read()
             f.close()
             return pubkey_data
-
 
 class LatestProfile(Resource):
     isLeaf = True
@@ -92,7 +87,6 @@ class LatestProfile(Resource):
         else:
             return "No profile saved."
 
-
 class WebAPI(Resource):
 
     # noinspection PyPep8Naming
@@ -107,7 +101,6 @@ class WebAPI(Resource):
         if name == '':
             return self
         return Resource.getChild(self, name, request)
-
 
 @plugins.on_start_hook
 def setup_web_api():
@@ -127,13 +120,11 @@ def setup_web_api():
         web_resource.putChild("rcon", WEBRcon())
     web_endpoint.listen(server.Site(web_resource))
 
-
 @plugins.on_connection_hook
 def on_connection(client):
     global peakPlayers
     if peakPlayers < len(data.clients.connectedClients):
         peakPlayers = len(data.clients.connectedClients)
-
 
 @plugins.on_connection_lost_hook
 def on_loss(client):  # This may be overkill

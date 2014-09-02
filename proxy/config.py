@@ -21,7 +21,7 @@ class YAMLConfig(object):
             self._config_values = yaml.load(f)
             f.close()
             self._validate_config()
-        print("[Config] Config %s loaded!" % self.filename)
+        print("[Config] Config '%s' loaded." % self.filename)
 
     def _save_config(self):
         f = open(self.filename, "w")
@@ -43,16 +43,16 @@ class YAMLConfig(object):
         for key, value in self.default_keys.iteritems():
             if key not in self._config_values:
                 self._config_values[key] = value
-                print("[Config] Added new default %s for config %s" % (key, self.filename))
+                print("[Config] Added new default '%s' for config '%s'." % (key, self.filename))
         if self.strict_mode:
             for key in self._config_values.keys():
                 if key not in self.default_keys:
                     del self._config_values[key]
-                    print("[Config] Deleted invlid key %s for config %s" % (key, self.filename))
+                    print("[Config] Deleted invlid key '%s' for config '%s'." % (key, self.filename))
                 else:
                     if self._config_values[key] is None:
                         self._config_values[key] = self.default_keys[key]
-                        print("[Config] Resetting invalid key type for %s in config %s." % (key, self.filename))
+                        print("[Config] Resetting invalid key type for '%s' in config '%s'." % (key, self.filename))
         self._save_config()
 
     def get_key(self, key):
@@ -79,18 +79,13 @@ class YAMLConfig(object):
     def __setitem__(self, key, value):
         self.set_key(key, value)
 
-
 banList = []
 
-globalConfig = YAMLConfig("cfg/pso2proxy.config.yml",
-                          {'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 1,
-                           'noisy': False, 'admins': [], 'enabledShips': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'commandPrefix': '!',
-                           'maxConnections': 0}, True)
+globalConfig = YAMLConfig("cfg/pso2proxy.config.yml", {'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 1,'noisy': False, 'admins': [], 'enabledShips': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'commandPrefix': '!','maxConnections': 0}, True)
 
 blockNames = {}
 
 proxy_ver = subprocess.Popen(["git", "describe", "--always"], stdout=subprocess.PIPE).communicate()[0].rstrip("\n")
-
 
 def is_admin(sega_id):
     if sega_id in globalConfig.get_key('admins'):
@@ -98,17 +93,15 @@ def is_admin(sega_id):
     else:
         return False
 
-
 def load_block_names():
     global blockNames
     if os.path.exists("cfg/blocknames.resources.json") and globalConfig.get_key('blockNameMode') == 1:
         f = open("cfg/blocknames.resources.json", 'r')
         blockNames = json.load(f)
         f.close()
-        print("[ShipProxy] %s Block names loaded!" % len(blockNames))
+        print("[ShipProxy] %s block names loaded." % len(blockNames))
 
 load_block_names()
-
 
 def load_bans():
     global banList
@@ -120,16 +113,14 @@ def load_bans():
     bans = f.read()
     f.close()
     banList = json.loads(bans)
-    print("[Bans] %i bans loaded!" % len(bans))
-
+    print("[Bans] %i bans loaded." % len(bans))
 
 def save_bans():
     global banList
     f = open('cfg/pso2proxy.bans.json', 'w')
     f.write(json.dumps(banList))
     f.close()
-    print("[Bans] %i bans saved!" % len(banList))
-
+    print("[Bans] %i bans saved." % len(banList))
 
 def is_segaid_banned(segaid):
     global banList
@@ -139,7 +130,6 @@ def is_segaid_banned(segaid):
                 return True
     return False
 
-
 def is_player_id_banned(player_id):
     global banList
     for ban in banList:
@@ -147,7 +137,6 @@ def is_player_id_banned(player_id):
             if int(ban['playerId']) == player_id:
                 return True
     return False
-
 
 load_bans()
 

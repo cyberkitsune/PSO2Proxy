@@ -8,8 +8,7 @@ from config import YAMLConfig
 import config
 from commands import Command
 
-ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
-                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': "", 'autoexec': []}, True)
+ircSettings = YAMLConfig("cfg/gchat-irc.config.yml", {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': "", 'autoexec': []}, True)
 
 ircMode = ircSettings.get_key('enabled')
 ircNick = ircSettings.get_key('nick')
@@ -107,12 +106,10 @@ if ircMode:
         def clientConnectionFailed(self, connector, reason):
             connector.connect()
 
-
 def lookup_gchatmode(client_preferences):
     if client_preferences['gchatMode'] is not -1:
         return client_preferences['gchatMode']
     return gchatSettings['displayMode']
-
 
 @plugins.on_start_hook
 def create_preferences():
@@ -122,7 +119,6 @@ def create_preferences():
         global ircServer
         bot = GIRCFactory(ircChannel)
         reactor.connectTCP(ircServer[0], ircServer[1], bot)
-
 
 # noinspection PyUnresolvedReferences
 @plugins.on_initial_connect_hook
@@ -142,7 +138,6 @@ def check_config(user):
                 0x3).build())
         if not client_preferences.has_preference("gchatMode"):
             client_preferences['gchatMode'] = -1
-
 
 @plugins.CommandHook("gchatmode", "Sets your global chat display mode.")
 class GChatModeCommand(Command):
@@ -171,24 +166,19 @@ class IRCCommand(Command):
             ircBot.sendLine(self.args.split(" ", 1)[1])
             return "[IRC] >>> %s" % self.args.split(" ", 1)[1]
 
-
 @plugins.CommandHook("gon", "Enable global chat.")
 class EnableGChat(Command):
     def call_from_client(self, client):
         preferences = data.clients.connectedClients[client.playerId].preferences
         preferences.set_preference("globalChat", True)
-        client.send_crypto_packet(
-            packetFactory.SystemMessagePacket("[Command] Global chat has been enabled for you.", 0x3).build())
-
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] Global chat has been enabled for you.", 0x3).build())
 
 @plugins.CommandHook("goff", "Disable global chat.")
 class DisableGChat(Command):
     def call_from_client(self, client):
         preferences = data.clients.connectedClients[client.playerId].preferences
         preferences.set_preference("globalChat", False)
-        client.send_crypto_packet(
-            packetFactory.SystemMessagePacket("[Command] Global chat has been disabled for you.", 0x3).build())
-
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] Global chat has been disabled for you.", 0x3).build())
 
 @plugins.CommandHook("gmute", "[Admin Only] Mutes a player in the global chat.", True)
 class MuteSomebody(Command):
@@ -220,7 +210,6 @@ class MuteSomebody(Command):
                 else:
                     return "[Command] %s is not connected to the proxy." % player_data[0].rstrip("\0")
 
-
 @plugins.CommandHook("gunmute", "[Admin Only] Unmutes a player in the global chat.", True)
 class UnmuteSomebody(Command):
     def call_from_client(self, client):
@@ -251,14 +240,12 @@ class UnmuteSomebody(Command):
                 else:
                     return "[Command] %s is not connected to the proxy." % player_data[0].rstrip("\0")
 
-
 @plugins.CommandHook("g", "Send a message to all players on the proxy.")
 class GChat(Command):
     def call_from_client(self, client):
         global ircMode
         if not data.clients.connectedClients[client.playerId].preferences.get_preference('globalChat'):
-            client.send_crypto_packet(packetFactory.SystemMessagePacket(
-                "[Command] {red}You do not have global chat enbled. You can enable it with !gon.", 0x3).build())
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}You do not have global chat enbled. You can enable it with !gon.", 0x3).build())
             return
         if data.clients.connectedClients[client.playerId].preferences.has_preference("chatMuted") and data.clients.connectedClients[client.playerId].preferences['chatMuted']:
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}You are muted in the global chat.", 0x3).build())
@@ -267,8 +254,7 @@ class GChat(Command):
         if ircMode:
             global ircBot
             if ircBot is not None:
-                ircBot.send_global_message(data.clients.connectedClients[client.playerId].ship,
-                    data.players.playerList[client.playerId][0].encode('utf-8'), self.args[3:].encode('utf-8'))
+                ircBot.send_global_message(data.clients.connectedClients[client.playerId].ship,data.players.playerList[client.playerId][0].encode('utf-8'), self.args[3:].encode('utf-8'))
         TCPacket = packetFactory.TeamChatPacket(client.playerId, "[G-%02i] %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0]), "%s%s" % (gchatSettings['prefix'], self.args[3:])).build()
         SCPacket = packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0], "%s%s" % (gchatSettings['prefix'], self.args[3:])), 0x3).build()
         for client_data in data.clients.connectedClients.values():
@@ -293,4 +279,3 @@ class GChat(Command):
                 else:
                     client.get_handle().send_crypto_packet(SMPacket)
         return "[GlobalChat] <Console> %s" % self.args[2:]
-

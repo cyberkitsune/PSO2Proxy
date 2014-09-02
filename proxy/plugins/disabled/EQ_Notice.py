@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import config
 import data.clients
 import plugins
@@ -43,10 +41,7 @@ try:
 except ImportError:
     agent = Agent(reactor)
 
-eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {
-'enabled': True, 'timer' : 60, 'debug': False
-,'1': "http://acf.me.uk/Public/PSO2EQ/pso2eq.txt"
-},  True)
+eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True, 'timer' : 60, 'debug': False,'1': "http://acf.me.uk/Public/PSO2EQ/pso2eq.txt"}, True)
 
 #HTTP Headers
 ETag_Headers     = ['','','','','','','','','','']
@@ -85,7 +80,7 @@ def load_eqJP_names():
         try:
             eqJP = json.load(f, "utf-8")
         except ValueError:
-            print "[EQ Notice] Bad custom resource file, falling back"
+            print "[EQ Notice] Bad custom resource file."
             RESloaded = False
         f.close()
     if not RESloaded and os.path.exists("cfg/eqJP.resources.json"):
@@ -93,7 +88,7 @@ def load_eqJP_names():
         try:
             eqJP = json.load(f, "utf-8")
         except ValueError:
-            print "[EQ Notice] Bad resources file, blank mapping"
+            print "[EQ Notice] Bad resources file."
         f.close()
     if not eqJP:
         return
@@ -248,7 +243,7 @@ def on_start():
     if eq_mode:
         taskrun.start(tasksec) # call every 60 seconds
     else:
-        print("EQ Notice is disabled by config")
+        print("[EQ Notice] EQ Notice plugin is disabled.")
 
 @plugins.on_initial_connect_hook
 def notify_and_config(client):

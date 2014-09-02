@@ -10,6 +10,7 @@ from commands import Command
 import plugins as p
 
 plugin_config = YAMLConfig("cfg/translator.config.yml", {"translationService": 0, "msTranslateID": '', "msTranslateSecret": ''})
+
 if plugin_config['translationService'] == 1 and plugin_config['msTranslateID'] != '' and plugin_config['msTranslateSecret'] != '':
     import microsofttranslator
     provider = "Bing"
@@ -30,7 +31,6 @@ def create_preferences(client):
         if not user_prefs.has_preference('translate_chat'):
             user_prefs.set_preference('translate_chat', False)
             user_prefs.set_preference('translate_out', False)
-
 
 @p.CommandHook("jpin", "Toggles the translation of incoming chat messages. (Powered by %s Translate, incoming only.)" % provider)
 class ToggleTranslate(Command):
@@ -53,7 +53,6 @@ class ToggleTranslate(Command):
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] {gre}Enabled outgoing chat translation.", 0x3).build())
             else:
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] {red}Disabled outgoing chat translation.", 0x3).build())
-
 
 @p.PacketHook(0x7, 0x0)
 def get_chat_packet(context, packet):
@@ -92,7 +91,6 @@ def get_chat_packet(context, packet):
         d.addCallback(context.peer.send_crypto_packet)
         return None
     return packet
-
 
 def generate_translated_message(player_id, channel_id, message, end_lang, start_lang):
     if provider == "Bing" and time.time() - lastKeyTime >= 600:

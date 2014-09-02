@@ -16,7 +16,6 @@ import data.players
 import data.blocks
 import packetFactory
 
-
 class ShipProxy(protocol.Protocol):
     def __init__(self):
         pass

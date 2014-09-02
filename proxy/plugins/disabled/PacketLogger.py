@@ -8,7 +8,6 @@ import packetFactory
 import json
 import os
 
-
 def write_file(filename, data, mode='wb'):
     with open(filename, mode) as f:
         f.write(data)
@@ -21,7 +20,6 @@ def on_start():
     print("Please be careful!")
     print("=== PacketLogger Notice ===")
 
-
 @plugins.on_initial_connect_hook
 def notify_and_config(client):
     """
@@ -31,18 +29,16 @@ def notify_and_config(client):
     if 'logPackets' not in client_config:
         client_config['logPackets'] = False
     if client_config['logPackets']:
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have opted-in to packet logging, thank you! You can opt-out at any time by using !optout", 0x3).build())
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogger] {gre}You have opted-in to packet logging, thank you! You can opt-out at any time by using !optout", 0x3).build())
     else:
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have opted-out of packet logging. You can opt-in at any time by using !optin", 0x3).build())
-
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogger] {red}You have opted-out of packet logging. You can opt-in at any time by using !optin", 0x3).build())
 
 @plugins.CommandHook("optin", "Opts you into packet logging.")
 class OptIn(Command):
     def call_from_client(self, client):
         client_config = dbManager.get_data_for_sega_id(client.myUsername)
         client_config['logPackets'] = True
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have enabled packet logging, thank you! You can opt-out at any time by using !optout", 0x3).build())
-
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogger] {gre}You have enabled packet logging, thank you! You can opt-out at any time by using !optout", 0x3).build())
 
 @plugins.CommandHook("optout", "Opts you out of the packet logging.")
 class OptOut(Command):
@@ -50,8 +46,7 @@ class OptOut(Command):
         archive_packets(client)
         client_config = dbManager.get_data_for_sega_id(client.myUsername)
         client_config['logPackets'] = True
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have disabled packet logging. If you change your mind, you can opt-in by using !optin", 0x3).build())
-
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogger] {red}You have disabled packet logging. If you change your mind, you can opt-in by using !optin", 0x3).build())
 
 @plugins.raw_packet_hook
 def on_packet_received(context, packet, packet_type, packet_subtype):
@@ -79,9 +74,7 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
     else:
         sender = "S"
     if context.myUsername is not None:
-        path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (
-            context.myUsername, context.connTimestamp, context.packetCount, packet_type, packet_subtype,
-            sender)
+        path = 'packets/%s/%s/%i.%x-%x.%s.bin' % (context.myUsername, context.connTimestamp, context.packetCount, packet_type, packet_subtype,sender)
         try:
             os.makedirs(os.path.dirname(path))
         except exceptions.OSError:
@@ -90,8 +83,7 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
     else:
         if 'orphans' not in context.extendedData:
             context.extendedData['orphans'] = []
-        context.extendedData['orphans'].append(
-            {'data': packet_data, 'count': context.packetCount, 'type': packet_type, "sub": packet_subtype, "sender": sender})
+        context.extendedData['orphans'].append({'data': packet_data, 'count': context.packetCount, 'type': packet_type, "sub": packet_subtype, "sender": sender})
 
     if context.myUsername is not None and 'orphans' in context.extendedData and len(context.extendedData['orphans']) > 0:
         count = 0
@@ -106,10 +98,9 @@ def on_packet_received(context, packet, packet_type, packet_subtype):
                 pass
             reactor.callInThread(write_file, path, orphan_packet['data'])
             count += 1
-        print('[ShipProxy] Flushed %i orphan packets for %s.' % (count, context.myUsername))
+        print('[PacketLogger] Flushed %i orphan packets for %s.' % (count, context.myUsername))
 
     return str(packet)
-
 
 @plugins.on_connection_lost_hook
 def archive_packets(client):
