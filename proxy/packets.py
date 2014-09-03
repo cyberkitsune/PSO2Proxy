@@ -165,25 +165,31 @@ def chat_packet(context, data):
             if command in commands.commandList:
                 try:
                     if commands.commandList[command][2] and not config.is_admin(context.myUsername):
-                        context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.", 0x3).build())
+                        context.send_crypto_packet(
+			  packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.", 0x3).build())
                         return
                     cmd_class = commands.commandList[command][0]
                     cmd_class(message).call_from_client(context)  # Lazy...
                 except:
-                    context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}An error occured when trying to run this command.", 0x3).build())
+                    context.send_crypto_packet(
+		      packetFactory.SystemMessagePacket("[Proxy] {red}An error occured when trying to run this command.", 0x3).build())
                     e = traceback.format_exc()
-                    context.send_crypto_packet(packetFactory.SystemMessagePacket("[{red}ERROR{def}] %s" % e, 0x3).build())
+                    context.send_crypto_packet(
+		      packetFactory.SystemMessagePacket("[{red}ERROR{def}] %s" % e, 0x3).build())
             elif command in plugin_manager.commands:
                 try:
                     if plugin_manager.commands[command][2] and not config.is_admin(context.myUsername):
-                        context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.", 0x3).build())
+                        context.send_crypto_packet(
+			  packetFactory.SystemMessagePacket("[Proxy] {red}You do not have permission to run this command.", 0x3).build())
                         return
                     cmd_class = plugin_manager.commands[command][0]
                     cmd_class(message).call_from_client(context)
                 except:
-                    context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}An error occured when trying to run this command.", 0x3).build())
+                    context.send_crypto_packet(
+		      packetFactory.SystemMessagePacket("[Proxy] {red}An error occured when trying to run this command.", 0x3).build())
                     e = traceback.format_exc()
-                    context.send_crypto_packet(packetFactory.SystemMessagePacket("[{red}ERROR{def}] \n %s" % e, 0x3).build())
+                    context.send_crypto_packet(
+		      packetFactory.SystemMessagePacket("[{red}ERROR{def}] \n %s" % e, 0x3).build())
             else:
                 return data
             return None

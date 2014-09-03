@@ -187,7 +187,7 @@ class MuteSomebody(Command):
         :param client: ShipProxy.ShipProxy
         """
         if len(self.args.split(" ", 1)) < 2:
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. (Usage: !gmute <Player Name>)", 0x3).build())
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage.\n(Usage: %sgmute <Player Name>)" % config.globalConfig.get_key('commandPrefix'), 0x3).build())
             return
         user_to_mute = self.args.split(" ", 1)[1]
         for player_id, player_data in data.players.playerList.iteritems():
@@ -217,7 +217,7 @@ class UnmuteSomebody(Command):
         :param client: ShipProxy.ShipProxy
         """
         if len(self.args.split(" ", 1)) < 2:
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. (Usage: !gunmute <Player Name>)", 0x3).build())
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage.\n(Usage: %sgunmute <Player Name>)" % config.globalConfig.get_key('commandPrefix'), 0x3).build())
             return
         user_to_mute = self.args.split(" ", 1)[1]
         for player_id, player_data in data.players.playerList.iteritems():
@@ -245,7 +245,7 @@ class GChat(Command):
     def call_from_client(self, client):
         global ircMode
         if not data.clients.connectedClients[client.playerId].preferences.get_preference('globalChat'):
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}You do not have global chat enbled. You can enable it with !gon.", 0x3).build())
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}You do not have global chat enbled. You can enable it with {command_prefix}gon.", 0x3).build())
             return
         if data.clients.connectedClients[client.playerId].preferences.has_preference("chatMuted") and data.clients.connectedClients[client.playerId].preferences['chatMuted']:
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}You are muted in the global chat.", 0x3).build())

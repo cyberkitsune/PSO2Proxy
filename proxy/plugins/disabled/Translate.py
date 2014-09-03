@@ -39,9 +39,11 @@ class ToggleTranslate(Command):
             user_prefs = data.clients.connectedClients[client.playerId].preferences
             user_prefs.set_preference('translate_chat', not user_prefs.get_preference('translate_chat'))
             if user_prefs.get_preference('translate_chat'):
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] {gre}Enabled incoming chat translation.", 0x3).build())
+                client.send_crypto_packet(
+		  packetFactory.SystemMessagePacket("[Translate] {gre}Enabled incoming chat translation.", 0x3).build())
             else:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] {red}Disabled incoming chat translation.", 0x3).build())
+                client.send_crypto_packet(
+		  packetFactory.SystemMessagePacket("[Translate] {red}Disabled incoming chat translation.", 0x3).build())
 
 @p.CommandHook("jpout", "Toggles the translation of outgoing chat messages to japanese. (Powered by %s Translate, outgoing only.)" % provider)
 class ToggleTranslate(Command):
@@ -50,9 +52,11 @@ class ToggleTranslate(Command):
             user_prefs = data.clients.connectedClients[client.playerId].preferences
             user_prefs.set_preference('translate_out', not user_prefs.get_preference('translate_out'))
             if user_prefs.get_preference('translate_out'):
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] {gre}Enabled outgoing chat translation.", 0x3).build())
+                client.send_crypto_packet(
+		  packetFactory.SystemMessagePacket("[Translate] {gre}Enabled outgoing chat translation.", 0x3).build())
             else:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] {red}Disabled outgoing chat translation.", 0x3).build())
+                client.send_crypto_packet(
+		  packetFactory.SystemMessagePacket("[Translate] {red}Disabled outgoing chat translation.", 0x3).build())
 
 @p.PacketHook(0x7, 0x0)
 def get_chat_packet(context, packet):

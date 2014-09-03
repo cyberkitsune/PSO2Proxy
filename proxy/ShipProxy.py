@@ -198,7 +198,7 @@ class ProxyServer(ShipProxy):
 	self.reactor.connectTCP(address, port, client)
 
     def connectionMade(self):
-	# I have locked this to 10 for now.
+	# I have locked this to 0 for now.
 	# We need to check if the user was already connected to the proxy so that they do not disconnect if the server is full when changing blocks!
 	maxConnections = 0 #config.globalConfig.get_key('maxConnections')
 	currentCount = len(data.clients.connectedClients)

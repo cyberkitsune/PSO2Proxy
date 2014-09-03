@@ -7,6 +7,7 @@ import struct
 import packetFactory
 import json
 import os
+import config
 
 def write_file(filename, data, mode='wb'):
     with open(filename, mode) as f:
@@ -29,16 +30,19 @@ def notify_and_config(client):
     if 'logPackets' not in client_config:
         client_config['logPackets'] = False
     if client_config['logPackets']:
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogger] {gre}You have opted-in to packet logging, thank you! You can opt-out at any time by using !optout", 0x3).build())
+        client.send_crypto_packet(
+	  packetFactory.SystemMessagePacket("[PacketLogger] {gre}You have opted-in to packet logging, thank you! You can opt-out at any time by using {command_prefix}optout", 0x3).build())
     else:
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogger] {red}You have opted-out of packet logging. You can opt-in at any time by using !optin", 0x3).build())
+        client.send_crypto_packet(
+	  packetFactory.SystemMessagePacket("[PacketLogger] {red}You have opted-out of packet logging. You can opt-in at any time by using {command_prefix}optin", 0x3).build())
 
 @plugins.CommandHook("optin", "Opts you into packet logging.")
 class OptIn(Command):
     def call_from_client(self, client):
         client_config = dbManager.get_data_for_sega_id(client.myUsername)
         client_config['logPackets'] = True
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogger] {gre}You have enabled packet logging, thank you! You can opt-out at any time by using !optout", 0x3).build())
+        client.send_crypto_packet(
+	  packetFactory.SystemMessagePacket("[PacketLogger] {gre}You have enabled packet logging, thank you! You can opt-out at any time by using {command_prefix}optout", 0x3).build())
 
 @plugins.CommandHook("optout", "Opts you out of the packet logging.")
 class OptOut(Command):
@@ -46,7 +50,8 @@ class OptOut(Command):
         archive_packets(client)
         client_config = dbManager.get_data_for_sega_id(client.myUsername)
         client_config['logPackets'] = True
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogger] {red}You have disabled packet logging. If you change your mind, you can opt-in by using !optin", 0x3).build())
+        client.send_crypto_packet(
+	  packetFactory.SystemMessagePacket("[PacketLogger] {red}You have disabled packet logging. If you change your mind, you can opt-in by using {command_prefix}optin", 0x3).build())
 
 @plugins.raw_packet_hook
 def on_packet_received(context, packet, packet_type, packet_subtype):

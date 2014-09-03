@@ -265,9 +265,11 @@ class ToggleEQNoitce(Command):
             user_prefs = data.clients.connectedClients[client.playerId].preferences
             user_prefs.set_preference('eqnotice', not user_prefs.get_preference('eqnotice'))
             if user_prefs.get_preference('eqnotice'):
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[EQ Notice] Enabled EQ notices.", 0x3).build())
+                client.send_crypto_packet(
+		  packetFactory.SystemMessagePacket("[EQ Notice] Enabled EQ notices.", 0x3).build())
             else:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[EQ Notice] Disabled EQ notices.", 0x3).build())
+                client.send_crypto_packet(
+		  packetFactory.SystemMessagePacket("[EQ Notice] Disabled EQ notices.", 0x3).build())
 
     def call_from_console(self):
         if taskrun.running:
