@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import sys
 
 import config
 import data.clients
@@ -187,6 +188,10 @@ def EQBody(body, ship): # 0 is ship1
 
     print("[EQ Notice] Sending players MSG on Ship %02d : %s" % (ship+1, msg_eq[ship]))
     SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
+    if 'GlobalChat' in sys.modules:
+        import GlobalChat
+        if GlobalChat.ircMode and GlobalChat.ircBot is not None:
+            GlobalChat.ircBot.send_channel_message("[EQ Notice] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]))
     for client in data.clients.connectedClients.values():
         try:
             chandle = client.get_handle()
