@@ -90,6 +90,9 @@ if ircMode:
         def send_global_message(self, ship, user, message):
             self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, replace_pso2_with_irc(message)))
 
+        def send_channel_message(self, message):
+            self.msg(self.factory.channel, message)
+
     class GIRCFactory(protocol.ClientFactory):
         """docstring for ClassName"""
 

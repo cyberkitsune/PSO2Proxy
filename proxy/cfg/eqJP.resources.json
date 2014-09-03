@@ -6,7 +6,7 @@
   "旧マザーシップ　作戦予告"    	:	"Beckoning Darkness",
   "森林　作戦予告"         	:	"Planet Naberius EQ",
   "浮遊大陸　作戦予告"       	:	"Planet Amduscia EQ",
-  "惑星アムドゥスキア　作戦予告告"       	:	"Planet Amduscia EQ",
+  "惑星アムドゥスキア　作戦予告告" 	:	"Planet Amduscia EQ",
   "異常値観測宙域　一斉調査予告"  	:	"Darker Den",
   "第一採掘基地ダーカー接近予告"  	:	"Primary Mining Base",
   "第三採掘基地ダーカー接近予告"  	:	"Tertiary Mining Base",
@@ -14,5 +14,6 @@
   "アークス船団ＤＦ接近予告"    	:	"Dark Falz Elder",
   "アークス船団ダーカー接近予告"  	:	"Urban EQ",
   "アークス船団航行物体接近予告"  	:	"Dark Falz Loser",
+  "地下坑道　作戦予告"       	:	"Mecha Awakening",
   " "                           :	"Blank"
 }

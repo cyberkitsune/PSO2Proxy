@@ -57,19 +57,19 @@ class SQLitePreferenceManager():
     def _get_user_data_from_db(self, segaid):
         user_data = {}
         local_cursor = self._db_connection.cursor()
-        local_cursor.execute("SELECT data FROM users WHERE sega_id = ?", (segaid, ))
+        local_cursor.execute("SELECT data FROM users WHERE sega_id = ?", (str(segaid), ))
         user_row = local_cursor.fetchone()
         if user_row is not None:
             user_data = yaml.load(user_row['data'])
         else:
-            local_cursor.execute("INSERT INTO users (sega_id, data) VALUES  (?,?)", (segaid, yaml.dump({})))
+            local_cursor.execute("INSERT INTO users (sega_id, data) VALUES  (?,?)", (str(segaid), yaml.dump({})))
         return user_data
 
     def _update_user_data_in_db(self, sega_id):
         if sega_id not in self.user_preference_cache:
             raise KeyError("User data isn't even cached, can't update data!")
         local_cursor = self._db_connection.cursor()
-        local_cursor.execute("UPDATE users SET data = ? WHERE sega_id = ?", (yaml.dump(self.user_preference_cache[sega_id]), sega_id))
+        local_cursor.execute("UPDATE users SET data = ? WHERE sega_id = ?", (yaml.dump(self.user_preference_cache[sega_id]), str(sega_id)))
         self._db_connection.commit()
 
     def update_user_cache(self, sega_id, new_config):
@@ -113,23 +113,27 @@ class ClientPreferences():
     def __setitem__(self, key, value):
         self.set_preference(key, value)
 
+
 def add_client(handle):
     try:
-        lmyUsername = handle.myUsername.rstrip('\0');
+        l_my_username = handle.myUsername.rstrip('\0')
     except AttributeError:
-        lmyUsername = handle.myUsername
+        l_my_username = handle.myUsername
 
-    connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, lmyUsername, get_ship_from_port(handle.transport.getHost().port), handle)
-    print('[Clients] Registered client %s (ID:%i) in online clients' % (lmyUsername, handle.playerId))
+    connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, l_my_username, get_ship_from_port(handle.transport.getHost().port), handle)
+    print('[Clients] Registered client %s (ID:%i) in online clients' % (l_my_username, handle.playerId))
     if config.is_player_id_banned(handle.playerId):
-        print('[Bans] Player %s (ID:%i) is banned!' % (lmyUsername, handle.playerId))
+        print('[Bans] Player %s (ID:%i) is banned!' % (l_my_username, handle.playerId))
         handle.send_crypto_packet(packetFactory.SystemMessagePacket("You are banned from connecting to this PSO2Proxy.", 0x1).build())
         handle.transport.loseConnection()
 
 
 def remove_client(handle):
     print("[Clients] Removing client %s (ID:%i) from online clients" % (handle.myUsername, handle.playerId))
-    del connectedClients[handle.playerId]
+    if handle.playerId in connectedClients:
+        del connectedClients[handle.playerId]
+    else:
+        print("[Clients] client %s (ID:%i) is not in list" % (handle.myUsername, handle.playerId))
 
 
 def populate_data(handle):

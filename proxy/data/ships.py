@@ -7,7 +7,8 @@ from twisted.internet.endpoints import TCP4ServerEndpoint
 
 from twisted.python import log
 
-from config import bindIp as interface_ip
+from config import myIpAddress as myIp
+from config import bindIp
 
 import blocks
 
@@ -95,7 +96,12 @@ def scrape_block_packet(ship_ip, ship_port, destination_ip):
         blocks.blockList[port] = (ip_string, name)
     if port not in blocks.listeningPorts:
         from ShipProxy import ProxyFactory
+        if bindIp == "0.0.0.0":
+            interface_ip = myIp
+        else:
+            interface_ip = bindIp
         block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
+        #twisted.internet.error.CannotListenError: Couldn't listen on 0.0.0.0:12468: [Errno 98] Address already in use.
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
         blocks.listeningPorts.append(port)
