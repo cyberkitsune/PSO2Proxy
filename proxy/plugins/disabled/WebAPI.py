@@ -46,7 +46,7 @@ class WEBRcon(Resource):
                         result = cmd_class("%s %s" % (request.args['command'][0], request.args['params'][0] if 'params' in request.args else None)).call_from_console()
                         return json.dumps({'success': True, 'output': result})
                     else:
-                        json.dumps({'success': False, 'reason': "Command not found."})
+                        return json.dumps({'success': False, 'reason': "Command not found."})
                 except:
                     e = traceback.format_exc()
                     return json.dumps({'success': False, 'reason': "Error executing command\n%s" % e})
