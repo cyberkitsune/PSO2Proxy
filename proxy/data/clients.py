@@ -25,7 +25,7 @@ class ClientData(object):
 
     def get_handle(self):
         """
-        :rtype : ShipProxy
+        :rtype : ShipProxy.ShipProxy
         """
         if self.handle is None:
             return None

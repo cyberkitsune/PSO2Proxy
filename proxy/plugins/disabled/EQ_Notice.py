@@ -141,7 +141,7 @@ def cleanup_EQ(message, ship): # 0 is ship1
     return cutup_EQ(message).rstrip("\n")
 
 def old_seconds(td):
-    return (td.seconds + td.days * 24 * 3600)
+    return td.seconds + td.days * 24 * 3600
 
 def check_if_EQ_old(ship):
     #logdebug("Ship %d: Checking time" %(ship+1))
@@ -157,19 +157,18 @@ def check_if_EQ_old(ship):
         # Short EQ notice is no good
         #logdebug("Ship %d: short EQ" %(ship+1))
         return True
-        if old_seconds(timediff) > 10*60:
-            #logdebug("Ship %d: Short EQ is older then 10 mins" %(ship+1))
-            return True
+        #if old_seconds(timediff) > 10*60:
+        #    #logdebug("Ship %d: Short EQ is older then 10 mins" %(ship+1))
+        #    return True
     return False
 
 def EQBody(body, ship): # 0 is ship1
-    old_eq = True
     logdebug("Ship %d's Body: %s" % (ship+1, body))
     if HTTP_Data[ship] == body:
         logdebug("Ship %d: Still have the same data" % (ship+1))
-        return; # same data, do not react on it
+        return # same data, do not react on it
     logdebug("Ship %d: have the new data" % (ship+1))
-    HTTP_Data[ship] == body
+    HTTP_Data[ship] = body
 
     data_eq[ship] = cleanup_EQ(unicode(body, 'utf-8-sig', 'replace'), ship)
 
@@ -199,7 +198,7 @@ def EQBody(body, ship): # 0 is ship1
                 and (ship+1 == data.clients.get_ship_from_port(chandle.transport.getHost().port)):
                 chandle.send_crypto_packet(SMPacket)
         except AttributeError:
-            logdebug("Ship %d: Got a dead cleint, skipping" %(ship+1))
+            logdebug("Ship %d: Got a dead client, skipping" %(ship+1))
 
 def EQResponse(response, ship = -1): # 0 is ship1
     if response.code == 304:
