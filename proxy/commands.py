@@ -51,7 +51,7 @@ class OpCommand(Command):
     def call_from_client(self, client):
         if len(self.args.split(" ")) < 2:
             client.send_crypto_packet(
-                packetFactory.SystemMessagePacket("[Proxy] {red}Not enough arguments. Usage: %sop <segaid>",
+                packetFactory.SystemMessagePacket("[Proxy] {red}Not enough arguments. Usage: |op <segaid>",
                                                   0x3).build())
             return
         player = self.args.split(" ")[1]
@@ -68,7 +68,7 @@ class OpCommand(Command):
 
     def call_from_console(self):
         if len(self.args.split(" ")) < 2:
-            return "[ShipProxy] Not enough arguments. Usage: %sop <segaid>"
+            return "[ShipProxy] Not enough arguments. Usage: >>> op <segaid>"
         player = self.args.split(" ")[1]
         if not config.is_admin(player):
             current_admins = config.globalConfig.get_key('admins')
@@ -84,7 +84,7 @@ class DeopCommand(Command):
     def call_from_client(self, client):
         if len(self.args.split(" ")) < 2:
             client.send_crypto_packet(
-                packetFactory.SystemMessagePacket("[Proxy] {red}Not enough arguments. Usage: %sdeop <segaid>",
+                packetFactory.SystemMessagePacket("[Proxy] {red}Not enough arguments. Usage: |deop <segaid>",
                                                   0x3).build())
             return
         player = self.args.split(" ")[1]
@@ -101,7 +101,7 @@ class DeopCommand(Command):
 
     def call_from_console(self):
         if len(self.args.split(" ")) < 2:
-            return "[ShipProxy] Not enough arguments. Usage: %sdeop <segaid>"
+            return "[ShipProxy] Not enough arguments. Usage: >>> deop <segaid>"
         player = self.args.split(" ")[1]
         if not config.is_admin(player):
             current_admins = config.globalConfig.get_key('admins')
@@ -174,7 +174,7 @@ class Ban(Command):
         args = self.args.split(' ')
         if len(args) < 3:
             client.send_crypto_packet(packetFactory.SystemMessagePacket(
-                "[Command] {red}Invalid usage! Proper usage, %sban <segaid/pid> <value>", 0x3).build())
+                "[Command] {red}Invalid usage! Proper usage, |ban <segaid/pid> <value>", 0x3).build())
             return
         if args[1] == "segaid":
             if config.is_segaid_banned(args[2]):
@@ -196,13 +196,13 @@ class Ban(Command):
             config.save_bans()
         else:
             client.send_crypto_packet(packetFactory.SystemMessagePacket(
-                "[Command] {red}Invalid usage! Proper usage, %sban <segaid/pid> <value>", 0x3).build())
+                "[Command] {red}Invalid usage! Proper usage, |ban <segaid/pid> <value>", 0x3).build())
             return
 
     def call_from_console(self):
         args = self.args.split(' ')
         if len(args) < 3:
-            return "[Command] Invalid usage! Proper usage, %sban <segaid/pid> <value>"
+            return "[Command] Invalid usage! Proper usage, >>> ban <segaid/pid> <value>"
         if args[1] == "segaid":
             if config.is_segaid_banned(args[2]):
                 return "[Command] %s is already banned!" % args[2]
@@ -214,7 +214,7 @@ class Ban(Command):
             config.banList.append({'playerId': args[2]})
             config.save_bans()
         else:
-            return "[Command] Invalid usage! Proper usage, >>> %s<segaid/pid> <value>"
+            return "[Command] Invalid usage! Proper usage, >>> ban <segaid/pid> <value>"
 
 
 @CommandHandler("unban", "Unbans somebody from the proxy. Admins only.", True)
@@ -223,7 +223,7 @@ class Unban(Command):
         args = self.args.split(' ')
         if len(args) < 3:
             client.send_crypto_packet(packetFactory.SystemMessagePacket(
-                "[Command] {red}Invalid usage! Proper usage, %sunban <segaid/pid> <value>", 0x3).build())
+                "[Command] {red}Invalid usage! Proper usage, |unban <segaid/pid> <value>", 0x3).build())
             return
         if args[1] == "segaid":
             if not config.is_segaid_banned(args[2]):
@@ -245,13 +245,13 @@ class Unban(Command):
             config.save_bans()
         else:
             client.send_crypto_packet(packetFactory.SystemMessagePacket(
-                "[Command] {red}Invalid usage! Proper usage, %sunban <segaid/pid> <value>", 0x3).build())
+                "[Command] {red}Invalid usage! Proper usage, |unban <segaid/pid> <value>", 0x3).build())
             return
 
     def call_from_console(self):
         args = self.args.split(' ')
         if len(args) < 3:
-            return "[Command] Invalid usage! Proper usage, %sunban <segaid/pid> <value>"
+            return "[Command] Invalid usage! Proper usage, >>> unban <segaid/pid> <value>"
         if args[1] == "segaid":
             if not config.is_segaid_banned(args[2]):
                 return "[Command] %s is not banned!" % args[2]
@@ -263,7 +263,7 @@ class Unban(Command):
             config.banList.remove({'playerId': args[2]})
             config.save_bans()
         else:
-            return "[Command] Invalid usage! Proper usage, %sunban <segaid/pid> <value>"
+            return "[Command] Invalid usage! Proper usage, >>> unban <segaid/pid> <value>"
 
 
 @CommandHandler("kick", "Kicks a client from the proxy. Admins only.", True)
@@ -292,7 +292,7 @@ class Kick(Command):
     def call_from_console(self):
         args = self.args.split(' ')
         if len(args) < 2:
-            return "[Command] Invalid usage! Proper usage: %skick <playerId>"
+            return "[Command] Invalid usage! Proper usage: >>> kick <playerId>"
         if int(args[1]) in data.clients.connectedClients:
             if data.clients.connectedClients[int(args[1])].get_handle() is not None:
                 data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet(
@@ -367,7 +367,7 @@ class GlobalMessage(Command):
         message = None
         print(self.args)
         if len(self.args.split(' ', 1)) < 2:
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[ShipProxy] {red}Incorrect usage. Usage: %sglobalmsg  <Message>", 0x3).build())
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[ShipProxy] {red}Incorrect usage. Usage: |globalmsg  <Message>", 0x3).build())
             return
         message = self.args.split(' ', 1)[1]
         for client in data.clients.connectedClients.values():
@@ -378,7 +378,7 @@ class GlobalMessage(Command):
     def call_from_console(self):
         message = None
         if len(self.args.split(' ', 1)) < 2:
-            return "[ShipProxy] Incorrect usage. Usage: %s[message_type] <Message>"
+            return "[ShipProxy] Incorrect usage. Usage: >>> [message_type] <Message>"
         try:
             mode = int(self.args.split(' ', 2)[1])
         except ValueError:
