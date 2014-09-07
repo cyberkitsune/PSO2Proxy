@@ -11,6 +11,7 @@ import time
 import data.clients as clients
 from datetime import datetime, timedelta
 from pprint import pformat
+from twisted.python import log
 from twisted.internet import task, reactor, defer, protocol
 from twisted.internet.protocol import Protocol
 from twisted.web.http_headers import Headers
@@ -40,6 +41,7 @@ except ImportError:
 try:
     from twisted.web.client import Agent, HTTPConnectionPool
     pool = HTTPConnectionPool(reactor)
+    pool._factory.noisy = False
     agent = Agent(reactor, pool=pool)
 except ImportError:
     agent = Agent(reactor)
@@ -190,7 +192,8 @@ def EQBody(body, ship): # 0 is ship1
     if 'plugins.GlobalChat' in sys.modules:
         import GlobalChat
         if GlobalChat.ircMode and GlobalChat.ircBot is not None:
-            GlobalChat.ircBot.send_channel_message("[EQ Notice Ship %02d] Incoming EQ Report from PSO2es: %s" % (ship + 1, msg_eq[ship]))
+            msg = "[EQ Notice Ship %02d] Incoming EQ Report from PSO2es: %s" % (ship + 1, msg_eq[ship])
+            GlobalChat.ircBot.send_channel_message(msg.encode('utf-8'))
     for client in data.clients.connectedClients.values():
         try:
             chandle = client.get_handle()
@@ -220,6 +223,7 @@ def EQResponse(response, ship = -1): # 0 is ship1
         Modified_time[ship] = None
     d = readBody(response)
     d.addCallback(EQBody, ship)
+    d.addErrback(log.err)
     return d
 
 def CheckupURL():
@@ -241,6 +245,7 @@ def CheckupURL():
             #logdebug(pformat(list(HTTPHeaderX.getAllRawHeaders())))
             EQ0 = agent.request('GET', eq_URL, HTTPHeaderX)
             EQ0.addCallback(EQResponse, shipNum)
+            EQ0.addErrback(log.err)
 
 @plugins.on_start_hook
 def on_start():
