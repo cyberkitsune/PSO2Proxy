@@ -190,7 +190,8 @@ def EQBody(body, ship): # 0 is ship1
     if 'plugins.GlobalChat' in sys.modules:
         import GlobalChat
         if GlobalChat.ircMode and GlobalChat.ircBot is not None:
-            GlobalChat.ircBot.send_channel_message("[EQ Notice Ship %02d] Incoming EQ Report from PSO2es: %s" % (ship + 1, msg_eq[ship]))
+            msg = "[EQ Notice Ship %02d] Incoming EQ Report from PSO2es: %s" % (ship + 1, msg_eq[ship])
+            GlobalChat.ircBot.send_channel_message(msg.encode('utf-8'))
     for client in data.clients.connectedClients.values():
         try:
             chandle = client.get_handle()
