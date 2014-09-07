@@ -40,6 +40,7 @@ except ImportError:
 try:
     from twisted.web.client import Agent, HTTPConnectionPool
     pool = HTTPConnectionPool(reactor)
+    pool._factory.noisy = False
     agent = Agent(reactor, pool=pool)
 except ImportError:
     agent = Agent(reactor)
