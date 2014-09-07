@@ -9,9 +9,10 @@ import config
 from commands import Command
 
 ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
-                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': "", 'autoexec': []}, True)
+                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': "", 'output': True, 'autoexec': []}, True)
 
 ircMode = ircSettings.get_key('enabled')
+ircOutput = ircSettings.get_key('output')
 ircNick = ircSettings.get_key('nick')
 ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
 ircChannel = ircSettings.get_key('channel')
@@ -21,7 +22,6 @@ gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'prefix': 
 if ircMode:
     from twisted.words.protocols import irc
     from twisted.internet import reactor, protocol
-
     ircBot = None
 
     # noinspection PyUnresolvedReferences
@@ -32,6 +32,7 @@ if ircMode:
         def __init__(self):
             global ircNick
             self.nickname = ircNick
+            self.ircOutput = ircOutput
 
         def get_user_id(self, user):
             if user not in self.userIds:
@@ -58,7 +59,8 @@ if ircMode:
 
         def privmsg(self, user, channel, msg):
             if channel == self.factory.channel:
-                print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8')))
+                if self.ircOutput is True:
+                    print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8')))
                 TCPacket = packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]), "[GIRC] %s" % user.split("!")[0], "%s%s" % (gchatSettings['prefix'], replace_irc_with_pso2(msg).decode('utf-8'))).build()
                 SMPacket = packetFactory.SystemMessagePacket("[GIRC] <%s> %s" % (user.split("!")[0], "%s%s" % (gchatSettings['prefix'], replace_irc_with_pso2(msg).decode('utf-8'))), 0x3).build()
                 if gchatSettings['displayMode'] == 0:
@@ -76,7 +78,8 @@ if ircMode:
 
         def action(self, user, channel, msg):
             if channel == self.factory.channel:
-                print("[GlobalChat] [IRC] * %s %s" % (user, replace_irc_with_pso2(msg).decode('utf-8')))
+                if self.ircOutput is True:
+                    print("[GlobalChat] [IRC] * %s %s" % (user, replace_irc_with_pso2(msg).decode('utf-8')))
                 TCPacket = packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]), "[GIRC] %s" % user.split("!")[0], "* %s%s" % (gchatSettings['prefix'], replace_irc_with_pso2(msg).decode('utf-8'))).build()
                 SMPacket = packetFactory.SystemMessagePacket("[GIRC] <%s> * %s" % (user.split("!")[0], "%s%s" % (gchatSettings['prefix'], replace_irc_with_pso2(msg).decode('utf-8'))), 0x3).build()
                 if gchatSettings['displayMode'] == 0:
@@ -183,6 +186,12 @@ class EnableGChat(Command):
         client.send_crypto_packet(
             packetFactory.SystemMessagePacket("[GlobalChat] Global chat enabled for you.", 0x3).build())
 
+    def call_from_console(self):
+        if ircMode:
+            global ircBot
+            if ircBot is not None:
+                ircBot.ircOutput = True
+        return "[GlobalChat] Global chat enabled for Console."
 
 @plugins.CommandHook("goff", "Disable global chat.")
 class DisableGChat(Command):
@@ -192,6 +201,12 @@ class DisableGChat(Command):
         client.send_crypto_packet(
             packetFactory.SystemMessagePacket("[GlobalChat] Global chat disabled for you.", 0x3).build())
 
+    def call_from_console(self):
+        if ircMode:
+            global ircBot
+            if ircBot is not None:
+                ircBot.ircOutput = False
+        return "[GlobalChat] Global chat disabled for Console."
 
 @plugins.CommandHook("gmute", "Mutes or somebody in gchat. Admin Only!", True)
 class MuteSomebody(Command):
