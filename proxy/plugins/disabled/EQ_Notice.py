@@ -11,6 +11,7 @@ import time
 import data.clients as clients
 from datetime import datetime, timedelta
 from pprint import pformat
+from twisted.python import log
 from twisted.internet import task, reactor, defer, protocol
 from twisted.internet.protocol import Protocol
 from twisted.web.http_headers import Headers
@@ -222,6 +223,7 @@ def EQResponse(response, ship = -1): # 0 is ship1
         Modified_time[ship] = None
     d = readBody(response)
     d.addCallback(EQBody, ship)
+    d.addErrback(log.err)
     return d
 
 def CheckupURL():
@@ -243,6 +245,7 @@ def CheckupURL():
             #logdebug(pformat(list(HTTPHeaderX.getAllRawHeaders())))
             EQ0 = agent.request('GET', eq_URL, HTTPHeaderX)
             EQ0.addCallback(EQResponse, shipNum)
+            EQ0.addErrback(log.err)
 
 @plugins.on_start_hook
 def on_start():
