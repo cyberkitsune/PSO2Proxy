@@ -442,9 +442,10 @@ class ReloadPlugins(Command):
     def call_from_console(self):
         if len(self.args.split(' ')) < 2:
             return "[Command] Invalid usage. (Usage: reloadplugin <Plugin Name>)"
-        if self.args[1] not in sys.modules:
-            return "That plugin is not loaded."
-        output = "[ShipProxy] Reloading plugin: %s..." % self.args[1]
-        reload(sys.modules[self.args[1]])
+        modulearg = self.args[13:]
+        if modulearg not in sys.modules.keys():
+            return "That plugin (%s) is not loaded." % modulearg
+        output = "[ShipProxy] Reloading plugin: %s..." % modulearg
+        reload(sys.modules[modulearg])
         output += "[ShipProxy] Plugin reloaded!\n"
         return output
