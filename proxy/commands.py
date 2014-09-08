@@ -9,6 +9,7 @@ from ShipProxy import ShipProxy
 
 from twisted.protocols import basic
 from twisted.internet import reactor
+from twisted.python import rebuild
 
 import plugins.plugins as plugin_manager
 import packetFactory
@@ -446,6 +447,6 @@ class ReloadPlugins(Command):
         if modulearg not in sys.modules.keys():
             return "That plugin (%s) is not loaded." % modulearg
         output = "[ShipProxy] Reloading plugin: %s..." % modulearg
-        reload(sys.modules[modulearg])
+        rebuild.rebuild(sys.modules[modulearg])
         output += "[ShipProxy] Plugin reloaded!\n"
         return output
