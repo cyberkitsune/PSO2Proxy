@@ -5,6 +5,8 @@ import pstats
 import datetime
 import shutil
 import sys
+import faulthandler
+
 from ShipProxy import ShipProxy
 
 from twisted.protocols import basic
@@ -410,7 +412,7 @@ class ReloadBlockNames(Command):
 
 profile = None
 
-@CommandHandler("profile")
+@CommandHandler("profile", "[Admin Only] Turn on profiling mode", True)
 class Profiler(Command):
     def call_from_console(self):
         global profile
@@ -438,7 +440,7 @@ class Profiler(Command):
             return "[Profiling] Profiling has been disabled, results written to disk."
 
 
-@CommandHandler("reloadplugin")
+@CommandHandler("reloadplugin", "[Admin Only] Reload one plugin", True)
 class ReloadPlugins(Command):
     def call_from_console(self):
         if len(self.args.split(' ')) < 2:
@@ -450,3 +452,9 @@ class ReloadPlugins(Command):
         rebuild.rebuild(sys.modules[modulearg])
         output += "[ShipProxy] Plugin reloaded!\n"
         return output
+
+@CommandHandler("dumptraceback", "[Admin Only] Dump stacktrack of Proxy", True)
+class ReloadPlugins(Command):
+    def call_from_console(self):
+        faulthandler.dump_traceback(file=open('log/tracestack.log', 'w+'), all_threads=True)
+        return "[Trackback] dumpped state of Proxy"
