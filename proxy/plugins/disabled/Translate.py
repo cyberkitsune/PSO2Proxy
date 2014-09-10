@@ -97,11 +97,13 @@ def get_chat_packet(context, packet):
 def generate_translated_message(player_id, channel_id, message, end_lang, start_lang):
     if provider == "Bing" and time.time() - lastKeyTime >= 600:
         translator.access_token = translator.get_access_token()
-    if end_lang == "ja":
-        message_string = "%s" % translator.translate(message, end_lang, start_lang)
-    else:
-        try:
+
+    try:
+        if end_lang == "ja":
+            message_string = "%s" % translator.translate(message, end_lang, start_lang)
+        else:
             message_string = "%s {def}(%s)" % (translator.translate(message, end_lang, start_lang), message)
-        except requests.exceptions.ConnectionError:
-            message_string = message
+    except:
+        message_string = message
+
     return packetFactory.ChatPacket(player_id, message_string, channel_id).build()
