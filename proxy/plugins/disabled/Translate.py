@@ -100,5 +100,8 @@ def generate_translated_message(player_id, channel_id, message, end_lang, start_
     if end_lang == "ja":
         message_string = "%s" % translator.translate(message, end_lang, start_lang)
     else:
-        message_string = "%s {def}(%s)" % (translator.translate(message, end_lang, start_lang), message)
+        try:
+            message_string = "%s {def}(%s)" % (translator.translate(message, end_lang, start_lang), message)
+        except requests.exceptions.ConnectionError:
+            message_string = message
     return packetFactory.ChatPacket(player_id, message_string, channel_id).build()
