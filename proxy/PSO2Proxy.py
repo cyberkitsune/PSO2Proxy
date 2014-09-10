@@ -112,5 +112,6 @@ def main():
 
 
 if __name__ == "__main__":
-    faulthandler.enable()
+    faulthandler.enable(file=open('log/tracestack.log', 'w+'), all_threads=True)
+    #faulthandler.dump_traceback_later()
     main()
