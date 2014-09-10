@@ -15,7 +15,6 @@ If you have a Debian based system, you can install via apt-get for the depends
     git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
 ```
 
-
 if your server are on Debian Wheezy, you need to get a more up to date version of python-twisted package from backports)
 ```
     echo deb http://http.debian.net/debian wheezy-backports main|sudo tee /etc/apt/sources.list.d/wheezy-backports.list>/dev/null
@@ -23,11 +22,16 @@ if your server are on Debian Wheezy, you need to get a more up to date version o
     sudo apt-get -t wheezy-backports install -y python-twisted
 ```
 
-If your server is running on a Azamon AWS ES2 setup, get ready to have some fun
+Now for RPM based system, like Amazon Linux AMI on Amazon EC2:
 
+```
+    sudo yum install python-pip gcc python-devel git
+    git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSOProxy
+    cd ~/PSO2Proxy
+    sudo pip install -r requirements.txt
+```
 
-
-If you have a git commandline client, setuptools and pip installed, you can install it like this:
+Others: If you have a git commandline client, setuptools and pip installed, you can install it like this:
 
 ```
     git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSOProxy
