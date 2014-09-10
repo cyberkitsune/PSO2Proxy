@@ -238,7 +238,7 @@ class Unban(Command):
             config.banList.remove({'segaId': args[2]})
             config.save_bans()
         elif args[1] == "pid":
-            if not config.is_player_id_banned(args[2]):
+            if not config.is_player_id_banned(int(args[2])):
                 client.send_crypto_packet(
                     packetFactory.SystemMessagePacket('[Command]{red} %s is not banned.' % args[2], 0x3).build())
                 return
