@@ -242,7 +242,7 @@ class Unban(Command):
                 client.send_crypto_packet(
                     packetFactory.SystemMessagePacket('[Command]{red} %s is not banned.' % args[2], 0x3).build())
                 return
-            config.banList.remove({'playerId': args[2]})
+            config.banList.remove({'playerId': unicode(args[2])})
             client.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Command] {gre}%s has been unbanned." % args[2], 0x3).build())
             config.save_bans()
