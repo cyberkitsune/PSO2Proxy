@@ -1,6 +1,8 @@
 import json
 import os
 
+from packetFactory import SystemMessagePacket
+
 from twisted.protocols import basic
 from commands import Command
 
@@ -58,11 +60,16 @@ class Whitelist(Command):
 
 @plugins.PacketHook(0x11, 0x0)
 def whitelist_check(context, data):
+    """
+
+    :type context: ShipProxy.ShipProxy
+    """
     global whitelist
     start = len(data) - 132  # Skip password
     username = data[start:start + 0x40].decode('utf-8')
     username = username.rstrip('\0')
     if username not in whitelist:
         print("[Whitelist] %s is not in the whitelist, hanging up!" % username)
+        context.send_crypto_packet(SystemMessagePacket("You are not whitelisted for this proxy. Please contact the owner to get in the whitelist.", 0x1).build())
         context.transport.loseConnection()
     return data
