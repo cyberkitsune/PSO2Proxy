@@ -53,8 +53,6 @@ class ServerConsole(basic.LineReceiver):
 
 
 def main():
-    if not os.path.exists("log/"):
-        os.makedirs("log/")
     log_file = logfile.LogFile.fromFullPath('log/serverlog.log')
     log.addObserver(log.FileLogObserver(log_file).emit)
     print("===== PSO2Proxy vGIT %s =====" % config.proxy_ver)
@@ -112,6 +110,8 @@ def main():
 
 
 if __name__ == "__main__":
+    if not os.path.exists("log/"):
+        os.makedirs("log/")
     faulthandler.enable(file=open('log/tracestack.log', 'w+'), all_threads=True)
     #faulthandler.dump_traceback_later()
     main()
