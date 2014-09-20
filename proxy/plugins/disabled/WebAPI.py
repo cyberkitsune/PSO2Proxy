@@ -102,7 +102,7 @@ class LatestStackTrace(Resource):
             f = open("log/tracestack.log")
             tracestack = f.read()
             f.close()
-            return trackstack
+            return tracestack
         else:
             return "No tracekstack saved."
 
