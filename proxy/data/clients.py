@@ -76,6 +76,12 @@ class SQLitePreferenceManager():
         self.user_preference_cache[sega_id] = new_config
         self._update_user_data_in_db(sega_id)
 
+
+    def get_db_size(self):
+        local_cursor = self._db_connection.cursor()
+        local_cursor.execute("SELECT COUNT(*) FROM users")
+        return local_cursor.fetchone()[0]
+
     def close_db(self):
         self._db_connection.close()
         print("[Database] Connection closed!")

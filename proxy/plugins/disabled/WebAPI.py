@@ -112,7 +112,7 @@ class WebAPI(Resource):
     @staticmethod
     def render_GET(request):
         current_data = {'playerCount': len(data.clients.connectedClients), 'blocksCached': len(data.blocks.blockList),
-                    'playersCached': len(data.players.playerList), 'upSince': upStart, 'peakPlayers': peakPlayers}
+                    'uniquePlayers': data.clients.dbManager.get_db_size(), 'upSince': upStart, 'peakPlayers': peakPlayers}
         request.setHeader("content-type", "application/json")
         return json.dumps(current_data)
 
