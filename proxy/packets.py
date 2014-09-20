@@ -205,11 +205,6 @@ def chat_packet(context, data):
                 return data
             return None
         return data
-    if player_id in players.playerList:
-        name = players.playerList[player_id][0]
-    else:
-        name = "ID:%i" % player_id
-    #log.msg("[ChatPacket] <%s> %s" % (name, message.encode('ascii', errors='xmlcharrefreplace')))
     return data
 
 
