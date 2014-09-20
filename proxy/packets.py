@@ -270,7 +270,7 @@ def player_info_packet(context, data):
 @PacketHandler(0x1c, 0x1f)
 def player_name_packet(context, data):
     player_id = struct.unpack_from('I', data, 0xC)[0]
-    if player_id not in players.playerList:
+    if player_id not in players.playerList and player_id in clients.connectedClients: # Only log for connected clients. UNTESTED?!
         player_name = data[0x14:0x56].decode('utf-16').rstrip("\0")
         if verbose:
             print("[PlayerData] Found new player %s with player ID %i" % (player_name, player_id))
