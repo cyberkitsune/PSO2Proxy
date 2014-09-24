@@ -55,14 +55,14 @@ def get_first_block(ship_port, destination_ip):
 
     if ship_port not in cachedBlocks:
         cachedBlocks[ship_port] = {'time_scraped': time.time(), 'data': scrape_block_packet(blockShipList[ship_port], ship_port, destination_ip)}
-        print("[BlockCache] Cached new block for ship %i, Holding onto it for a minute..." % ship_port)
+        print("[BlockCache] Cached new block for ship %i, Holding onto it for 5 minutes..." % ship_port)
         return cachedBlocks[ship_port]['data']
 
     last_time = cachedBlocks[ship_port]['time_scraped']
     current_time = time.time()
     if current_time > last_time + (60 * 3):
         cachedBlocks[ship_port] = {'time_scraped': time.time(), 'data': scrape_block_packet(blockShipList[ship_port], ship_port, destination_ip)}
-        print("[BlockCache] Cached new block for ship %i, Holding onto it for a minute..." % ship_port)
+        print("[BlockCache] Cached new block for ship %i, Holding onto it for 5 minutes..." % ship_port)
     return cachedBlocks[ship_port]['data']
 
 
