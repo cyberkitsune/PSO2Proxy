@@ -138,11 +138,11 @@ def check_config(user):
             client_preferences.set_preference("globalChat", True)
         if client_preferences.get_preference('globalChat'):
             user.send_crypto_packet(packetFactory.SystemMessagePacket(
-                "[Proxy] {yel}Global chat is enabled. Use %sg <Message> to chat, %sgoff to disable it, and %sgchatmode to toggle team/system chat mode." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
+                "[Proxy] {yel}Global chat is enabled. Use %sg <Message> to chat, %sgoff to disable it, and %sgchatmode to toggle team/system chat mode." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
                 0x3).build())
         else:
             user.send_crypto_packet(packetFactory.SystemMessagePacket(
-                "[Proxy] {yel}Global chat is disabled. Use %sgon to enable it, %sg <Message> to chat, and %sgchatmode to toggle team/system chat mode" % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
+                "[Proxy] {yel}Global chat is disabled. Use %sgon to enable it, %sg <Message> to chat, and %sgchatmode to toggle team/system chat mode" % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
                 0x3).build())
         if not client_preferences.has_preference("gchatMode"):
             client_preferences['gchatMode'] = -1
