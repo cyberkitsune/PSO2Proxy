@@ -221,8 +221,12 @@ class MuteSomebody(Command):
                 if player_id in data.clients.connectedClients:
                     data.clients.connectedClients[player_id].preferences['chatMuted'] = True
                     client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Muted %s." % player_data[0].rstrip("\0"), 0x3).build())
+                    return
                 else:
                     client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0"), 0x3).build())
+                    return
+
+        client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s either is not connected or is not part of the proxy." % user_to_mute, 0x3).build())
 
     def call_from_console(self):
         if len(self.args.split(" ", 1)) < 2:
