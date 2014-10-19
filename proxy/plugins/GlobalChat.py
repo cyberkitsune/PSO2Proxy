@@ -17,7 +17,7 @@ ircNick = ircSettings.get_key('nick')
 ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
 ircChannel = ircSettings.get_key('channel')
 
-gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'prefix': ''}, True)
+gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePrefix': '', 'systemPrefix': '{whi}'}, True)
 
 if ircMode:
     from twisted.words.protocols import irc
@@ -290,8 +290,8 @@ class GChat(Command):
             if ircBot is not None:
                 ircBot.send_global_message(data.clients.connectedClients[client.playerId].ship,
                     data.players.playerList[client.playerId][0].encode('utf-8'), self.args[3:].encode('utf-8'))
-        TCPacket = packetFactory.TeamChatPacket(client.playerId, "[G-%02i] %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0]), "%s%s" % (gchatSettings['prefix'], self.args[3:])).build()
-        SCPacket = packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0], "%s%s" % (gchatSettings['prefix'], self.args[3:])), 0x3).build()
+        TCPacket = packetFactory.TeamChatPacket(client.playerId, "[G-%02i] %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0]), "%s%s" % (gchatSettings['bubblePrefix'], self.args[3:])).build()
+        SCPacket = packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0], "%s%s" % (gchatSettings['systemPrefix'], self.args[3:])), 0x3).build()
         for client_data in data.clients.connectedClients.values():
             if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
                 if lookup_gchatmode(client_data.preferences) == 0:
