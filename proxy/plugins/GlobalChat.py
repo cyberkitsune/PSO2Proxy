@@ -17,7 +17,7 @@ ircNick = ircSettings.get_key('nick')
 ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
 ircChannel = ircSettings.get_key('channel')
 
-gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePrefix': '', 'systemPrefix': '{whi}'}, True)
+gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePrefix': '', 'systemPrefix': '{whi}', 'prefix': ''}, True)
 
 if ircMode:
     from twisted.words.protocols import irc
@@ -136,6 +136,8 @@ def check_config(user):
         client_preferences = data.clients.connectedClients[user.playerId].preferences
         if not client_preferences.has_preference("globalChat"):
             client_preferences.set_preference("globalChat", True)
+        if not client_preferences.has_preference("globalChatPrefix"):
+            client_preferences.set_preference("globalChatPrefix", gchatSettings['prefix'])
         if client_preferences.get_preference('globalChat'):
             user.send_crypto_packet(packetFactory.SystemMessagePacket(
                 "[Proxy] {yel}Global chat is enabled. Use %sg <Message> to chat, %sgoff to disable it, and %sgchatmode to toggle team/system chat mode." % (config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix'), config.globalConfig.get_key('commandPrefix')),
@@ -148,7 +150,7 @@ def check_config(user):
             client_preferences['gchatMode'] = -1
 
 
-@plugins.CommandHook("gchatmode", "Sets your global chat display mode")
+@plugins.CommandHook("gmode", "Sets your global chat display mode")
 class GChatModeCommand(Command):
     def call_from_client(self, client):
         if client.playerId is not None:
@@ -165,6 +167,19 @@ class GChatModeCommand(Command):
                     client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Global chat will now come through team chat. (Default)", 0x3).build())
                 else:
                     client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Global chat will now come through system chat. (Default)", 0x3).build())
+
+@plugins.CommandHook("gprefix", "Changes your chat prefix / color.")
+class GPrefixCommand(Command):
+    def call_from_client(self, client):
+        if client.playerId is not None:
+            client_prefs = data.clients.connectedClients[client.playerId].preferences
+            if len(self.args.split(" ", 1)) < 2:
+                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. Usage: gprefix <Prefix or PSO2 Color Code>", 0x3).build())
+                return
+            prefix = self.args.split(" ", 1)[1]
+            client_prefs['globalChatPrefix'] = prefix
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Your prefix has been set.", 0x3).build())
+
 
 @plugins.CommandHook("irc")
 class IRCCommand(Command):
@@ -290,14 +305,14 @@ class GChat(Command):
             if ircBot is not None:
                 ircBot.send_global_message(data.clients.connectedClients[client.playerId].ship,
                     data.players.playerList[client.playerId][0].encode('utf-8'), self.args[3:].encode('utf-8'))
-        TCPacket = packetFactory.TeamChatPacket(client.playerId, "[G-%02i] %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0]), "%s%s" % (gchatSettings['bubblePrefix'], self.args[3:])).build()
-        SCPacket = packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0], "%s%s" % (gchatSettings['systemPrefix'], self.args[3:])), 0x3).build()
+        #TCPacket = packetFactory.TeamChatPacket(client.playerId, "[G-%02i] %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0]), "%s%s" % (gchatSettings['bubblePrefix'], self.args[3:])).build()
+        #SCPacket = packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0], "%s%s" % (gchatSettings['systemPrefix'], self.args[3:])), 0x3).build()
         for client_data in data.clients.connectedClients.values():
             if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
                 if lookup_gchatmode(client_data.preferences) == 0:
-                    client_data.get_handle().send_crypto_packet(TCPacket)
+                    client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(client.playerId, "[G-%02i] %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0]), "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), self.args[3:])).build())
                 else:
-                    client_data.get_handle().send_crypto_packet(SCPacket)
+                    client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), self.args[3:])), 0x3).build())
 
     def call_from_console(self):
         global ircMode
