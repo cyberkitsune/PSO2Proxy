@@ -235,6 +235,7 @@ class MuteSomebody(Command):
                     return "[Command] Muted %s." % player_data[0].rstrip("\0")
                 else:
                     return "[Command] %s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0")
+        return "[Command] %s either is not connected or is not part of the proxy." % user_to_mute
 
 
 @plugins.CommandHook("gunmute", "Mutes or unmutes somebody in gchat. Admin Only!", True)
