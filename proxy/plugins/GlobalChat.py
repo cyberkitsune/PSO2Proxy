@@ -196,7 +196,7 @@ class EnableGChat(Command):
     def call_from_client(self, client):
         preferences = data.clients.connectedClients[client.playerId].preferences
         if not preferences['globalChat']:
-            preferences.set_preference("globalChat", True)
+            preferences['globalChat'] = True
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] Global chat enabled for you.", 0x3).build())
         else:
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] You already have global chat enabled.", 0x3).build())
