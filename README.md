@@ -47,7 +47,7 @@ PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyC
 ```
 
 ## Configuring the Server
-To configure the server, run it once to generate the pso2proxy.config.yml in `~/PSO2Proxy/proxy/cfg/`, then edit that. You need to at least set your Public IP address in `myIpAddr`, and your adapter IP if it is different from your public IP. If unsure, leave the `bindI` as `0.0.0.0`.
+To configure the server, run it once to generate the pso2proxy.config.yml in `~/PSO2Proxy/proxy/cfg/`, then edit that. You need to at least set your Public IP address in `myIpAddr`, and your adapter IP if it is different from your public IP. If unsure, leave the `bindIp` as `0.0.0.0`.
 ### RSA Keys
 #### Your private / public keypair
 You'll need to generate an RSA public and private keypair for your server and your proxy's clients for the proxy to work. You can use OpenSSL to do this.
