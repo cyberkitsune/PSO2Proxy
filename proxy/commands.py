@@ -5,7 +5,13 @@ import pstats
 import datetime
 import shutil
 import sys
-import faulthandler
+
+useFaulthandler = True
+
+try:
+    import faulthandler
+except ImportError:
+    useFaulthandler = False
 
 from ShipProxy import ShipProxy
 
@@ -453,8 +459,9 @@ class ReloadPlugins(Command):
         output += "[ShipProxy] Plugin reloaded!\n"
         return output
 
-@CommandHandler("dumptraceback", "[Admin Only] Dump stacktrack of Proxy", True)
-class ReloadPlugins(Command):
-    def call_from_console(self):
-        faulthandler.dump_traceback(file=open('log/tracestack.log', 'w+'), all_threads=True)
-        return "[Trackback] dumpped state of Proxy"
+if useFaulthandler:
+    @CommandHandler("dumptraceback", "[Admin Only] Dump stacktrack of Proxy", True)
+    class ReloadPlugins(Command):
+        def call_from_console(self):
+            faulthandler.dump_traceback(file=open('log/tracestack.log', 'w+'), all_threads=True)
+            return "[Trackback] dumpped state of Proxy"
