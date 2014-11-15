@@ -7,7 +7,7 @@ This program allows you to host your own PSO2Proxy on a server you have access t
 
 If you require assistance, feel free to contact us on [IRC](irc://irc.badnik.net/pso2proxypublic): irc.badnik.net, #pso2proxypublic
 ## Installing
-PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyCrypto](https://www.dlitz.net/software/pycrypto/). Please install these from their respective websites or use the commands below.
+PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyCrypto](https://www.dlitz.net/software/pycrypto/). Please install these from their respective websites or use the commands below depending on your distrubution.
 
 ####If you have a Debian based system, you can install via apt-get for the depends:
 
@@ -47,10 +47,10 @@ PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyC
 ```
 
 ## Configuring the Server
-To configure the server, run it once to generate the pso2proxy.config.yml, then edit that. You need at least your Public IP address set and your adapter IP set if it's different from your public ip. If unsure, leave the bindIp `0.0.0.0`.
+To configure the server, run it once to generate the pso2proxy.config.yml in `~/PSO2Proxy/proxy/cfg/`, then edit that. You need to at least set your Public IP address in `myIpAddr`, and your adapter IP if it is different from your public IP. If unsure, leave the `bindI` as `0.0.0.0`.
 ### RSA Keys
 #### Your private / public keypair
-You'll need to generate a RSA public and private keypair for your server and your proxy's clients for the proxy to work. You can use OpenSSL to do this.
+You'll need to generate an RSA public and private keypair for your server and your proxy's clients for the proxy to work. You can use OpenSSL to do this.
 
 First, change into the keys folder.
 ```
