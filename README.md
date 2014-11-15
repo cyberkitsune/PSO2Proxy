@@ -9,21 +9,21 @@ If you require assistance, feel free to contact us on [IRC](irc://irc.badnik.net
 ## Installing
 PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyCrypto](https://www.dlitz.net/software/pycrypto/). Please install these from their respective websites or use the commands below.
 
-###If you have a Debian based system, you can install via apt-get for the depends:
+####If you have a Debian based system, you can install via apt-get for the depends:
 
 ```
     sudo apt-get install python-twisted python-crypto python-yaml python-faulthandler openssl git
     git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
 ```
 
-###If your server is running Debian Wheezy, you need to get a more up to date version of the python-twisted package from backports:
+####If your server is running Debian Wheezy, you need to get a more up to date version of the python-twisted package from backports:
 ```
     echo deb http://http.debian.net/debian wheezy-backports main|sudo tee /etc/apt/sources.list.d/wheezy-backports.list>/dev/null
     sudo apt-get update
     sudo apt-get -t wheezy-backports install python-twisted
 ```
 
-###For RPM based systems, like Amazon Linux AMI on Amazon EC2 (Amazon Web Services Instance):
+####For RPM based systems, like Amazon Linux AMI on Amazon EC2 (Amazon Web Services Instance):
 
 ```
     sudo yum install python-pip gcc python-devel git
@@ -32,7 +32,7 @@ PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyC
     sudo pip install -r requirements.txt
 ```
 
-###Others: If you have a git commandline client, setuptools and pip installed, you can install it like this:
+####Others: If you have a git commandline client, setuptools and pip installed, you can install it like this:
 
 ```
     git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
