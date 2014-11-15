@@ -195,9 +195,11 @@ class IRCCommand(Command):
 class EnableGChat(Command):
     def call_from_client(self, client):
         preferences = data.clients.connectedClients[client.playerId].preferences
-        preferences.set_preference("globalChat", True)
-        client.send_crypto_packet(
-            packetFactory.SystemMessagePacket("[GlobalChat] Global chat enabled for you.", 0x3).build())
+        if not preferences['globalChat']:
+            preferences['globalChat'] = True
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] Global chat enabled for you.", 0x3).build())
+        else:
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] You already have global chat enabled.", 0x3).build())
 
     def call_from_console(self):
         if ircMode:
@@ -210,9 +212,11 @@ class EnableGChat(Command):
 class DisableGChat(Command):
     def call_from_client(self, client):
         preferences = data.clients.connectedClients[client.playerId].preferences
-        preferences.set_preference("globalChat", False)
-        client.send_crypto_packet(
-            packetFactory.SystemMessagePacket("[GlobalChat] Global chat disabled for you.", 0x3).build())
+        if preferences["globalChat"]:
+            preferences['globalChat'] = False
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] Global chat disabled for you.", 0x3).build())
+        else:
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] You already have global chat disabled.", 0x3).build())
 
     def call_from_console(self):
         if ircMode:
