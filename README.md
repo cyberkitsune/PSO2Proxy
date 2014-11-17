@@ -7,7 +7,7 @@ This program allows you to host your own PSO2Proxy on a server you have access t
 
 If you require assistance, feel free to contact us on [IRC](irc://irc.badnik.net/pso2proxypublic): irc.badnik.net, #pso2proxypublic
 ## Installing
-PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyCrypto](https://www.dlitz.net/software/pycrypto/). Please install these from their respective websites or use the commands below depending on your distrubution.
+PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyCrypto](https://www.dlitz.net/software/pycrypto/). Please install these from their respective websites or use the commands below depending on your distribution.
 
 ####If you have a Debian based system, you can install via apt-get for the depends:
 
