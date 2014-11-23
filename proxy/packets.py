@@ -84,9 +84,9 @@ def key_packet(context, data):
 @PacketHandler(0x11, 0x1)
 def login_confirmation_packet(context, data):
     data = bytearray(data)
-    #string_length = (struct.unpack_from('<I', buffer(data), 0xD)[0] ^ 0x8BA4 ) - 0xB6
-    #if string_length > 0: # We got an error! TODO Translate error
-    #    return str(data)
+    string_length = (struct.unpack_from('<I', buffer(data), 0xD)[0] ^ 0x8BA4 ) - 0xB6
+    if string_length > 0: # We got an error! TODO Translate error
+        return str(data)
     block_port = context.peer.transport.getHost().port
     if block_port in blocks.blockList:
         block_info = blocks.blockList[block_port]
