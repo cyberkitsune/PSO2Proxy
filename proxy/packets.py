@@ -84,6 +84,7 @@ def key_packet(context, data):
 @PacketHandler(0x11, 0x1)
 def login_confirmation_packet(context, data):
     data = bytearray(data)
+    return str(data)
     string_length = (struct.unpack_from('<I', buffer(data), 0xC)[0] ^ 0x8BA4 ) - 0xB6
     if string_length > 0:
         return str(data)
