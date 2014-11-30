@@ -76,7 +76,7 @@ You'll need to set your system's locale to UFT8 instead of ASCII, so it can prop
 
 On Debian systems, you can use this command:
 
-dpkg-reconfigure locales
+`dpkg-reconfigure locales`
 
 Make sure to uncheck everything but "en_US.UTF-8".
 
