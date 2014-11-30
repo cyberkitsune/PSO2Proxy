@@ -3,6 +3,8 @@ import os
 import plugins
 import packetFactory
 
+from packetFactory import SystemMessagePacket
+
 from twisted.protocols import basic
 from commands import Command
 
