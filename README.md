@@ -71,7 +71,7 @@ To convert SEGAKey.blob to SEGAKey.pem, use this OpenSSL command:
 
 `openssl rsa -pubin -inform MS\ PUBLICKEYBLOB -in SEGAKey.blob -outform PEM -out SEGAKey.pem`
 
-#### Change system locale
+### Change system locale
 You'll need to set your system's locale to UFT8 instead of ASCII, so it can properly parse JP characters.
 
 On Debian systems, you can use this command:
