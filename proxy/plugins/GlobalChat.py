@@ -225,7 +225,7 @@ class DisableGChat(Command):
                 ircBot.ircOutput = False
         return "[GlobalChat] Global chat disabled for Console."
 
-@plugins.CommandHook("gmute", "Mutes or somebody in gchat. Admin Only!", True)
+@plugins.CommandHook("gmute", "[Admin Only] Mutes or somebody in gchat.", True)
 class MuteSomebody(Command):
     def call_from_client(self, client):
         """
@@ -269,7 +269,7 @@ class MuteSomebody(Command):
         return "[Command] %s either is not connected or is not part of the proxy." % user_to_mute
 
 
-@plugins.CommandHook("gunmute", "Mutes or unmutes somebody in gchat. Admin Only!", True)
+@plugins.CommandHook("gunmute", "[Admin Only] Mutes or unmutes somebody in gchat.", True)
 class UnmuteSomebody(Command):
     def call_from_client(self, client):
         """
