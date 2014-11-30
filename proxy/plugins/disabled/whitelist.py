@@ -35,7 +35,7 @@ def save_whitelist():
     print('[Whitelist] Saved whitelist.')
 
 
-@plugins.CommandHook("whitelist", "Adds or removes someone to the connection whitelist.", True)
+@plugins.CommandHook("whitelist", "[Admin Only] Adds or removes someone to the connection whitelist.", True)
 class Whitelist(Command):
     def call_from_console(self):
         global whitelist
