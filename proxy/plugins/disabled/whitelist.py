@@ -1,7 +1,7 @@
 import json
 import os
-
-from packetFactory import SystemMessagePacket
+import plugins
+import packetFactory
 
 from twisted.protocols import basic
 from commands import Command
@@ -33,13 +33,13 @@ def save_whitelist():
     print('[Whitelist] Saved whitelist.')
 
 
-@plugins.CommandHook("whitelist")
+@plugins.CommandHook("whitelist", "Adds or removes someone to the connection whitelist.", True)
 class Whitelist(Command):
     def call_from_console(self):
         global whitelist
         params = self.args.split(" ")
         if len(params) < 3:
-            return "[Whitelist] Invalid usage. (Usage: whitelist <ADD/DEL> <SEGAID>)"
+            return "[Whitelist] Invalid usage. (Usage: whitelist <add/del> <SegaID>)"
         if params[1] == "add" or params[1]== "ADD":
             if params[2] not in whitelist:
                 whitelist.append(params[2])
@@ -55,7 +55,38 @@ class Whitelist(Command):
             else:
                 return "[Whitelist] %s is not in the whitelist, can not delete!" % params[2]
         else:
-            return "[Whitelist] Invalid usage. (Usage: whitelist <ADD/DEL> <SEGAID>)"
+            return "[Whitelist] Invalid usage. (Usage: whitelist <add/del> <SegaID>)"
+            
+    def call_from_client(self, client):
+        """
+        :param client: ShipProxy.ShipProxy
+        """
+        global whitelist
+        params = self.args.split(" ")
+        if len(params) < 3:
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. (Usage: whitelist <add/del> <SegaID>)", 0x3).build())
+            return
+        if params[1] == "add" or params[1]== "ADD":
+            if params[2] not in whitelist:
+                whitelist.append(params[2])
+                save_whitelist()
+                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Added %s to the whitelist." % params[2], 0x3).build())
+                return
+            else:
+                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s is already in the whitelist." % params[2], 0x3).build())
+                return
+        elif params[1] == "del" or params[1] == "DEL":
+            if params[2] in whitelist:
+                whitelist.remove(params[2])
+                save_whitelist()
+                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Removed %s from whitelist." % params[2], 0x3).build())
+                return
+            else:
+                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s is not in the whitelist, can not delete!" % params[2], 0x3).build())
+                return
+        else:
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. (Usage: whitelist <add/del> <SegaID>)", 0x3).build())
+            return
 
 
 @plugins.PacketHook(0x11, 0x0)
