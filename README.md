@@ -70,6 +70,16 @@ You'll ALSO need to import SEGA's RSA public keys from the PSO2 client. For inst
 To convert SEGAKey.blob to SEGAKey.pem, use this OpenSSL command:
 
 `openssl rsa -pubin -inform MS\ PUBLICKEYBLOB -in SEGAKey.blob -outform PEM -out SEGAKey.pem`
+
+#### Change system locale
+You'll need to set your system's locale to UFT8 instead of ASCII, so it can properly parse JP characters.
+
+On Debian systems, you can use this command:
+
+dpkg-reconfigure locales
+
+Make sure to uncheck everything but "en_US.UTF-8".
+
 ### Plugins
 PSO2Proxy has several plugins that come bundled in to make the experience better. Most of them are disabed by default, with the exception of `LoginMessage` and `GlobalChat`. To disable a plugin that is not in the disabled folder, simply delete it.
 
