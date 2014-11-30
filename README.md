@@ -78,7 +78,7 @@ On Debian systems, you can use this command:
 
 `dpkg-reconfigure locales`
 
-Make sure to uncheck everything but "en_US.UTF-8".
+Make sure to uncheck everything but "en_US.UTF-8", and reboot your machine after the process is completed.
 
 ### Plugins
 PSO2Proxy has several plugins that come bundled in to make the experience better. Most of them are disabed by default, with the exception of `LoginMessage` and `GlobalChat`. To disable a plugin that is not in the disabled folder, simply delete it.
