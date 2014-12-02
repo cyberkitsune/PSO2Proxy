@@ -284,8 +284,8 @@ class Kick(Command):
                 packetFactory.SystemMessagePacket("[Command] {red}Invalid usage.\n(Usage: %skick <PlayerID>)" % config.globalConfig.get_key('commandPrefix'),
                                                   0x3).build())
             return
-        if int(args[1]) in data.clients.connectedClients:
-            if data.clients.connectedClients[int(args[1])].get_handle() is not None and type(args[1]) == int:
+        if type(args[1]) == int and int(args[1]) in data.clients.connectedClients:
+            if data.clients.connectedClients[int(args[1])].get_handle() is not None:
                 data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet(
                     packetFactory.SystemMessagePacket("[Proxy] {yel}You have been disconnected from the proxy by an admin.",
                                                       0x2).build())
@@ -302,8 +302,8 @@ class Kick(Command):
         args = self.args.split(' ')
         if len(args) < 2:
             return "[Command] Invalid usage. (Usage: kick <PlayerID>)"
-        if int(args[1]) in data.clients.connectedClients:
-            if data.clients.connectedClients[int(args[1])].get_handle() is not None and type(args[1]) == int:
+        if type(args[1]) == int and int(args[1]) in data.clients.connectedClients:
+            if data.clients.connectedClients[int(args[1])].get_handle() is not None:
                 data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet(
                     packetFactory.SystemMessagePacket("[Proxy] You have been disconnected from the proxy by an admin.", 0x1).build())
                 data.clients.connectedClients[int(args[1])].get_handle().transport.loseConnection()
