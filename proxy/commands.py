@@ -285,7 +285,7 @@ class Kick(Command):
                                                   0x3).build())
             return
         if int(args[1]) in data.clients.connectedClients:
-            if data.clients.connectedClients[int(args[1])].get_handle() is not None:
+            if args[1].is_integer() and data.clients.connectedClients[int(args[1])].get_handle() is not None :
                 data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet(
                     packetFactory.SystemMessagePacket("[Proxy] {yel}You have been disconnected from the proxy by an admin.",
                                                       0x2).build())
