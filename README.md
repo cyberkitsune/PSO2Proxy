@@ -2,35 +2,40 @@
 PSO2Proxy is a open source protocol proxy for the Japanese MMORPG, Phantasy Star Online 2 written in python. It allows the game's packet data to be unencrypted, logged, parsed and modified to both the client and server. It can also be used to connect to the game's servers if a client is blocked from normally connecting for any reason.
 
 ## Note
-This program allows you to host your own PSO2Proxy on a server you have access to. **If you just want to play the game via the proxy, a public PSO2Proxy server is provided for both users who can't connect to PSO2 and users who want to contribute data for packet analysis at [pso2proxy.cyberkitsune.net](http://pso2proxy.cyberkitsune.net/). Below are the instructions for installing and setting up your own PSO2Proxy server.**
+This program allows you to host your own PSO2Proxy on a server you have access to. 
+**If you just want to play the game via the proxy, a public PSO2Proxy server is available for users who can't connect to PSO2 and users who want to contribute data for packet analysis. This server can be found at [pso2proxy.cyberkitsune.net](http://pso2proxy.cyberkitsune.net/). Below are the instructions for installing and setting up your own PSO2Proxy server.**
 
-Feel free to contact us on [IRC](irc://irc.badnik.net/pso2proxypublic): irc.badnik.net, #pso2proxypublic
+If you require assistance, feel free to contact us on [IRC](irc://irc.badnik.net/pso2proxypublic): irc.badnik.net, #pso2proxypublic
 ## Installing
-PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyCrypto](https://www.dlitz.net/software/pycrypto/). Please install these from their respective websites.
+PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyCrypto](https://www.dlitz.net/software/pycrypto/). Please install these from their respective websites or use the commands below depending on your distribution.
 
-If you have a Debian based system, you can install via apt-get for the depends
+####If you have a Debian based system, you can install via apt-get for the depends:
 
 ```
-    sudo apt-get install -y python-twisted python-crypto python-yaml python-faulthandler openssl git
+    sudo apt-get install python-twisted python-crypto python-yaml python-faulthandler openssl git
     git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
 ```
 
-
-if your server are on Debian Wheezy, you need to get a more up to date version of python-twisted package from backports)
+####If your server is running Debian Wheezy, you need to get a more up to date version of the python-twisted package from backports:
 ```
     echo deb http://http.debian.net/debian wheezy-backports main|sudo tee /etc/apt/sources.list.d/wheezy-backports.list>/dev/null
     sudo apt-get update
-    sudo apt-get -t wheezy-backports install -y python-twisted
+    sudo apt-get -t wheezy-backports install python-twisted
 ```
 
-If your server is running on a Azamon AWS ES2 setup, get ready to have some fun
-
-
-
-If you have a git commandline client, setuptools and pip installed, you can install it like this:
+####For RPM based systems, like Amazon Linux AMI on Amazon EC2 (Amazon Web Services Instance):
 
 ```
-    git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSOProxy
+    sudo yum install python-pip gcc python-devel git
+    git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
+    cd ~/PSO2Proxy
+    sudo pip install -r requirements.txt
+```
+
+####Others: If you have a git commandline client, setuptools and pip installed, you can install it like this:
+
+```
+    git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
     cd ~/PSO2Proxy
     pip install -r requirements.txt
 ```
@@ -42,10 +47,10 @@ If you have a git commandline client, setuptools and pip installed, you can inst
 ```
 
 ## Configuring the Server
-To configure the server, run it once to generate the pso2proxy.config.yml, then edit that. You need at least your Public IP address set and your adapter IP set if it's different from your public ip. If unsure, leave the bindIp `0.0.0.0`.
+To configure the server, run it once to generate the pso2proxy.config.yml in `~/PSO2Proxy/proxy/cfg/`, then edit that. You need to at least set your Public IP address in `myIpAddr`, and your adapter IP if it is different from your public IP. If unsure, leave the `bindIp` as `0.0.0.0`.
 ### RSA Keys
 #### Your private / public keypair
-You'll need to generate a RSA public and private keypair for your server and your proxy's clients for the proxy to work. You can use OpenSSL to do this.
+You'll need to generate an RSA public and private keypair for your server and your proxy's clients for the proxy to work. You can use OpenSSL to do this.
 
 First, change into the keys folder.
 ```
@@ -65,6 +70,16 @@ You'll ALSO need to import SEGA's RSA public keys from the PSO2 client. For inst
 To convert SEGAKey.blob to SEGAKey.pem, use this OpenSSL command:
 
 `openssl rsa -pubin -inform MS\ PUBLICKEYBLOB -in SEGAKey.blob -outform PEM -out SEGAKey.pem`
+
+### Change system locale
+You'll need to set your system's locale to UFT8 instead of ASCII, so it can properly parse JP characters.
+
+On Debian systems, you can use this command:
+
+`dpkg-reconfigure locales`
+
+Make sure to uncheck everything but "en_US.UTF-8", and reboot your machine after the process is completed.
+
 ### Plugins
 PSO2Proxy has several plugins that come bundled in to make the experience better. Most of them are disabed by default, with the exception of `LoginMessage` and `GlobalChat`. To disable a plugin that is not in the disabled folder, simply delete it.
 

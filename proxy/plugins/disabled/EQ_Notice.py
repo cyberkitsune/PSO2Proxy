@@ -11,6 +11,7 @@ import time
 import data.clients as clients
 from datetime import datetime, timedelta
 from pprint import pformat
+from twisted.python import log
 from twisted.internet import task, reactor, defer, protocol
 from twisted.internet.protocol import Protocol
 from twisted.web.http_headers import Headers
@@ -40,6 +41,7 @@ except ImportError:
 try:
     from twisted.web.client import Agent, HTTPConnectionPool
     pool = HTTPConnectionPool(reactor)
+    pool._factory.noisy = False
     agent = Agent(reactor, pool=pool)
 except ImportError:
     agent = Agent(reactor)
@@ -141,7 +143,7 @@ def cleanup_EQ(message, ship): # 0 is ship1
     return cutup_EQ(message).rstrip("\n")
 
 def old_seconds(td):
-    return (td.seconds + td.days * 24 * 3600)
+    return td.seconds + td.days * 24 * 3600
 
 def check_if_EQ_old(ship):
     #logdebug("Ship %d: Checking time" %(ship+1))
@@ -157,19 +159,18 @@ def check_if_EQ_old(ship):
         # Short EQ notice is no good
         #logdebug("Ship %d: short EQ" %(ship+1))
         return True
-        if old_seconds(timediff) > 10*60:
-            #logdebug("Ship %d: Short EQ is older then 10 mins" %(ship+1))
-            return True
+        #if old_seconds(timediff) > 10*60:
+        #    #logdebug("Ship %d: Short EQ is older then 10 mins" %(ship+1))
+        #    return True
     return False
 
 def EQBody(body, ship): # 0 is ship1
-    old_eq = True
     logdebug("Ship %d's Body: %s" % (ship+1, body))
     if HTTP_Data[ship] == body:
         logdebug("Ship %d: Still have the same data" % (ship+1))
-        return; # same data, do not react on it
+        return # same data, do not react on it
     logdebug("Ship %d: have the new data" % (ship+1))
-    HTTP_Data[ship] == body
+    HTTP_Data[ship] = body
 
     data_eq[ship] = cleanup_EQ(unicode(body, 'utf-8-sig', 'replace'), ship)
 
@@ -188,10 +189,11 @@ def EQBody(body, ship): # 0 is ship1
 
     print("[EQ Notice] Sending players MSG on Ship %02d : %s" % (ship+1, msg_eq[ship]))
     SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
-    if 'GlobalChat' in sys.modules:
+    if 'plugins.GlobalChat' in sys.modules:
         import GlobalChat
         if GlobalChat.ircMode and GlobalChat.ircBot is not None:
-            GlobalChat.ircBot.send_channel_message("[EQ Notice Ship %02d] Incoming EQ Report from PSO2es: %s" % (ship + 1, msg_eq[ship]))
+            msg = "[EQ Notice Ship %02d] Incoming EQ Report from PSO2es: %s" % (ship + 1, msg_eq[ship])
+            GlobalChat.ircBot.send_channel_message(msg.encode('utf-8'))
     for client in data.clients.connectedClients.values():
         try:
             chandle = client.get_handle()
@@ -199,7 +201,7 @@ def EQBody(body, ship): # 0 is ship1
                 and (ship+1 == data.clients.get_ship_from_port(chandle.transport.getHost().port)):
                 chandle.send_crypto_packet(SMPacket)
         except AttributeError:
-            logdebug("Ship %d: Got a dead cleint, skipping" %(ship+1))
+            logdebug("Ship %d: Got a dead client, skipping" %(ship+1))
 
 def EQResponse(response, ship = -1): # 0 is ship1
     if response.code == 304:
@@ -221,6 +223,7 @@ def EQResponse(response, ship = -1): # 0 is ship1
         Modified_time[ship] = None
     d = readBody(response)
     d.addCallback(EQBody, ship)
+    d.addErrback(log.err)
     return d
 
 def CheckupURL():
@@ -242,6 +245,7 @@ def CheckupURL():
             #logdebug(pformat(list(HTTPHeaderX.getAllRawHeaders())))
             EQ0 = agent.request('GET', eq_URL, HTTPHeaderX)
             EQ0.addCallback(EQResponse, shipNum)
+            EQ0.addErrback(log.err)
 
 @plugins.on_start_hook
 def on_start():

@@ -5,10 +5,19 @@ import pstats
 import datetime
 import shutil
 import sys
+
+useFaulthandler = True
+
+try:
+    import faulthandler
+except ImportError:
+    useFaulthandler = False
+
 from ShipProxy import ShipProxy
 
 from twisted.protocols import basic
 from twisted.internet import reactor
+from twisted.python import rebuild
 
 import plugins.plugins as plugin_manager
 import packetFactory
@@ -235,11 +244,11 @@ class Unban(Command):
             config.banList.remove({'segaId': args[2]})
             config.save_bans()
         elif args[1] == "pid":
-            if not config.is_player_id_banned(args[2]):
+            if not config.is_player_id_banned(int(args[2])):
                 client.send_crypto_packet(
                     packetFactory.SystemMessagePacket('[Command]{red} %s is not banned.' % args[2], 0x3).build())
                 return
-            config.banList.remove({'playerId': args[2]})
+            config.banList.remove({'playerId': unicode(args[2])})
             client.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Command] {gre}%s has been unbanned." % args[2], 0x3).build())
             config.save_bans()
@@ -409,7 +418,7 @@ class ReloadBlockNames(Command):
 
 profile = None
 
-@CommandHandler("profile")
+@CommandHandler("profile", "[Admin Only] Turn on profiling mode", True)
 class Profiler(Command):
     def call_from_console(self):
         global profile
@@ -437,14 +446,22 @@ class Profiler(Command):
             return "[Profiling] Profiling has been disabled, results written to disk."
 
 
-@CommandHandler("reloadplugin")
+@CommandHandler("reloadplugin", "[Admin Only] Reload one plugin", True)
 class ReloadPlugins(Command):
     def call_from_console(self):
         if len(self.args.split(' ')) < 2:
             return "[Command] Invalid usage. (Usage: reloadplugin <Plugin Name>)"
-        if self.args[1] not in sys.modules:
-            return "That plugin is not loaded."
-        output = "[ShipProxy] Reloading plugin: %s..." % self.args[1]
-        reload(sys.modules[self.args[1]])
+        modulearg = self.args[13:]
+        if modulearg not in sys.modules.keys():
+            return "That plugin (%s) is not loaded." % modulearg
+        output = "[ShipProxy] Reloading plugin: %s..." % modulearg
+        rebuild.rebuild(sys.modules[modulearg])
         output += "[ShipProxy] Plugin reloaded!\n"
         return output
+
+if useFaulthandler:
+    @CommandHandler("dumptraceback", "[Admin Only] Dump stacktrack of Proxy", True)
+    class ReloadPlugins(Command):
+        def call_from_console(self):
+            faulthandler.dump_traceback(file=open('log/tracestack.log', 'w+'), all_threads=True)
+            return "[Trackback] dumpped state of Proxy"

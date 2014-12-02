@@ -55,14 +55,14 @@ def get_first_block(ship_port, destination_ip):
 
     if ship_port not in cachedBlocks:
         cachedBlocks[ship_port] = {'time_scraped': time.time(), 'data': scrape_block_packet(blockShipList[ship_port], ship_port, destination_ip)}
-        print("[BlockCache] Cached new block for ship %i, Holding onto it for a minute..." % ship_port)
+        print("[BlockCache] Cached new block for ship %i, Holding onto it for 5 minutes..." % ship_port)
         return cachedBlocks[ship_port]['data']
 
     last_time = cachedBlocks[ship_port]['time_scraped']
     current_time = time.time()
-    if current_time > last_time + 60:
+    if current_time > last_time + (60 * 3):
         cachedBlocks[ship_port] = {'time_scraped': time.time(), 'data': scrape_block_packet(blockShipList[ship_port], ship_port, destination_ip)}
-        print("[BlockCache] Cached new block for ship %i, Holding onto it for a minute..." % ship_port)
+        print("[BlockCache] Cached new block for ship %i, Holding onto it for 5 minutes..." % ship_port)
     return cachedBlocks[ship_port]['data']
 
 
@@ -79,7 +79,15 @@ def get_ship_query(my_ip_address):
 def scrape_block_packet(ship_ip, ship_port, destination_ip):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     log.msg("[BlockQuery] Scraping %s:%i for a initial block..." % (ship_ip, ship_port))
-    s.connect((ship_ip, ship_port))
+    s.settimeout(5)
+    try:
+        s.connect((ship_ip, ship_port))
+    except socket.error, e:
+        log.msg("[BlockQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, e))
+        return None
+    except:
+        log.msg("[BlockQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, sys.exc_info()[0]))
+        return None
     data = io.BytesIO()
     data.write(s.recv(4))
     actual_size = struct.unpack_from('i', data.getvalue(), 0x0)[0]
@@ -114,7 +122,15 @@ def scrape_ship_packet(ship_ip, ship_port, destination_ip):
     o1, o2, o3, o4 = destination_ip.split(".")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     log.msg("[ShipQuery] Scraping %s:%i for ship status..." % (ship_ip, ship_port))
-    s.connect((ship_ip, ship_port))
+    s.settimeout(5)
+    try:
+        s.connect((ship_ip, ship_port))
+    except socket.error, e:
+        log.msg("[ShipQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, e))
+        return None
+    except:
+        log.msg("[ShipQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, sys.exc_info()[0]))
+        return None
     data = io.BytesIO()
     data.write(s.recv(4))
     actual_size = struct.unpack_from('i', data.getvalue(), 0x0)[0]

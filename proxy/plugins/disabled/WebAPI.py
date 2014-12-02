@@ -92,6 +92,19 @@ class LatestProfile(Resource):
         else:
             return "No profile saved."
 
+class LatestStackTrace(Resource):
+    isLeaf = True
+
+    @staticmethod
+    def render_GET(request):
+        request.setHeader("content-type", "text-plain")
+        if os.path.exists("log/tracestack.log"):
+            f = open("log/tracestack.log")
+            tracestack = f.read()
+            f.close()
+            return tracestack
+        else:
+            return "No tracekstack saved."
 
 class WebAPI(Resource):
 
@@ -99,7 +112,7 @@ class WebAPI(Resource):
     @staticmethod
     def render_GET(request):
         current_data = {'playerCount': len(data.clients.connectedClients), 'blocksCached': len(data.blocks.blockList),
-                    'playersCached': len(data.players.playerList), 'upSince': upStart, 'peakPlayers': peakPlayers}
+                    'uniquePlayers': data.clients.dbManager.get_db_size(), 'upSince': upStart, 'peakPlayers': peakPlayers}
         request.setHeader("content-type", "application/json")
         return json.dumps(current_data)
 
@@ -123,6 +136,7 @@ def setup_web_api():
     web_resource.putChild("config.json", JSONConfig())
     web_resource.putChild("publickey.blob", PublicKey())
     web_resource.putChild("latest_profile", LatestProfile())
+    web_resource.putChild("stacktrace", LatestStackTrace())
     if web_api_config.get_key('webRconEnabled'):
         web_resource.putChild("rcon", WEBRcon())
     web_endpoint.listen(server.Site(web_resource))
