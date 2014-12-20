@@ -22,6 +22,8 @@ class BlockScraper(protocol.Protocol):
 
 
 class BlockScraperFactory(protocol.Factory):
+    noisy = False
+
     def __init__(self):
         self.noisy = verbose
         pass
@@ -47,6 +49,8 @@ class ShipAdvertiser(protocol.Protocol):
 
 
 class ShipAdvertiserFactory(protocol.Factory):
+    noisy = False
+
     def __init__(self):
         self.noisy = verbose
         pass

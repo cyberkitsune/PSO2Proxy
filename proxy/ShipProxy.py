@@ -150,7 +150,10 @@ class ProxyClient(ShipProxy):
 
 
 class ProxyClientFactory(protocol.ClientFactory):
+    noisy = False
+
     def __init__(self):
+        self.noisy = verbose
         self.protocol = ProxyClient
         self.server = None
 
@@ -194,6 +197,7 @@ class ProxyServer(ShipProxy):
 
 
 class ProxyFactory(protocol.Factory):
+    noisy = False
     """Factory for port forwarder."""
 
     def __init__(self):

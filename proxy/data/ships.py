@@ -78,15 +78,15 @@ def get_ship_query(my_ip_address):
 
 def scrape_block_packet(ship_ip, ship_port, destination_ip):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    log.msg("[BlockQuery] Scraping %s:%i for a initial block..." % (ship_ip, ship_port))
+    #log.msg("[BlockQuery] Scraping %s:%i for a initial block..." % (ship_ip, ship_port))
     s.settimeout(5)
     try:
         s.connect((ship_ip, ship_port))
     except socket.error, e:
-        log.msg("[BlockQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, e))
+        #log.msg("[BlockQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, e))
         return None
     except:
-        log.msg("[BlockQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, sys.exc_info()[0]))
+        #log.msg("[BlockQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, sys.exc_info()[0]))
         return None
     data = io.BytesIO()
     data.write(s.recv(4))
@@ -100,7 +100,7 @@ def scrape_block_packet(ship_ip, ship_port, destination_ip):
     o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), 0x64)
     ip_string = '%i.%i.%i.%i' % (o1, o2, o3, o4)
     if port not in blocks.blockList:
-        #log.msg("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (namelog, ip_string, port))
+        ##log.msg("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (namelog, ip_string, port))
         blocks.blockList[port] = (ip_string, name)
     if port not in blocks.listeningPorts:
         from ShipProxy import ProxyFactory
@@ -121,15 +121,15 @@ def scrape_block_packet(ship_ip, ship_port, destination_ip):
 def scrape_ship_packet(ship_ip, ship_port, destination_ip):
     o1, o2, o3, o4 = destination_ip.split(".")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    log.msg("[ShipQuery] Scraping %s:%i for ship status..." % (ship_ip, ship_port))
+    #log.msg("[ShipQuery] Scraping %s:%i for ship status..." % (ship_ip, ship_port))
     s.settimeout(5)
     try:
         s.connect((ship_ip, ship_port))
     except socket.error, e:
-        log.msg("[ShipQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, e))
+        l#og.msg("[ShipQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, e))
         return None
     except:
-        log.msg("[ShipQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, sys.exc_info()[0]))
+        #log.msg("[ShipQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, sys.exc_info()[0]))
         return None
     data = io.BytesIO()
     data.write(s.recv(4))
