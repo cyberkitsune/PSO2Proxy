@@ -153,6 +153,7 @@ class ProxyClientFactory(protocol.ClientFactory):
     noisy = False
 
     def __init__(self):
+        self.noisy = verbose
         self.protocol = ProxyClient
         self.server = None
 
