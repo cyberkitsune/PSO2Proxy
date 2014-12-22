@@ -126,7 +126,7 @@ def scrape_ship_packet(ship_ip, ship_port, destination_ip):
     try:
         s.connect((ship_ip, ship_port))
     except socket.error, e:
-        l#og.msg("[ShipQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, e))
+        #log.msg("[ShipQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, e))
         return None
     except:
         #log.msg("[ShipQuery] Scraping %s:%i return an error: %s"% (ship_ip, ship_port, sys.exc_info()[0]))
