@@ -55,15 +55,15 @@ if ircMode:
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
             try:
-        		if ["#","!","+","&"].index(self.factory.channel[:1]) > 0:
+            	if ["#","!","+","&"].index(self.factory.channel[:1]) > 0:
             		self.join(self.factory.channel)
             		print("[GlobalChat] Joined %s" % self.factory.channel)
             		ircBot = self
-        		else:
+            	else:
             		raise NameError("[GlobalChat] Failed to join %s channel must contain a # or ! or + or & before the channel name" % self.factory.channel)
             except NameError as ne:
-				print(ne)
-				log.msg(ne)
+            	print(ne)
+            	log.msg(ne)
 
         def privmsg(self, user, channel, msg):
             if channel == self.factory.channel:
