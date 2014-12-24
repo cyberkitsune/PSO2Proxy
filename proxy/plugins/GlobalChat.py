@@ -17,14 +17,14 @@ ircOutput = ircSettings.get_key('output')
 ircNick = ircSettings.get_key('nick')
 ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
 try:
-	if ircSettings.get_key('channel')[:1] == "#":
+	if ["#","!","+","&"].index(ircSettings.get_key('channel')[:1]) > 0:
 		ircChannel = ircSettings.get_key('channel')
 	else:
-		raise NameError("Channel Must contain a # before the channel name adding....")
+		raise NameError("Channel Must contain a # or & or + or & before the channel name refusing to join....")
 except NameError as ne:
 	print(ne)
 	log.msg(ne)
-	ircChannel = "#"+ircSettings.get_key('channel')
+	ircChannel = ''
 
 gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePrefix': '', 'systemPrefix': '{whi}', 'prefix': ''}, True)
 
