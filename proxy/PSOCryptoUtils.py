@@ -1,5 +1,6 @@
 from Crypto.Cipher import ARC4, PKCS1_v1_5
 from Crypto.PublicKey import RSA
+from twisted.python import log
 
 
 class PSO2RC4(object):
