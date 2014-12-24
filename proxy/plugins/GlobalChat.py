@@ -60,7 +60,7 @@ if ircMode:
             	    print("[GlobalChat] Joined %s" % self.factory.channel)
             	    ircBot = self
             	else:
-            	    raise NameError("[GlobalChat] Failed to join %s channel must contain a # or ! or + or & before the channel name" % self.factory.channel)
+            	    raise NameError("[GlobalChat] Failed to join %s channel must contain a #, !, + or & before the channel name" % self.factory.channel)
             except NameError as ne:
             	print(ne)
             	log.msg(ne)
