@@ -7,6 +7,7 @@ from PSO2DataTools import replace_irc_with_pso2, replace_pso2_with_irc
 from config import YAMLConfig
 import config
 from commands import Command
+from twisted.python import log
 
 ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
                          {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': "", 'output': True, 'autoexec': []}, True)
@@ -15,7 +16,17 @@ ircMode = ircSettings.get_key('enabled')
 ircOutput = ircSettings.get_key('output')
 ircNick = ircSettings.get_key('nick')
 ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
-ircChannel = ircSettings.get_key('channel')
+try:
+	if ircSettings.get_key('channel')[0] == "#":
+		ircChannel = ircSettings.get_key('channel')
+	else:
+		raise NameError("Channel Must contain a # before the channel name adding....")
+except NameError as ne:
+	print(ne)
+	log.msg(ne)
+	ircChannel = "#"+ircSettings.get_key('channel')
+
+		
 
 gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePrefix': '', 'systemPrefix': '{whi}', 'prefix': ''}, True)
 
