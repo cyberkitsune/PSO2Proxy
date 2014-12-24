@@ -60,15 +60,18 @@ def get_chat_packet(context, packet):
     """
     :type context: ShipProxy.ShipProxy
     """
-    if context.psoClient and context.playerId and data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out'):
-        player_id = struct.unpack_from("I", packet, 0x8)[0]
-        if player_id != 0:  # ???
-            return
-        channel_id = struct.unpack_from("I", packet, 0x14)[0]
-        message = packet[0x1C:].decode('utf-16').rstrip("\0")
-        d = threads.deferToThread(generate_translated_message, player_id, channel_id, message, "ja", "en")
-        d.addCallback(context.peer.send_crypto_packet)
-        return None
+    try:
+        if context.psoClient and context.playerId and data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out'):
+            player_id = struct.unpack_from("I", packet, 0x8)[0]
+            if player_id != 0:  # ???
+                return
+            channel_id = struct.unpack_from("I", packet, 0x14)[0]
+            message = packet[0x1C:].decode('utf-16').rstrip("\0")
+            d = threads.deferToThread(generate_translated_message, player_id, channel_id, message, "ja", "en")
+            d.addCallback(context.peer.send_crypto_packet)
+            return None
+    except KeyError:
+        return packet
     if context.peer.psoClient and context.peer.playerId in data.clients.connectedClients:
         user_prefs = data.clients.connectedClients[context.peer.playerId].preferences
         if not user_prefs.get_preference('translate_chat'):

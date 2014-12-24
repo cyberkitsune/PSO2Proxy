@@ -44,6 +44,7 @@ try:
     pool._factory.noisy = False
     agent = Agent(reactor, pool=pool)
 except ImportError:
+    from twisted.web.client import Agent
     agent = Agent(reactor)
 
 eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {
@@ -251,8 +252,12 @@ def CheckupURL():
 def on_start():
     global taskrun
     taskrun = task.LoopingCall(CheckupURL)
-    pool.cachedConnectionTimeout = (tasksec/2)+tasksec+1
-    pool.retryAutomatically = False
+    try:
+        pool.cachedConnectionTimeout = (tasksec/2)+tasksec+1
+        pool.retryAutomatically = False
+    except:
+        print("[EQ Notice] No pool, please update Twisted")
+
 
     if eq_mode:
         taskrun.start(tasksec) # call every 60 seconds
