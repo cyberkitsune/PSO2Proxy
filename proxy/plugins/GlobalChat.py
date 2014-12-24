@@ -55,7 +55,7 @@ if ircMode:
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
             try:
-                if ["#","!","+","&"].index(self.factory.channel[:1]) > 0:
+            	if ["#","!","+","&"].index(self.factory.channel[:1]) > 0:
             		self.join(self.factory.channel)
             		print("[GlobalChat] Joined %s" % self.factory.channel)
             		ircBot = self
