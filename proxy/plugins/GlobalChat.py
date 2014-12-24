@@ -26,8 +26,6 @@ except NameError as ne:
 	log.msg(ne)
 	ircChannel = "#"+ircSettings.get_key('channel')
 
-		
-
 gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePrefix': '', 'systemPrefix': '{whi}', 'prefix': ''}, True)
 
 if ircMode:
