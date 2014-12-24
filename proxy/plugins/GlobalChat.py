@@ -16,15 +16,7 @@ ircMode = ircSettings.get_key('enabled')
 ircOutput = ircSettings.get_key('output')
 ircNick = ircSettings.get_key('nick')
 ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
-try:
-	if ["#","!","+","&"].index(ircSettings.get_key('channel')[:1]) > 0:
-		ircChannel = ircSettings.get_key('channel')
-	else:
-		raise NameError("Channel Must contain a # or & or + or & before the channel name refusing to join....")
-except NameError as ne:
-	print(ne)
-	log.msg(ne)
-	ircChannel = ''
+ircChannel = ircSettings.get_key('channel')
 
 gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePrefix': '', 'systemPrefix': '{whi}', 'prefix': ''}, True)
 
@@ -62,9 +54,16 @@ if ircMode:
             for command in ircSettings.get_key('autoexec'):
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
-            self.join(self.factory.channel)
-            print("[GlobalChat] Joined %s" % self.factory.channel)
-            ircBot = self
+            try:
+        		if ["#","!","+","&"].index(self.factory.channel[:1]) > 0:
+            		self.join(self.factory.channel)
+            		print("[GlobalChat] Joined %s" % self.factory.channel)
+            		ircBot = self
+        		else:
+            		raise NameError("[GlobalChat] Failed to join %s channel must contain a # or ! or + or & before the channel name" % self.factory.channel)
+            except NameError as ne:
+				print(ne)
+				log.msg(ne)
 
         def privmsg(self, user, channel, msg):
             if channel == self.factory.channel:
