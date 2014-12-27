@@ -18,9 +18,9 @@ PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyC
 
 ####If your server is running Debian Wheezy, you need to get a more up to date version of the python-twisted package from backports:
 ```
-    echo deb http://http.debian.net/debian wheezy-backports main|sudo tee /etc/apt/sources.list.d/wheezy-backports.list>/dev/null
-    sudo apt-get update
-    sudo apt-get -t wheezy-backports install python-twisted
+    echo deb http://http.debian.net/debian wheezy-backports main|tee /etc/apt/sources.list.d/wheezy-backports.list>/dev/null
+    apt-get update
+    apt-get -t wheezy-backports install python-twisted
 ```
 
 ####For RPM based systems, like Amazon Linux AMI on Amazon EC2 (Amazon Web Services Instance):
