@@ -7,6 +7,7 @@ from PSO2DataTools import replace_irc_with_pso2, replace_pso2_with_irc
 from config import YAMLConfig
 import config
 from commands import Command
+from twisted.python import log
 
 ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
                          {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': "", 'output': True, 'autoexec': []}, True)
@@ -53,9 +54,16 @@ if ircMode:
             for command in ircSettings.get_key('autoexec'):
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
-            self.join(self.factory.channel)
-            print("[GlobalChat] Joined %s" % self.factory.channel)
-            ircBot = self
+            try:
+            	if self.factory.channel[:1] in ["#","!","+","&"]:
+            	    self.join(self.factory.channel)
+            	    print("[GlobalChat] Joined %s" % self.factory.channel)
+            	    ircBot = self
+            	else:
+            	    raise NameError("[GlobalChat] Failed to join %s channel must contain a #, !, + or & before the channel name" % self.factory.channel)
+            except NameError as ne:
+            	print(ne)
+            	log.msg(ne)
 
         def privmsg(self, user, channel, msg):
             if channel == self.factory.channel:
@@ -341,4 +349,3 @@ class GChat(Command):
                 else:
                     client.get_handle().send_crypto_packet(SMPacket)
         return "[GlobalChat] <Console> %s" % self.args[2:]
-
