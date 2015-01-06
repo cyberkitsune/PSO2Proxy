@@ -19,7 +19,7 @@ pub_sub.subscribe(**{"proxy-server-%s" % connector_conf['server_name']: serverco
 pub_sub_thread = pub_sub.run_in_thread(sleep_time=0.001)
 
 def sendCommand(command_dict):
-    pub_sub.publish("proxy-server-%s" % connector_conf['server_name'], json.dumps(command_dict))
+    db_conn.publish("proxy-server-%s" % connector_conf['server_name'], json.dumps(command_dict))
 
 @plugins.on_start_hook
 def addServer():
