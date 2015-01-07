@@ -133,11 +133,11 @@ if ircMode:
                         else:
                             client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> * %s" % (user.split("!")[0], "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(msg).decode('utf-8'))), 0x3).build())
 
-        def send_global_message(self, ship, user, message):
-            self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, replace_pso2_with_irc(message)))
-
-        def send_global_message(self, ship, user, message, server):
-            self.msg(self.factory.channel, "(%s) [G-%02i] <%s> %s" % (server, ship, user, replace_pso2_with_irc(message)))
+        def send_global_message(self, ship, user, message, server=None):
+            if server is None:
+                self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, replace_pso2_with_irc(message)))
+            else:
+                self.msg(self.factory.channel, "(%s) [G-%02i] <%s> %s" % (server, ship, user, replace_pso2_with_irc(message)))
 
         def send_channel_message(self, message):
             self.msg(self.factory.channel, message)
