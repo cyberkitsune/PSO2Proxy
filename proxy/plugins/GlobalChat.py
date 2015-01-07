@@ -28,7 +28,7 @@ except ImportError:
     redisEnabled = False
 
 def doRedisGchat(message):
-    gchatMsg = json.dumps(message['data'])
+    gchatMsg = json.loads(message['data'])
     if gchatMsg['server'] == PSO2PDConnector.connector_conf['server_name']:
         return
     if gchatMsg['sender'] == 1:
