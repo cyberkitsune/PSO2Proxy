@@ -36,6 +36,9 @@ def servercom_handler(message):
         except:
             e = traceback.format_exc()
             sendCommand({'command': "msg", 'msg': "[ShipProxy] Error Occurred: %s" % e})
+    if cmdObj['command'] == "register":
+        sendCommand({'command': "newserver", 'ip': config.myIpAddress, 'name': connector_conf['server_name']})
+        print("[PSO2PD] Registered with redis!")
 
 
 connector_conf = config.YAMLConfig("cfg/distributed.cfg.yml",{'db_host': 'localhost', 'db_port': 6379, 'db_id': 0, 'db_pass': '', 'server_name': 'changeme'}, True)
