@@ -1,4 +1,5 @@
 # Connector for PSO2Proxy-Distributed. Requires redis.
+import traceback
 import redis
 import config
 import json
@@ -6,12 +7,44 @@ import plugins
 
 import data.clients
 
+from commands import commandList
+
+
 def servercom_handler(message):
-    pass
+    try:
+        cmdObj = json.loads(message['data'])
+    except:
+        print("[PSO2PD] Got unknown message on servercom channel: %s" % message['data'])
+        return
+    if cmdObj['command'] == "exec":
+        line = cmdObj['input']
+        try:
+            command = line.split(' ')[0]
+            if command != "":
+                if command in commandList:
+                    f = commandList[command][0]
+                    out = f(line).call_from_console()
+                    if out is not None:
+                        sendCommand({'command': "msg", 'msg': out})
+                elif command in plugins.commands:
+                    plugin_f = plugins.commands[command][0]
+                    out = plugin_f(line).call_from_console()
+                    if out is not None:
+                        sendCommand({'command': "msg", 'msg': out})
+                else:
+                    sendCommand({'command': "msg", 'msg': "[Command] Command %s not found!" % command})
+        except:
+            e = traceback.format_exc()
+            sendCommand({'command': "msg", 'msg': "[ShipProxy] Error Occurred: %s" % e})
 
-connector_conf = config.YAMLConfig("cfg/distributed.cfg.yml",{'db_host': 'localhost', 'db_port': 6379, 'db_id': 0, 'server_name': 'changeme'},True)
 
-db_conn = redis.StrictRedis(host=connector_conf['db_host'], port=connector_conf['db_port'], db=connector_conf['db_id'])
+connector_conf = config.YAMLConfig("cfg/distributed.cfg.yml",{'db_host': 'localhost', 'db_port': 6379, 'db_id': 0, 'db_pass': '', 'server_name': 'changeme'}, True)
+
+if connector_conf['db_pass'] is not '':
+    db_conn = redis.StrictRedis(host=connector_conf['db_host'], port=connector_conf['db_port'], db=connector_conf['db_id'], password=connector_conf['db_pass'])
+else:
+    db_conn = redis.StrictRedis(host=connector_conf['db_host'], port=connector_conf['db_port'], db=connector_conf['db_id'])
+
 pub_sub = db_conn.pubsub(ignore_subscribe_messages=True)
 
 pub_sub.subscribe(**{"proxy-server-%s" % connector_conf['server_name']: servercom_handler})
