@@ -51,6 +51,7 @@ else:
 pub_sub = db_conn.pubsub(ignore_subscribe_messages=True)
 
 pub_sub.subscribe(**{"proxy-server-%s" % connector_conf['server_name']: servercom_handler})
+pub_sub.subscribe(**{"proxy-global": servercom_handler})
 
 pub_sub_thread = pub_sub.run_in_thread(sleep_time=0.001)
 
