@@ -43,7 +43,7 @@ def doRedisGchat(message):
                 global ircBot
                 if ircBot is not None:
                     ircBot.send_global_message(gchatMsg['ship'],
-                        str(gchatMsg['playerName']).encode('utf-8'), str(gchatMsg['text']).encode('utf-8'), gchatMsg['server'])
+                        str(gchatMsg['playerName']).encode('utf-8'), str(gchatMsg['text']).encode('utf-8'), str(gchatMsg['server']))
         for client_data in data.clients.connectedClients.values():
                 if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
                     if lookup_gchatmode(client_data.preferences) == 0:
