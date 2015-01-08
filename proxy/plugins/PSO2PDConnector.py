@@ -3,11 +3,12 @@ import traceback
 import redis
 import config
 import json
+from packetFactory import SystemMessagePacket
 import plugins
 
 import data.clients
 
-from commands import commandList
+from commands import commandList, Command
 
 
 def servercom_handler(message):
@@ -82,3 +83,9 @@ def notifyMaster(client):
 @plugins.on_client_remove_hook
 def notifyMaster(client):
     sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': len(data.clients.connectedClients) - 1})
+
+
+@plugins.CommandHook("server", "Shows the server you're currently connected to.")
+class ServerCommand(Command):
+    def call_from_client(self, client):
+        client.send_crypto_packet(SystemMessagePacket("You are currently connected to %s, on the IP address %s." % (connector_conf['server_name'], config.myIpAddress)).build())
