@@ -1,4 +1,5 @@
 # Connector for PSO2Proxy-Distributed. Requires redis.
+import threading
 import traceback
 import redis
 import config
@@ -50,29 +51,36 @@ if connector_conf['db_pass'] is not '':
 else:
     db_conn = redis.StrictRedis(host=connector_conf['db_host'], port=connector_conf['db_port'], db=connector_conf['db_id'])
 
-pub_sub = db_conn.pubsub(ignore_subscribe_messages=True)
 
-pub_sub.subscribe(**{"proxy-server-%s" % connector_conf['server_name']: servercom_handler})
-pub_sub.subscribe(**{"proxy-global": servercom_handler})
+class RedisListenThread(threading.Thread):
+    def __init__(self, r):
+        super(RedisListenThread, self).__init__()
+        self.r = r
+        self.pubsub = self.r.pubsub(ignore_subscribe_messages=True)
 
-pub_sub_thread = pub_sub.run_in_thread(sleep_time=0.001)
+    def run(self):
+        self.pubsub.subscribe(**{"proxy-server-%s" % connector_conf['server_name']: servercom_handler})
+        self.pubsub.subscribe(**{"proxy-global": servercom_handler})
+        for item in self.pubsub.listen():
+            print("[REDIS] MSG: %s" % item['data'])
 
 def sendCommand(command_dict):
     db_conn.publish("proxy-server-%s" % connector_conf['server_name'], json.dumps(command_dict))
+
+thread = RedisListenThread(db_conn)
 
 @plugins.on_start_hook
 def addServer():
     sendCommand({'command': "newserver", 'ip': config.myIpAddress, 'name': connector_conf['server_name']})
     print("[PSO2PD] Registered with redis!")
+    global thread
+    thread.daemon = True
+    thread.start()
 
 
 @plugins.on_stop_hook
 def removeServer():
     sendCommand({'command': "delserver", 'name': connector_conf['server_name']})
-
-    pub_sub_thread.stop()
-    pub_sub.close()
-
     print("[PSO2PD] Redis stopped!")
 
 

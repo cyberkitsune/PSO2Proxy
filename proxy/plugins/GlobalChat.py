@@ -53,7 +53,7 @@ def doRedisGchat(message):
 
 
 if redisEnabled:
-    PSO2PDConnector.pub_sub.subscribe(**{'plugin-message-gchat': doRedisGchat})
+    PSO2PDConnector.thread.pubsub.subscribe(**{'plugin-message-gchat': doRedisGchat})
 
 if ircMode:
     from twisted.words.protocols import irc
