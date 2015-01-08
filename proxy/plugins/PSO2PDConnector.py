@@ -39,6 +39,7 @@ def servercom_handler(message):
     if cmdObj['command'] == "register":
         sendCommand({'command': "newserver", 'ip': config.myIpAddress, 'name': connector_conf['server_name']})
         print("[PSO2PD] Registered with redis!")
+        sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': len(data.clients.connectedClients)})
 
 
 connector_conf = config.YAMLConfig("cfg/distributed.cfg.yml",{'db_host': 'localhost', 'db_port': 6379, 'db_id': 0, 'db_pass': '', 'server_name': 'changeme'}, True)
