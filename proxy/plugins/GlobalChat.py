@@ -35,21 +35,21 @@ def doRedisGchat(message):
          for client in data.clients.connectedClients.values():
                 if client.preferences.get_preference('globalChat') and client.get_handle() is not None:
                     if lookup_gchatmode(client.preferences) == 0:
-                        client.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(gchatMsg['playerId'], "[GIRC] %s" % gchatMsg['playerName'], "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(gchatMsg['text']).decode('utf-8'))).build())
+                        client.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(gchatMsg['playerId'], "[GIRC] %s" % str(gchatMsg['playerName']), "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(str(gchatMsg['text'])).decode('utf-8'))).build())
                     else:
-                        client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> %s" % (gchatMsg['playerName'], "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(gchatMsg['text']).decode('utf-8'))), 0x3).build())
+                        client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> %s" % (str(gchatMsg['playerName']), "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(str(gchatMsg['text'])).decode('utf-8'))), 0x3).build())
     else:
         if ircMode:
                 global ircBot
                 if ircBot is not None:
                     ircBot.send_global_message(gchatMsg['ship'],
-                        gchatMsg['playerName'].encode('utf-8'), gchatMsg['text'].encode('utf-8'), gchatMsg['server'])
+                        str(gchatMsg['playerName']).encode('utf-8'), str(gchatMsg['text']).encode('utf-8'), gchatMsg['server'])
         for client_data in data.clients.connectedClients.values():
                 if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
                     if lookup_gchatmode(client_data.preferences) == 0:
-                        client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(gchatMsg['playerId'], "[G-%02i] %s" % (gchatMsg['ship'], gchatMsg['playerName']), "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), gchatMsg['text'])).build())
+                        client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(gchatMsg['playerId'], "[G-%02i] %s" % (gchatMsg['ship'], str(gchatMsg['playerName'])), "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), str(gchatMsg['text']))).build())
                     else:
-                        client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (gchatMsg['ship'], gchatMsg['playerName'], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), gchatMsg['text'])), 0x3).build())
+                        client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (gchatMsg['ship'], str(gchatMsg['playerName']), "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), str(gchatMsg['text']))), 0x3).build())
 
 
 if redisEnabled:
