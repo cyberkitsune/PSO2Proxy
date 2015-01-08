@@ -1,3 +1,4 @@
+import json
 import plugins
 import packetFactory
 import data.clients
@@ -7,6 +8,7 @@ from PSO2DataTools import replace_irc_with_pso2, replace_pso2_with_irc
 from config import YAMLConfig
 import config
 from commands import Command
+from twisted.python import log
 
 ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
                          {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': "", 'output': True, 'autoexec': []}, True)
@@ -18,6 +20,40 @@ ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
 ircChannel = ircSettings.get_key('channel')
 
 gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePrefix': '', 'systemPrefix': '{whi}', 'prefix': ''}, True)
+
+redisEnabled = True
+try:
+    import PSO2PDConnector
+except ImportError:
+    redisEnabled = False
+
+def doRedisGchat(message):
+    gchatMsg = json.loads(message['data'])
+    if gchatMsg['server'] == PSO2PDConnector.connector_conf['server_name']:
+        return
+    if gchatMsg['sender'] == 1:
+         for client in data.clients.connectedClients.values():
+                if client.preferences.get_preference('globalChat') and client.get_handle() is not None:
+                    if lookup_gchatmode(client.preferences) == 0:
+                        client.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(gchatMsg['playerId'], "[GIRC] %s" % str(gchatMsg['playerName']), "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(str(gchatMsg['text'])).decode('utf-8'))).build())
+                    else:
+                        client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> %s" % (str(gchatMsg['playerName']), "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(str(gchatMsg['text'])).decode('utf-8'))), 0x3).build())
+    else:
+        if ircMode:
+                global ircBot
+                if ircBot is not None:
+                    ircBot.send_global_message(gchatMsg['ship'],
+                        str(gchatMsg['playerName']).encode('utf-8'), str(gchatMsg['text']).encode('utf-8'), str(gchatMsg['server']))
+        for client_data in data.clients.connectedClients.values():
+                if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
+                    if lookup_gchatmode(client_data.preferences) == 0:
+                        client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(gchatMsg['playerId'], "[G-%02i] %s" % (gchatMsg['ship'], str(gchatMsg['playerName'])), "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), str(gchatMsg['text']))).build())
+                    else:
+                        client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (gchatMsg['ship'], str(gchatMsg['playerName']), "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), str(gchatMsg['text']))), 0x3).build())
+
+
+if redisEnabled:
+    PSO2PDConnector.pub_sub.subscribe(**{'plugin-message-gchat': doRedisGchat})
 
 if ircMode:
     from twisted.words.protocols import irc
@@ -53,9 +89,16 @@ if ircMode:
             for command in ircSettings.get_key('autoexec'):
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
-            self.join(self.factory.channel)
-            print("[GlobalChat] Joined %s" % self.factory.channel)
-            ircBot = self
+            try:
+                if self.factory.channel[:1] in ["#","!","+","&"]:
+                    self.join(self.factory.channel)
+                    print("[GlobalChat] Joined %s" % self.factory.channel)
+                    ircBot = self
+                else:
+                    raise NameError("[GlobalChat] Failed to join %s channel must contain a #, !, + or & before the channel name" % self.factory.channel)
+            except NameError as ne:
+                print(ne)
+                log.msg(ne)
 
         def privmsg(self, user, channel, msg):
             if channel == self.factory.channel:
@@ -63,6 +106,8 @@ if ircMode:
                     print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8')))
                 #TCPacket = packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]), "[GIRC] %s" % user.split("!")[0], "%s%s" % (gchatSettings['prefix'], replace_irc_with_pso2(msg).decode('utf-8'))).build()
                 #SMPacket = packetFactory.SystemMessagePacket("[GIRC] <%s> %s" % (user.split("!")[0], "%s%s" % (gchatSettings['prefix'], replace_irc_with_pso2(msg).decode('utf-8'))), 0x3).build()
+                if redisEnabled:
+                    PSO2PDConnector.db_conn.publish("plugin-message-gchat", json.dumps({'sender': 1, 'text': replace_irc_with_pso2(msg).decode('utf-8'), 'server': PSO2PDConnector.connector_conf['server_name'], 'playerName': user.split("!")[0], 'playerId': self.get_user_id(user.split("!")[0])}))
                 for client in data.clients.connectedClients.values():
                     if client.preferences.get_preference('globalChat') and client.get_handle() is not None:
                         if lookup_gchatmode(client.preferences) == 0:
@@ -88,8 +133,11 @@ if ircMode:
                         else:
                             client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> * %s" % (user.split("!")[0], "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(msg).decode('utf-8'))), 0x3).build())
 
-        def send_global_message(self, ship, user, message):
-            self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, replace_pso2_with_irc(message)))
+        def send_global_message(self, ship, user, message, server=None):
+            if server is None:
+                self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, replace_pso2_with_irc(message)))
+            else:
+                self.msg(self.factory.channel, "(%s) [G-%02i] <%s> %s" % (server, ship, user, replace_pso2_with_irc(message)))
 
         def send_channel_message(self, message):
             self.msg(self.factory.channel, message)
@@ -312,6 +360,8 @@ class GChat(Command):
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[GChat] {red}You have been muted from GChat and can not talk in it. :(", 0x3).build())
             return
         print("[GlobalChat] <%s> %s" % (data.players.playerList[client.playerId][0], self.args[3:]))
+        if redisEnabled:
+                    PSO2PDConnector.db_conn.publish("plugin-message-gchat", json.dumps({'sender': 0, 'text': self.args[3:], 'server': PSO2PDConnector.connector_conf['server_name'], 'playerName':  data.players.playerList[client.playerId][0], 'playerId': client.playerId, 'ship': data.clients.connectedClients[client.playerId].ship}))
         if ircMode:
             global ircBot
             if ircBot is not None:
@@ -341,4 +391,3 @@ class GChat(Command):
                 else:
                     client.get_handle().send_crypto_packet(SMPacket)
         return "[GlobalChat] <Console> %s" % self.args[2:]
-

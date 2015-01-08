@@ -12,38 +12,38 @@ PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyC
 ####If you have a Debian based system, you can install via apt-get for the depends:
 
 ```
-    sudo apt-get install python-twisted python-crypto python-yaml python-faulthandler openssl git
-    git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
+sudo apt-get install python-twisted python-crypto python-yaml python-faulthandler openssl git
+git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
 ```
 
 ####If your server is running Debian Wheezy, you need to get a more up to date version of the python-twisted package from backports:
 ```
-    echo deb http://http.debian.net/debian wheezy-backports main|sudo tee /etc/apt/sources.list.d/wheezy-backports.list>/dev/null
-    sudo apt-get update
-    sudo apt-get -t wheezy-backports install python-twisted
+echo deb http://http.debian.net/debian wheezy-backports main|tee /etc/apt/sources.list.d/wheezy-backports.list>/dev/null
+apt-get update
+apt-get -t wheezy-backports install python-twisted
 ```
 
 ####For RPM based systems, like Amazon Linux AMI on Amazon EC2 (Amazon Web Services Instance):
 
 ```
-    sudo yum install python-pip gcc python-devel git
-    git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
-    cd ~/PSO2Proxy
-    sudo pip install -r requirements.txt
+sudo yum install python-pip gcc python-devel git
+git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
+cd ~/PSO2Proxy
+sudo pip install -r requirements.txt
 ```
 
 ####Others: If you have a git commandline client, setuptools and pip installed, you can install it like this:
 
 ```
-    git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
-    cd ~/PSO2Proxy
-    pip install -r requirements.txt
+git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
+cd ~/PSO2Proxy
+pip install -r requirements.txt
 ```
 
 ## Start up the Sever for the first time
 ```
-    cd ~/PSO2Proxy/proxy
-    python ./PSO2Proxy.py
+cd ~/PSO2Proxy/proxy
+python ./PSO2Proxy.py
 ```
 
 ## Configuring the Server
@@ -54,7 +54,7 @@ You'll need to generate an RSA public and private keypair for your server and yo
 
 First, change into the keys folder.
 ```
-    cd ~/PSO2Proxy/proxy/keys
+cd ~/PSO2Proxy/proxy/keys
 ```
 
 Generate the private key:
@@ -85,8 +85,8 @@ PSO2Proxy has several plugins that come bundled in to make the experience better
 
 If you would like to enable a plugin already in the disabled folder, use the following command to make symlinks so they get updated.
 ```
-    cd ~/PSO2Proxy/proxy/plugins
-    ln -s disabled/DisabledPluginName.py .
+cd ~/PSO2Proxy/proxy/plugins
+ln -s disabled/DisabledPluginName.py .
 ```
 ## Getting clients to connect
 ### Automatic configuration
@@ -94,8 +94,8 @@ For automatic configuration using PSO2Tweaker, simply enable WebAPI.py and point
 
 To enable WebAPI...
 ```
-    cd ~/PSO2Proxy/proxy/plugins
-    ln -s disabled/WebAPI.py .
+cd ~/PSO2Proxy/proxy/plugins
+ln -s disabled/WebAPI.py .
 ```
 Be sure that publickey.blob is in your keys/ folder.
 ### Manual Mode

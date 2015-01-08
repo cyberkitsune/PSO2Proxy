@@ -112,6 +112,8 @@ def main():
     reactor.suggestThreadPoolSize(30)  # We got 2 cores, screw it!
     reactor.run()
     data.clients.dbManager.close_db()
+    for f in plugin_manager.onStop:
+        f()
 
 
 if __name__ == "__main__":
