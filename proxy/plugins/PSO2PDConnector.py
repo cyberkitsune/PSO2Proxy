@@ -80,4 +80,4 @@ def notifyMaster(client):
 
 @plugins.on_client_remove_hook
 def notifyMaster(client):
-    sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': len(data.clients.connectedClients)})
+    sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': len(data.clients.connectedClients) - 1})
