@@ -88,4 +88,4 @@ def notifyMaster(client):
 @plugins.CommandHook("server", "Shows the server you're currently connected to.")
 class ServerCommand(Command):
     def call_from_client(self, client):
-        client.send_crypto_packet(SystemMessagePacket("You are currently connected to %s, on the IP address %s." % (connector_conf['server_name'], config.myIpAddress)).build())
+        client.send_crypto_packet(SystemMessagePacket("You are currently connected to %s, on the IP address %s." % (connector_conf['server_name'], config.myIpAddress), 0x3).build())
