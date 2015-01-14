@@ -277,6 +277,19 @@ def notify_and_config(client):
         SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
         client.send_crypto_packet(SMPacket)
 
+@plugins.CommandHook("checkeq", "Redisplay of EQ notices from PSO2es sources")
+class RequestEQNoitce(Command):
+    def call_from_client(self, client):
+        ship = data.clients.get_ship_from_port(client.transport.getHost().port)-1
+        if data_eq[ship] and not check_if_EQ_old(ship):
+            SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
+        else:
+            SMPacket = packetFactory.SystemMessagePacket("[Proxy] No new EQ Report from PSO2es", 0x0).build()
+        client.send_crypto_packet(SMPacket)
+
+    def call_from_console(self):
+        return
+
 @plugins.CommandHook("eqnotice", "Toggles display of EQ notices from PSO2es sources")
 class ToggleEQNoitce(Command):
     def call_from_client(self, client):
