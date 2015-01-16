@@ -79,7 +79,7 @@ def get_ship_query(my_ip_address):
 def scrape_block_packet(ship_ip, ship_port, destination_ip):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     log.msg("[BlockQuery] Scraping %s:%i for a initial block..." % (ship_ip, ship_port))
-    s.settimeout(5)
+    s.settimeout(30)
     try:
         s.connect((ship_ip, ship_port))
     except socket.error, e:
