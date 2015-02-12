@@ -109,9 +109,9 @@ def login_confirmation_packet(context, data):
 @PacketHandler(0x11, 0x4f)
 def team_room_info_packet(context, data):
     data = bytearray(data)
-    o1, o2, o3, o4 = struct.unpack_from('BBBB', buffer(data), 0x24)
+    o1, o2, o3, o4 = struct.unpack_from('BBBB', buffer(data), 0x20)
     ip_string = "%i.%i.%i.%i" % (o1, o2, o3, o4)
-    port = struct.unpack_from('H', buffer(data), 0x32)[0]
+    port = struct.unpack_from('H', buffer(data), 0x28)[0]
     if port not in blocks.blockList:
         if verbose:
             print("[BlockPacket] Discovered a 'Team Room' block at %s:%i!" % (ip_string, port))
@@ -126,7 +126,7 @@ def team_room_info_packet(context, data):
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
         blocks.listeningPorts.append(port)
-    struct.pack_into('BBBB', data, 0x24, int(i0), int(i1), int(i2), int(i3))
+    struct.pack_into('BBBB', data, 0x20, int(i0), int(i1), int(i2), int(i3))
     context.peer.changingBlocks = True
     return str(data)
 
@@ -134,9 +134,9 @@ def team_room_info_packet(context, data):
 @PacketHandler(0x11, 0x17)
 def my_room_info_packet(context, data):
     data = bytearray(data)
-    o1, o2, o3, o4 = struct.unpack_from('BBBB', buffer(data), 0x24)
+    o1, o2, o3, o4 = struct.unpack_from('BBBB', buffer(data), 0x20)
     ip_string = "%i.%i.%i.%i" % (o1, o2, o3, o4)
-    port = struct.unpack_from('H', buffer(data), 0x32)[0]
+    port = struct.unpack_from('H', buffer(data), 0x28)[0]
     if port not in blocks.blockList:
         if verbose:
             print("[BlockPacket] Discovered a 'My Room' block at %s:%i!" % (ip_string, port))
@@ -151,7 +151,7 @@ def my_room_info_packet(context, data):
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
         blocks.listeningPorts.append(port)
-    struct.pack_into('BBBB', data, 0x24, int(i0), int(i1), int(i2), int(i3))
+    struct.pack_into('BBBB', data, 0x20, int(i0), int(i1), int(i2), int(i3))
     context.peer.changingBlocks = True
     return str(data)
 
@@ -233,7 +233,7 @@ def block_list_packet(context, data):
             struct.pack_into('%is' % len(block_string), data, pos, block_string)
             if len(block_string) < 0x40:
                 struct.pack_into('%ix' % (0x40 - len(block_string)), data, pos + len(block_string))
-        struct.pack_into('BBBB', data, pos + 0x44, int(i0), int(i1), int(i2), int(i3))
+        struct.pack_into('BBBB', data, pos + 0x40, int(i0), int(i1), int(i2), int(i3))
         pos += 0x88
 
     return str(data)
@@ -242,8 +242,8 @@ def block_list_packet(context, data):
 @PacketHandler(0x11, 0x13)
 def block_reply_packet(context, data):
     data = bytearray(data)
-    struct.pack_into('BBBB', data, 0x18, int(i0), int(i1), int(i2), int(i3))
-    port = struct.unpack_from("H", buffer(data), 0x22)[0]
+    struct.pack_into('BBBB', data, 0x14, int(i0), int(i1), int(i2), int(i3))
+    port = struct.unpack_from("H", buffer(data), 0x18)[0]
     if port in blocks.blockList and port not in blocks.listeningPorts:
         from ShipProxy import ProxyFactory
         if bindIp == "0.0.0.0":
