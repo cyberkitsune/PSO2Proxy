@@ -111,7 +111,7 @@ def scrape_block_packet(ship_ip, ship_port, destination_ip):
     data = bytearray(data.getvalue())
     name = data[0x24:0x64].decode('utf-16le')
     #namelog = name.encode('ascii', errors='ignore').rstrip('\0')
-    o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), 0x64)
+    o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), 0x68)
     ip_string = '%i.%i.%i.%i' % (o1, o2, o3, o4)
     if port not in blocks.blockList:
         #log.msg("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (namelog, ip_string, port))
