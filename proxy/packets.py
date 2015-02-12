@@ -214,7 +214,7 @@ def block_list_packet(context, data):
     data = bytearray(data)
     print("[BlockList] Got block list! Updating local cache and rewriting packet...")
     # Jump to 0x28, 0x88 sep
-    pos = 0x28
+    pos = 0x2C
     while pos < len(data) and data[pos] != 0:
         name = data[pos:pos + 0x40].decode('utf-16le')
         o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), pos + 0x40)
@@ -234,7 +234,7 @@ def block_list_packet(context, data):
             if len(block_string) < 0x40:
                 struct.pack_into('%ix' % (0x40 - len(block_string)), data, pos + len(block_string))
         struct.pack_into('BBBB', data, pos + 0x40, int(i0), int(i1), int(i2), int(i3))
-        pos += 0x88
+        pos += 0x84
 
     return str(data)
 
