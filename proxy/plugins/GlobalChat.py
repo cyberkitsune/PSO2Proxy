@@ -11,13 +11,15 @@ from commands import Command
 from twisted.python import log
 
 ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
-                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': "", 'output': True, 'autoexec': []}, True)
+                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'svname': 'NickServ', 'svpass': '', 'channel': "", 'output': True, 'autoexec': []}, True)
 
 ircMode = ircSettings.get_key('enabled')
 ircOutput = ircSettings.get_key('output')
 ircNick = ircSettings.get_key('nick')
 ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
 ircChannel = ircSettings.get_key('channel')
+ircServicePass = ircSettings.get_key('svpass')
+ircServiceName = ircSettings.get_key('svname')
 
 gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePrefix': '', 'systemPrefix': '{whi}', 'prefix': ''}, True)
 
@@ -238,6 +240,17 @@ class IRCCommand(Command):
             ircBot.sendLine(self.args.split(" ", 1)[1])
             return "[IRC] >>> %s" % self.args.split(" ", 1)[1]
 
+@plugins.CommandHook("ident")
+class IdentCommand(Command):
+    def call_from_console(self):
+        global ircMode
+        global ircBot
+        global ircServiceName
+        global ircServicePass
+        if ircMode and ircBot is not None:
+            if ircServicePass is not None:
+                ircBot.sendLine("privmsg %s id %s" % (ircServiceName,ircServicePass))
+                return "Sent identify command to %s." % (ircServiceName)
 
 @plugins.CommandHook("gon", "Enable global chat.")
 class EnableGChat(Command):
