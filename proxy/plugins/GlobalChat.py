@@ -249,7 +249,7 @@ class IdentCommand(Command):
         global ircServicePass
         if ircMode and ircBot is not None:
             if ircServicePass is not None:
-                ircBot.sendLine("privmsg %s id %s" % (ircServiceName,ircServicePass))
+                ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
                 return "Sent identify command to %s." % (ircServiceName)
 
 @plugins.CommandHook("gon", "Enable global chat.")
