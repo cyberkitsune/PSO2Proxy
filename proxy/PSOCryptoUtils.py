@@ -1,5 +1,6 @@
 from Crypto.Cipher import ARC4, PKCS1_v1_5
 from Crypto.PublicKey import RSA
+from twisted.python import log
 
 
 class PSO2RC4(object):
@@ -30,7 +31,11 @@ class PSO2RSADecrypt(object):
 
     def decrypt(self, data):
         cipher = PKCS1_v1_5.new(self.key)
-        return cipher.decrypt(''.join(reversed(data)), None)  # For now
+        try:
+            return cipher.decrypt(''.join(reversed(data)), None)  # For now
+        except ValueError:
+            log.msg("Message too large to decrypt")
+            return None
 
 
 class PSO2RSAEncrypt(object):
@@ -46,4 +51,8 @@ class PSO2RSAEncrypt(object):
 
     def encrypt(self, data):
         cipher = PKCS1_v1_5.new(self.key)
-        return ''.join(reversed(cipher.encrypt(data)))  # Because MICROSOFT
+        try:
+            return ''.join(reversed(cipher.encrypt(data)))  # Because MICROSOFT
+        except ValueError:
+            log.msg("Message too large to encrypt")
+            return None

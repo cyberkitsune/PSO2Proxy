@@ -7,7 +7,12 @@ import os
 import sys
 import traceback
 import config
-import faulthandler
+
+useFaulthandler = True
+try:
+    import faulthandler
+except ImportError:
+    useFaulthandler = False
 
 from twisted.internet import reactor, stdio
 from twisted.protocols import basic
@@ -107,11 +112,14 @@ def main():
     reactor.suggestThreadPoolSize(30)  # We got 2 cores, screw it!
     reactor.run()
     data.clients.dbManager.close_db()
+    for f in plugin_manager.onStop:
+        f()
 
 
 if __name__ == "__main__":
     if not os.path.exists("log/"):
         os.makedirs("log/")
-    faulthandler.enable(file=open('log/tracestack.log', 'w+'), all_threads=True)
-    #faulthandler.dump_traceback_later()
+    if useFaulthandler:
+        faulthandler.enable(file=open('log/tracestack.log', 'w+'), all_threads=True)
+        #faulthandler.dump_traceback_later()
     main()

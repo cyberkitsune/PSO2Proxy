@@ -84,8 +84,9 @@ def key_packet(context, data):
 @PacketHandler(0x11, 0x1)
 def login_confirmation_packet(context, data):
     data = bytearray(data)
-    string_length = (struct.unpack_from('<I', buffer(data), 0xD)[0] ^ 0x8BA4 ) - 0xB6
-    if string_length > 0: # We got an error! TODO Translate error
+    return str(data)
+    string_length = (struct.unpack_from('<I', buffer(data), 0xC)[0] ^ 0x8BA4 ) - 0xB6
+    if string_length > 0:
         return str(data)
     block_port = context.peer.transport.getHost().port
     if block_port in blocks.blockList:
@@ -100,7 +101,7 @@ def login_confirmation_packet(context, data):
             struct.pack_into('%is' % len(address_string), data, 0x1C, address_string)
             if len(address_string) < 0x40:
                 struct.pack_into('%ix' % (0x40 - len(address_string)), data, 0x1C + len(address_string))
-    player_id = struct.unpack_from("<I", buffer(data), 0x11) # Should be at the same place as long as the string is empty.
+    player_id = struct.unpack_from("<I", buffer(data), 0x10)[0] # Should be at the same place as long as the string is empty.
     context.playerId = player_id
     return str(data)
 
@@ -213,7 +214,7 @@ def block_list_packet(context, data):
     data = bytearray(data)
     print("[BlockList] Got block list! Updating local cache and rewriting packet...")
     # Jump to 0x28, 0x88 sep
-    pos = 0x28
+    pos = 0x2C
     while pos < len(data) and data[pos] != 0:
         name = data[pos:pos + 0x40].decode('utf-16le')
         o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), pos + 0x40)
@@ -233,7 +234,7 @@ def block_list_packet(context, data):
             if len(block_string) < 0x40:
                 struct.pack_into('%ix' % (0x40 - len(block_string)), data, pos + len(block_string))
         struct.pack_into('BBBB', data, pos + 0x40, int(i0), int(i1), int(i2), int(i3))
-        pos += 0x88
+        pos += 0x84
 
     return str(data)
 
