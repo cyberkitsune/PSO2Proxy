@@ -88,6 +88,7 @@ If you would like to enable a plugin already in the disabled folder, use the fol
 cd ~/PSO2Proxy/proxy/plugins
 ln -s disabled/DisabledPluginName.py .
 ```
+Note that some plugins may have additional steps involved to get them working. If you have issues, you should check for a new config file in `~/PSO2Proxy/proxy/cfg`, consult [the Wiki](https://github.com/cyberkitsune/PSO2Proxy/wiki), or contact us on [IRC](http://widget.mibbit.com/?server=irc.badnik.net&channel=%23PSO2Proxypublic).
 ## Getting clients to connect
 ### Automatic configuration
 For automatic configuration using PSO2Tweaker, simply enable WebAPI.py and point the tweaker to http://your.ip.addr.here:8080/config.json

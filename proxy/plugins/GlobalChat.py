@@ -237,7 +237,7 @@ class IRCCommand(Command):
         global ircMode
         global ircBot
         if ircMode and ircBot is not None:
-            ircBot.sendLine(self.args.split(" ", 1)[1])
+            ircBot.sendLine(self.args.split(" ", 1)[1].encode('utf-8'))
             return "[IRC] >>> %s" % self.args.split(" ", 1)[1]
 
 @plugins.CommandHook("ident")
