@@ -20,6 +20,7 @@ else:
     provider = "Google"
     translator = goslate.Goslate()
 
+
 @p.on_initial_connect_hook
 def create_preferences(client):
     """
@@ -33,7 +34,7 @@ def create_preferences(client):
 
 
 @p.CommandHook("jpin", "Toggles proxy-end chat translation. (Powered by %s Translate, Incoming only.)" % provider)
-class ToggleTranslate(Command):
+class ToggleTranslateIn(Command):
     def call_from_client(self, client):
         if client.playerId in data.clients.connectedClients:
             user_prefs = data.clients.connectedClients[client.playerId].preferences
@@ -43,8 +44,9 @@ class ToggleTranslate(Command):
             else:
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled incoming chat translation.", 0x3).build())
 
+
 @p.CommandHook("jpout", "Toggles outbound chat translation to japanese. (Powered by %s Translate, Outgoing only.)" % provider)
-class ToggleTranslate(Command):
+class ToggleTranslateOut(Command):
     def call_from_client(self, client):
         if client.playerId in data.clients.connectedClients:
             user_prefs = data.clients.connectedClients[client.playerId].preferences

@@ -74,8 +74,8 @@ class ShipProxy(protocol.Protocol):
         while len(self.readBuffer) >= 8:
             packet_size = struct.unpack_from('i', self.readBuffer)[0]
             packet_type = struct.unpack_from('BB', self.readBuffer, 4)
-            #If the packets reported size is less than a normal packet header, wrap it up to 8 as it should NEVER be that way.
-            #This prevents an infinite loop.
+#           If the packets reported size is less than a normal packet header, wrap it up to 8 as it should NEVER be that way.
+#           This prevents an infinite loop.
             if packet_size < 8:
                 print("[ShipProxy] Warning! Got invalid packet size %i. Resetting to 8 to prevent infinite loop..." % packet_size)
                 packet_size = 8

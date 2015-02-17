@@ -22,4 +22,5 @@ tools/PSO2KeyTools/PSO2KeyInjector/Release
 log/
 proxy/keys/*.blob
 proxy/keys/*.pem
+.*.swp
 *~

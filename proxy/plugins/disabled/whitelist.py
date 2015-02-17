@@ -5,13 +5,10 @@ import packetFactory
 
 from packetFactory import SystemMessagePacket
 
-from twisted.protocols import basic
 from commands import Command
 
-import plugins
-
-
 whitelist = []
+
 
 @plugins.on_start_hook
 def load_whitelist():
@@ -42,7 +39,7 @@ class Whitelist(Command):
         params = self.args.split(" ")
         if len(params) < 3:
             return "[Whitelist] Invalid usage. (Usage: whitelist <add/del> <SegaID>)"
-        if params[1] == "add" or params[1]== "ADD":
+        if params[1] == "add" or params[1] == "ADD":
             if params[2] not in whitelist:
                 whitelist.append(params[2])
                 save_whitelist()
@@ -58,7 +55,7 @@ class Whitelist(Command):
                 return "[Whitelist] %s is not in the whitelist, can not delete!" % params[2]
         else:
             return "[Whitelist] Invalid usage. (Usage: whitelist <add/del> <SegaID>)"
-            
+
     def call_from_client(self, client):
         """
         :param client: ShipProxy.ShipProxy
@@ -68,7 +65,7 @@ class Whitelist(Command):
         if len(params) < 3:
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. (Usage: whitelist <add/del> <SegaID>)", 0x3).build())
             return
-        if params[1] == "add" or params[1]== "ADD":
+        if params[1] == "add" or params[1] == "ADD":
             if params[2] not in whitelist:
                 whitelist.append(params[2])
                 save_whitelist()
