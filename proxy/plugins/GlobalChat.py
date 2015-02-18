@@ -255,9 +255,8 @@ class IdentCommand(Command):
         global ircServiceName
         global ircServicePass
         if ircMode and ircBot is not None:
-            if ircServicePass is not None:
-                ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
-                return "Sent identify command to %s." % (ircServiceName)
+            ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
+            return "Sent identify command to %s." % (ircServiceName)
 
 @plugins.CommandHook("gon", "Enable global chat.")
 class EnableGChat(Command):
