@@ -122,7 +122,6 @@ if ircMode:
         def noticed(self, user, channel, message):
             print("[IRC] [NOTICE] %s %s" % (user, message))
             if user.split("!")[0] == 'NickServ' and 'registered' in message:
-                print ("That works.")
                 global ircServicePass
                 global ircServiceName
                 if ircServicePass is not '':
@@ -255,9 +254,8 @@ class IdentCommand(Command):
         global ircServiceName
         global ircServicePass
         if ircMode and ircBot is not None:
-            if ircServicePass is not None:
-                ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
-                return "Sent identify command to %s." % (ircServiceName)
+            ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
+            return "Sent identify command to %s." % (ircServiceName)
 
 @plugins.CommandHook("gon", "Enable global chat.")
 class EnableGChat(Command):
