@@ -11,13 +11,15 @@ from commands import Command
 from twisted.python import log
 
 ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
-                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'channel': "", 'output': True, 'autoexec': []}, True)
+                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'svname': 'NickServ', 'svpass': '', 'channel': "", 'output': True, 'autoexec': []}, True)
 
 ircMode = ircSettings.get_key('enabled')
 ircOutput = ircSettings.get_key('output')
 ircNick = ircSettings.get_key('nick')
 ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
 ircChannel = ircSettings.get_key('channel')
+ircServicePass = ircSettings.get_key('svpass')
+ircServiceName = ircSettings.get_key('svname')
 
 gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePrefix': '', 'systemPrefix': '{whi}', 'prefix': ''}, True)
 
@@ -119,6 +121,12 @@ if ircMode:
 
         def noticed(self, user, channel, message):
             print("[IRC] [NOTICE] %s %s" % (user, message))
+            if user.split("!")[0] == 'NickServ' and 'registered' in message:
+                global ircServicePass
+                global ircServiceName
+                if ircServicePass is not '':
+                    ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
+                    print("[IRC] Sent identify command to %s." % (ircServiceName))
 
         def action(self, user, channel, msg):
             if channel == self.factory.channel:
@@ -239,6 +247,16 @@ class IRCCommand(Command):
             ircBot.sendLine(self.args.split(" ", 1)[1].encode('utf-8'))
             return "[IRC] >>> %s" % self.args.split(" ", 1)[1]
 
+@plugins.CommandHook("ident")
+class IdentCommand(Command):
+    def call_from_console(self):
+        global ircMode
+        global ircBot
+        global ircServiceName
+        global ircServicePass
+        if ircMode and ircBot is not None:
+            ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
+            return "[IRC] Sent identify command to %s." % (ircServiceName)
 
 @plugins.CommandHook("gon", "Enable global chat.")
 class EnableGChat(Command):
