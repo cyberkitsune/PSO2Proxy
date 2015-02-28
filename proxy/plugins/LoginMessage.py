@@ -2,7 +2,6 @@ import config
 import data.clients
 import plugins
 import packetFactory
-import subprocess
 
 from commands import Command
 

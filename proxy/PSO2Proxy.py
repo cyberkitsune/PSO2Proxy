@@ -21,7 +21,6 @@ from twisted.internet.endpoints import TCP4ServerEndpoint
 
 from commands import commandList
 import data
-import data.clients as clients
 import plugins.plugins as plugin_manager
 from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
 from config import myIpAddress as myIp
@@ -121,5 +120,5 @@ if __name__ == "__main__":
         os.makedirs("log/")
     if useFaulthandler:
         faulthandler.enable(file=open('log/tracestack.log', 'w+'), all_threads=True)
-        #faulthandler.dump_traceback_later()
+#       faulthandler.dump_traceback_later()
     main()

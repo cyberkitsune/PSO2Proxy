@@ -52,7 +52,6 @@ class WEBRcon(Resource):
                     return json.dumps({'success': False, 'reason': "Error executing command\n%s" % e})
 
 
-
 class JSONConfig(Resource):
     isLeaf = True
 
@@ -92,6 +91,7 @@ class LatestProfile(Resource):
         else:
             return "No profile saved."
 
+
 class LatestStackTrace(Resource):
     isLeaf = True
 
@@ -106,13 +106,13 @@ class LatestStackTrace(Resource):
         else:
             return "No tracekstack saved."
 
+
 class WebAPI(Resource):
 
     # noinspection PyPep8Naming
     @staticmethod
     def render_GET(request):
-        current_data = {'playerCount': len(data.clients.connectedClients), 'blocksCached': len(data.blocks.blockList),
-                    'uniquePlayers': data.clients.dbManager.get_db_size(), 'upSince': upStart, 'peakPlayers': peakPlayers}
+        current_data = {'playerCount': len(data.clients.connectedClients), 'blocksCached': len(data.blocks.blockList), 'uniquePlayers': data.clients.dbManager.get_db_size(), 'upSince': upStart, 'peakPlayers': peakPlayers}
         request.setHeader("content-type", "application/json")
         return json.dumps(current_data)
 

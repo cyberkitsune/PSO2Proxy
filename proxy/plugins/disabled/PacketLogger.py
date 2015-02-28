@@ -13,6 +13,7 @@ def write_file(filename, data, mode='wb'):
     with open(filename, mode) as f:
         f.write(data)
 
+
 @plugins.on_start_hook
 def on_start():
     print("!!! WARNING !!!")

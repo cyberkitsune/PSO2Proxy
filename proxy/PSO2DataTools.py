@@ -46,7 +46,7 @@ PSO2_IRC = [
     ("{black}", "\x03""01"),  # black
     ("{pla}", "\x03""01"),  # black
 
-    ("{def}", "\x0F"    ),  # colour reset
+    ("{def}", "\x0F"),  # colour reset
 
     ("{orang}", "\x03""10"),  # teal (a green/blue cyan)
 
@@ -413,10 +413,11 @@ IRC_PSO2 = [
     ("\x1E", ""),
 ]
 
+
 def replace_with_table(pIncoming, table, debug=0):
     lIncoming = unicode(pIncoming, 'utf-8-sig', 'replace')
 
-    if debug > 0 :
+    if debug > 0:
         print "Incoming object:  {}".format(repr(pIncoming))
         print "Incoming unicode: {}".format(repr(lIncoming))
 
@@ -426,14 +427,16 @@ def replace_with_table(pIncoming, table, debug=0):
 
     outtext = lIncoming.encode('utf-8', 'replace')
 
-    if debug > 0 :
+    if debug > 0:
         print "Outgoing replace: {}".format(repr(lIncoming))
         print "Outgoing string:  {}".format(repr(outtext))
 
     return outtext
 
+
 def replace_pso2_with_irc(pIncoming, debug=0):
     return replace_with_table(pIncoming, PSO2_IRC, debug)
+
 
 def replace_irc_with_pso2(pIncoming, debug=0):
     return replace_with_table(pIncoming, IRC_PSO2, debug)
