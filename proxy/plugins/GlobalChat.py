@@ -247,6 +247,7 @@ class IRCCommand(Command):
             ircBot.sendLine(self.args.split(" ", 1)[1].encode('utf-8'))
             return "[IRC] >>> %s" % self.args.split(" ", 1)[1]
 
+
 @plugins.CommandHook("ident")
 class IdentCommand(Command):
     def call_from_console(self):
@@ -257,6 +258,7 @@ class IdentCommand(Command):
         if ircMode and ircBot is not None:
             ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
             return "[IRC] Sent identify command to %s." % (ircServiceName)
+
 
 @plugins.CommandHook("gon", "Enable global chat.")
 class EnableGChat(Command):
