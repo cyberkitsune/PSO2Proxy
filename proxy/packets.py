@@ -1,25 +1,24 @@
-import struct
-import io
-import traceback
-from twisted.internet import reactor
-from twisted.internet.endpoints import TCP4ServerEndpoint
-
-import data.blocks as blocks
-import data.players as players
-import data.clients as clients
-import packetFactory
-from PSOCryptoUtils import PSO2RSADecrypt, PSO2RC4, PSO2RSAEncrypt
 import commands
-import plugins.plugins as plugin_manager
-from config import myIpAddress as ipAddress
-from config import blockNameMode as bNameMode
-from config import noisy as verbose
-from config import myIpAddress as myIp
-from config import bindIp
 import config
+from config import bindIp
+from config import blockNameMode as bNameMode
+from config import myIpAddress as myIp
+from config import noisy as verbose
+import data.blocks as blocks
+import data.clients as clients
+import data.players as players
+import io
+import packetFactory
+import plugins.plugins as plugin_manager
+from PSOCryptoUtils import PSO2RC4
+from PSOCryptoUtils import PSO2RSADecrypt
+from PSOCryptoUtils import PSO2RSAEncrypt
+import struct
+import traceback
+from twisted.internet import endpoints
+from twisted.internet import reactor
 
-
-i0, i1, i2, i3 = ipAddress.split(".")
+i0, i1, i2, i3 = myIp.split(".")
 rsaDecrypter = PSO2RSADecrypt("keys/myKey.pem")
 rsaEncryptor = PSO2RSAEncrypt("keys/SEGAKey.pem")
 
@@ -120,7 +119,7 @@ def team_room_info_packet(context, data):
             interface_ip = myIp
         else:
             interface_ip = bindIp
-        block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
+        block_endpoint = endpoints.TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
         blocks.listeningPorts.append(port)
@@ -145,7 +144,7 @@ def my_room_info_packet(context, data):
             interface_ip = myIp
         else:
             interface_ip = bindIp
-        block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
+        block_endpoint = endpoints.TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
         blocks.listeningPorts.append(port)
@@ -184,7 +183,7 @@ def chat_packet(context, data):
                         return
                     cmd_class = commands.commandList[command][0]
                     cmd_class(message).call_from_client(context)  # Lazy...
-                except:
+                except Exception as e:
                     context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}An error occured when trying to run this command.", 0x3).build())
                     e = traceback.format_exc()
                     context.send_crypto_packet(packetFactory.SystemMessagePacket("[{red}ERROR{def}] %s" % e, 0x3).build())
@@ -196,7 +195,7 @@ def chat_packet(context, data):
                         return
                     cmd_class = plugin_manager.commands[command][0]
                     cmd_class(message).call_from_client(context)
-                except:
+                except Exception as e:
                     context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}An error occured when trying to run this command.", 0x3).build())
                     e = traceback.format_exc()
                     context.send_crypto_packet(packetFactory.SystemMessagePacket("[{red}ERROR{def}] %s" % e, 0x3).build())
@@ -248,7 +247,7 @@ def block_reply_packet(context, data):
             interface_ip = myIp
         else:
             interface_ip = bindIp
-        block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
+        block_endpoint = endpoints.TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
         blocks.listeningPorts.append(port)

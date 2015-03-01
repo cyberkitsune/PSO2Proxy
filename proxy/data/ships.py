@@ -1,17 +1,14 @@
-import socket
-import io
-import struct
-import time
-import sys
-from twisted.internet import reactor
-from twisted.internet.endpoints import TCP4ServerEndpoint
-
-from twisted.python import log
-
-from config import myIpAddress as myIp
-from config import bindIp
-
 import blocks
+from config import bindIp
+from config import myIpAddress as myIp
+import io
+import socket
+import struct
+import sys
+import time
+from twisted.internet import endpoints
+from twisted.internet import reactor
+from twisted.python import log
 
 
 blockShipList = {
@@ -83,28 +80,28 @@ def scrape_block_packet(ship_ip, ship_port, destination_ip):
     s.settimeout(30)
     try:
         s.connect((ship_ip, ship_port))
-    except socket.error, e:
+    except socket.error as e:
         log.msg("[BlockQuery] Scraping %s:%i connect return an error: %s" % (ship_ip, ship_port, e))
         return None
-    except:
+    except Exception as e:
         log.msg("[BlockQuery] Scraping %s:%i connect return an error: %s" % (ship_ip, ship_port, sys.exc_info()[0]))
         return None
     data = io.BytesIO()
     try:
         data.write(s.recv(4))
-    except socket.error, e:
+    except socket.error as e:
         log.msg("[BlockQuery] Scraping %s:%i write return an error: %s" % (ship_ip, ship_port, e))
         return None
-    except:
+    except Exception as e:
         log.msg("[BlockQuery] Scraping %s:%i write return an error: %s" % (ship_ip, ship_port, sys.exc_info()[0]))
         return None
     actual_size = struct.unpack_from('i', data.getvalue(), 0x0)[0]
     try:
         data.write(s.recv(actual_size - 4))
-    except socket.error, e:
+    except socket.error as e:
         log.msg("[BlockQuery] Scraping %s:%i recv return an error: %s" % (ship_ip, ship_port, e))
         return None
-    except:
+    except Exception as e:
         log.msg("[BlockQuery] Scraping %s:%i recv return an error: %s" % (ship_ip, ship_port, sys.exc_info()[0]))
         return None
     s.close()
@@ -123,7 +120,7 @@ def scrape_block_packet(ship_ip, ship_port, destination_ip):
             interface_ip = myIp
         else:
             interface_ip = bindIp
-        block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
+        block_endpoint = endpoints.TCP4ServerEndpoint(reactor, port, interface=interface_ip)
 #       twisted.internet.error.CannotListenError: Couldn't listen on 0.0.0.0:12468: [Errno 98] Address already in use.
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
@@ -140,28 +137,28 @@ def scrape_ship_packet(ship_ip, ship_port, destination_ip):
     s.settimeout(30)
     try:
         s.connect((ship_ip, ship_port))
-    except socket.error, e:
+    except socket.error as e:
         log.msg("[ShipQuery] Scraping %s:%i connnect return an error: %s" % (ship_ip, ship_port, e))
         return None
-    except:
+    except Exception as e:
         log.msg("[ShipQuery] Scraping %s:%i connect return an error: %s" % (ship_ip, ship_port, sys.exc_info()[0]))
         return None
     data = io.BytesIO()
     try:
         data.write(s.recv(4))
-    except socket.error, e:
+    except socket.error as e:
         log.msg("[ShipQuery] Scraping %s:%i recv return an error: %s" % (ship_ip, ship_port, e))
         return None
-    except:
+    except Exception as e:
         log.msg("[ShipQuery] Scraping %s:%i recv return an error: %s" % (ship_ip, ship_port, sys.exc_info()[0]))
         return None
     actual_size = struct.unpack_from('i', data.getvalue(), 0x0)[0]
     try:
         data.write(s.recv(actual_size - 4))
-    except socket.error, e:
+    except socket.error as e:
         log.msg("[ShipQuery] Scraping %s:%i write return an error: %s" % (ship_ip, ship_port, e))
         return None
-    except:
+    except Exception as e:
         log.msg("[ShipQuery] Scraping %s:%i wrtie return an error: %s" % (ship_ip, ship_port, sys.exc_info()[0]))
         return None
     s.close()

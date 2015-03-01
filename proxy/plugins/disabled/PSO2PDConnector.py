@@ -1,21 +1,23 @@
 # Connector for PSO2Proxy-Distributed. Requires redis.
-import threading
-import traceback
-import redis
+
+import commands
 import config
-import json
-from packetFactory import SystemMessagePacket
-import plugins
 
 import data.clients
 
-from commands import commandList, Command
+import json
+
+from packetFactory import SystemMessagePacket
+import plugins
+import redis
+import threading
+import traceback
 
 
 def servercom_handler(message):
     try:
         cmdObj = json.loads(message['data'])
-    except:
+    except Exception as e:
         print("[PSO2PD] Got unknown message on servercom channel: %s" % message['data'])
         return
     if cmdObj['command'] == "exec":
@@ -23,8 +25,8 @@ def servercom_handler(message):
         try:
             command = line.split(' ')[0]
             if command != "":
-                if command in commandList:
-                    f = commandList[command][0]
+                if command in commands.commandList:
+                    f = commands.commandList[command][0]
                     out = f(line).call_from_console()
                     if out is not None:
                         sendCommand({'command': "msg", 'msg': out})
@@ -35,7 +37,7 @@ def servercom_handler(message):
                         sendCommand({'command': "msg", 'msg': out})
                 else:
                     sendCommand({'command': "msg", 'msg': "[Command] Command %s not found!" % command})
-        except:
+        except Exception as e:
             e = traceback.format_exc()
             sendCommand({'command': "msg", 'msg': "[ShipProxy] Error Occurred: %s" % e})
     if cmdObj['command'] == "register":
@@ -97,6 +99,6 @@ def removeuser(client):
 
 
 @plugins.CommandHook("server", "Shows the server you're currently connected to.")
-class ServerCommand(Command):
+class ServerCommand(commands.Command):
     def call_from_client(self, client):
         client.send_crypto_packet(SystemMessagePacket("You are currently connected to %s, on the IP address %s." % (connector_conf['server_name'], config.myIpAddress), 0x3).build())

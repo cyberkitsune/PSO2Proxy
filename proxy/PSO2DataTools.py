@@ -23,9 +23,6 @@ PSO2_IRC = [
     ("{vio}", "\x03""13"),  # Violet
     ("{violet}", "\x03""13"),  # Violet
 
-    ("{bro}", "\x03""11"),  # light purple?
-
-
     ("{bei}", "\x03""05"),  # Beige
     ("{beige}", "\x03""05"),  # Beige
 
@@ -47,10 +44,6 @@ PSO2_IRC = [
     ("{pla}", "\x03""01"),  # black
 
     ("{def}", "\x0F"),  # colour reset
-
-    ("{orang}", "\x03""10"),  # teal (a green/blue cyan)
-
-    ("{yello}", "\x03""05"),  # brown (maroon)
 ]
 
 IRC_PSO2 = [
@@ -414,24 +407,40 @@ IRC_PSO2 = [
 ]
 
 
-def replace_with_table(pIncoming, table, debug=0):
+def replace_with_table(pIncoming, table, debug=0, check=0):
     lIncoming = unicode(pIncoming, 'utf-8-sig', 'replace')
 
     if debug > 0:
-        print "Incoming object:  {}".format(repr(pIncoming))
-        print "Incoming unicode: {}".format(repr(lIncoming))
+        print ("Incoming object:  {}".format(repr(pIncoming)))
+        print ("Incoming unicode: {}".format(repr(lIncoming)))
 
-    for i, o in table:
-        outtext = lIncoming.replace(i, o)
-        lIncoming = outtext
+    if (check):
+        for i, o in table:
+            outtext = lIncoming.replace(i, "")
+            lIncoming = outtext
+    else:
+        for i, o in table:
+            outtext = lIncoming.replace(i, o)
+            lIncoming = outtext
+
+    if (check):
+        lIncoming = lIncoming.strip()
 
     outtext = lIncoming.encode('utf-8', 'replace')
 
     if debug > 0:
-        print "Outgoing replace: {}".format(repr(lIncoming))
-        print "Outgoing string:  {}".format(repr(outtext))
+        print ("Outgoing replace: {}".format(repr(lIncoming)))
+        print ("Outgoing string:  {}".format(repr(outtext)))
 
     return outtext
+
+
+def check_pso2_with_irc(pIncoming, debug=0):
+    return replace_with_table(pIncoming, PSO2_IRC, debug, check=1)
+
+
+def check_irc_with_pso2(pIncoming, debug=0):
+    return replace_with_table(pIncoming, IRC_PSO2, debug, check=1)
 
 
 def replace_pso2_with_irc(pIncoming, debug=0):

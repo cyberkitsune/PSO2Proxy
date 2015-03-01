@@ -1,6 +1,6 @@
 #!/bin/python
-import sys
 from PSO2DataTools import replace_irc_with_pso2
+import sys
 
 f = sys.stdin
 
