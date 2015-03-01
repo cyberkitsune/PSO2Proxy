@@ -1,13 +1,13 @@
 import calendar
-import struct
-import datetime
-from twisted.internet import protocol, reactor
+from config import noisy as verbose
+from data import blocks
 from data import clients
+import datetime
 import packets
 import plugins.plugins as plugin_manager
-from data import blocks
-
-from config import noisy as verbose
+import struct
+from twisted.internet import protocol
+from twisted.internet import reactor
 
 
 class ShipProxy(protocol.Protocol):

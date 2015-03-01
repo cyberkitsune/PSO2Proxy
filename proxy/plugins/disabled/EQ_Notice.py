@@ -255,7 +255,7 @@ def on_start():
     try:
         pool.cachedConnectionTimeout = (tasksec/2)+tasksec+1
         pool.retryAutomatically = False
-    except:
+    except Exception as e:
         print("[EQ Notice] No pool, please update Twisted")
 
 

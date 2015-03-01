@@ -418,8 +418,8 @@ def replace_with_table(pIncoming, table, debug=0):
     lIncoming = unicode(pIncoming, 'utf-8-sig', 'replace')
 
     if debug > 0:
-        print "Incoming object:  {}".format(repr(pIncoming))
-        print "Incoming unicode: {}".format(repr(lIncoming))
+        print ("Incoming object:  {}".format(repr(pIncoming)))
+        print ("Incoming unicode: {}".format(repr(lIncoming)))
 
     for i, o in table:
         outtext = lIncoming.replace(i, o)
@@ -428,8 +428,8 @@ def replace_with_table(pIncoming, table, debug=0):
     outtext = lIncoming.encode('utf-8', 'replace')
 
     if debug > 0:
-        print "Outgoing replace: {}".format(repr(lIncoming))
-        print "Outgoing string:  {}".format(repr(outtext))
+        print ("Outgoing replace: {}".format(repr(lIncoming)))
+        print ("Outgoing string:  {}".format(repr(outtext)))
 
     return outtext
 

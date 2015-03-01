@@ -1,12 +1,9 @@
+import commands
 import json
 import os
-import plugins
 import packetFactory
-
 from packetFactory import SystemMessagePacket
-
-from commands import Command
-
+import plugins
 whitelist = []
 
 
@@ -33,7 +30,7 @@ def save_whitelist():
 
 
 @plugins.CommandHook("whitelist", "[Admin Only] Adds or removes someone to the connection whitelist.", True)
-class Whitelist(Command):
+class Whitelist(commands.Command):
     def call_from_console(self):
         global whitelist
         params = self.args.split(" ")
