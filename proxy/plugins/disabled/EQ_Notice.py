@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-import data.clients as clients
 from commands import Command
 import config
+import data.clients as clients
 from datetime import datetime
 import json
 import os.path
