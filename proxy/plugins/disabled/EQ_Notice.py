@@ -14,6 +14,7 @@ from twisted.internet import reactor
 from twisted.internet import task
 from twisted.python import log
 from twisted.web.client import Agent
+from twisted.web.client import RedirectAgent
 from twisted.web.http_headers import Headers
 
 
@@ -46,9 +47,9 @@ try:
     from twisted.web.client import HTTPConnectionPool
     pool = HTTPConnectionPool(reactor)
     pool._factory.noisy = False
-    agent = Agent(reactor, pool=pool)
+    agent = RedirectAgent(Agent(reactor, pool=pool))
 except ImportError:
-    agent = Agent(reactor)
+    agent = RedirectAgent(Agent(reactor))
 
 eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True, 'timer': 60, 'debug': False, '1': "http://acf.me.uk/Public/PSO2EQ/pso2eq.txt"}, True)
 
