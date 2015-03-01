@@ -23,9 +23,6 @@ PSO2_IRC = [
     ("{vio}", "\x03""13"),  # Violet
     ("{violet}", "\x03""13"),  # Violet
 
-    ("{bro}", "\x03""11"),  # light purple?
-
-
     ("{bei}", "\x03""05"),  # Beige
     ("{beige}", "\x03""05"),  # Beige
 
@@ -47,10 +44,6 @@ PSO2_IRC = [
     ("{pla}", "\x03""01"),  # black
 
     ("{def}", "\x0F"),  # colour reset
-
-    ("{orang}", "\x03""10"),  # teal (a green/blue cyan)
-
-    ("{yello}", "\x03""05"),  # brown (maroon)
 ]
 
 IRC_PSO2 = [
