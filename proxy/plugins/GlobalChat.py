@@ -6,6 +6,8 @@ import data.players
 import json
 import packetFactory
 import plugins
+from PSO2DataTools import check_irc_with_pso2
+from PSO2DataTools import check_pso2_with_irc
 from PSO2DataTools import replace_irc_with_pso2
 from PSO2DataTools import replace_pso2_with_irc
 from twisted.internet import protocol
@@ -36,20 +38,23 @@ gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePre
 
 def doRedisGchat(message):
     gchatMsg = json.loads(message['data'])
+    strgchatmsg = str(gchatMsg['text'].encode('utf-8'))
+    if not check_irc_with_pso2(strgchatmsg):
+        return
     if gchatMsg['server'] == PSO2PDConnector.connector_conf['server_name']:
         return
     if gchatMsg['sender'] == 1:
         for client in data.clients.connectedClients.values():
             if client.preferences.get_preference('globalChat') and client.get_handle() is not None:
                 if lookup_gchatmode(client.preferences) == 0:
-                    client.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(gchatMsg['playerId'], "[GIRC] %s" % gchatMsg['playerName'], "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(str(gchatMsg['text'].encode('utf-8'))).decode('utf-8'))).build())
+                    client.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(gchatMsg['playerId'], "[GIRC] %s" % gchatMsg['playerName'], "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(strgchatmsg).decode('utf-8'))).build())
                 else:
-                    client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> %s" % (gchatMsg['playerName'], "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(str(gchatMsg['text'].encode('utf-8'))).decode('utf-8'))), 0x3).build())
+                    client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> %s" % (gchatMsg['playerName'], "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(strgchatmsg).decode('utf-8'))), 0x3).build())
     else:
         if ircMode:
                 global ircBot
                 if ircBot is not None:
-                    ircBot.send_global_message(gchatMsg['ship'], str(gchatMsg['playerName'].encode('utf-8')), str(gchatMsg['text'].encode('utf-8')), str(gchatMsg['server']))
+                    ircBot.send_global_message(gchatMsg['ship'], str(gchatMsg['playerName'].encode('utf-8')), strgchatmsg, str(gchatMsg['server']))
         for client_data in data.clients.connectedClients.values():
                 if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
                     if lookup_gchatmode(client_data.preferences) == 0:
@@ -103,6 +108,8 @@ if ircMode:
                 log.msg(ne)
 
         def privmsg(self, user, channel, msg):
+            if not check_irc_with_pso2(msg):
+                return
             if channel == self.factory.channel:
                 if self.ircOutput is True:
                     print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8')))
@@ -127,6 +134,8 @@ if ircMode:
                     print("[IRC] Sent identify command to %s." % (ircServiceName))
 
         def action(self, user, channel, msg):
+            if not check_irc_with_pso2(msg):
+                return
             if channel == self.factory.channel:
                 if self.ircOutput is True:
                     print("[GlobalChat] [IRC] * %s %s" % (user, replace_irc_with_pso2(msg).decode('utf-8')))
@@ -138,6 +147,8 @@ if ircMode:
                             client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> * %s" % (user.split("!")[0], "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(msg).decode('utf-8'))), 0x3).build())
 
         def send_global_message(self, ship, user, message, server=None):
+            if not check_pso2_with_irc(message):
+                return
             if server is None:
                 self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, replace_pso2_with_irc(message)))
             else:
