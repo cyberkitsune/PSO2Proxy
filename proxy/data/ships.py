@@ -40,6 +40,8 @@ curShipIndex = 0
 
 def get_ship_from_port(port):
     port_string = str(port)
+    if int(port_string[1]) == 3:
+        return 11
     ship_num = int(port_string[2])
     if ship_num == 0:
         ship_num = 10
@@ -112,6 +114,9 @@ def scrape_block_packet(ship_ip, ship_port, destination_ip):
 #   namelog = name.encode('ascii', errors='ignore').rstrip('\0')
     o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), 0x68)
     ip_string = '%i.%i.%i.%i' % (o1, o2, o3, o4)
+    if ship_ip == blockShipList[13000]: #Shared ship hack
+        port += 1000  # Bump port up to 13000
+        struct.pack_into('H', data, 0x68+4, port)
     if port not in blocks.blockList:
         # log.msg("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (namelog, ip_string, port))
         blocks.blockList[port] = (ip_string, name)
