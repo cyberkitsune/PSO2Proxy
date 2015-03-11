@@ -105,6 +105,8 @@ def main():
         query_endpoint = endpoints.TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=interface_ip)
         query_endpoint.listen(BlockScraperFactory())
         print("[ShipProxy] Bound port %i for ship %i query server!" % ((12000 + (100 * shipNum)), shipNum))
+    query_endpoint = endpoints.TCP4ServerEndpoint(reactor, 13000, interface=interface_ip)
+    query_endpoint.listen(BlockScraperFactory())
     stdio.StandardIO(ServerConsole())
     print("[ShipProxy] Loading plugins...")
     import glob
