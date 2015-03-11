@@ -109,6 +109,7 @@ def team_room_info_packet(context, data):
     o1, o2, o3, o4 = struct.unpack_from('BBBB', buffer(data), 0x20)
     ip_string = "%i.%i.%i.%i" % (o1, o2, o3, o4)
     port = struct.unpack_from('H', buffer(data), 0x28)[0]
+
     if port not in blocks.blockList:
         if verbose:
             print("[BlockPacket] Discovered a 'Team Room' block at %s:%i!" % (ip_string, port))
@@ -216,6 +217,8 @@ def block_list_packet(context, data):
         name = data[pos:pos + 0x40].decode('utf-16le')
         o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), pos + 0x40)
         ip_string = "%i.%i.%i.%i" % (o1, o2, o3, o4)
+        if context.peer.transport.getHost().port > 12999:
+            port += 1000
         if port not in blocks.blockList:
             if verbose:
                 print("[BlockList] Discovered new block %s at address %s:%i! Recording..." % (name, ip_string, port))
@@ -241,6 +244,9 @@ def block_reply_packet(context, data):
     data = bytearray(data)
     struct.pack_into('BBBB', data, 0x14, int(i0), int(i1), int(i2), int(i3))
     port = struct.unpack_from("H", buffer(data), 0x18)[0]
+    if context.peer.transport.getHost().port > 12999:
+        port += 1000
+        struct.pack_into("H", data, 0x14+4, port)
     if port in blocks.blockList and port not in blocks.listeningPorts:
         from ShipProxy import ProxyFactory
         if bindIp == "0.0.0.0":
