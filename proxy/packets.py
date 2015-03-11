@@ -279,6 +279,6 @@ def player_name_packet(context, data):
 @PacketHandler(0x11, 0x21)
 def shared_ship_packet(context, data):
     data = bytearray(data)
-    struct.pack_into("BBBB", data, 0x8, i0, i1, i2, i3)
+    struct.pack_into("BBBB", data, 0x8, int(i0), int(i1), int(i2), int(i3))
     struct.pack_into("H", data, 0xC, 13000) # Maybe incorrect?
     return str(data)
