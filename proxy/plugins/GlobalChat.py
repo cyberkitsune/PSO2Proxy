@@ -93,6 +93,7 @@ if ircMode:
 
         def signedOn(self):
             global ircBot
+            global ircServicePass
             for command in ircSettings.get_key('autoexec'):
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
@@ -133,6 +134,7 @@ if ircMode:
             if user.split("!")[0] == 'NickServ' and 'registered' in message:
                 global ircServicePass
                 global ircServiceName
+                global ircBot
                 if ircServicePass is not '':
                     ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
                     print("[IRC] Sent identify command to %s." % (ircServiceName))
