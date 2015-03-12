@@ -96,17 +96,17 @@ if ircMode:
             for command in ircSettings.get_key('autoexec'):
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
-		if ircServicePass == '':
-			joinChan(self)
+	    if ircServicePass == '':
+	        joinChan(self)
 			
 	def joinChan(self):
-		try:
-            if self.factory.channel[:1] in ["#", "!", "+", "&"]:
-                self.join(self.factory.channel)
-                print("[GlobalChat] Joined %s" % self.factory.channel)
-                ircBot = self
-            else:
-        raise NameError("[GlobalChat] Failed to join %s channel must contain a #, !, + or & before the channel name" % self.factory.channel)
+	    try:
+                if self.factory.channel[:1] in ["#", "!", "+", "&"]:
+                    self.join(self.factory.channel)
+                    print("[GlobalChat] Joined %s" % self.factory.channel)
+                    ircBot = self
+                else:
+                    raise NameError("[GlobalChat] Failed to join %s channel must contain a #, !, + or & before the channel name" % self.factory.channel)
             except NameError as ne:
                 print(ne)
                 log.msg(ne)
