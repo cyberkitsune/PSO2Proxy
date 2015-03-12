@@ -134,9 +134,7 @@ if ircMode:
             if user.split("!")[0] == 'NickServ' and 'registered' in message:
                 global ircServicePass
                 global ircServiceName
-                global ircBot
                 if ircServicePass is not '':
-                    #ircBot = self
                     self.msg(ircServiceName, "identify %s" % (ircServicePass))
                     print("[IRC] Sent identify command to %s." % (ircServiceName))
 
