@@ -136,7 +136,7 @@ if ircMode:
                 if ircServicePass is not '':
                     ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
                     print("[IRC] Sent identify command to %s." % (ircServiceName))
-					joinChan(self)
+	            joinChan(self)
 
         def action(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
