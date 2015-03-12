@@ -12,6 +12,7 @@ from PSO2DataTools import replace_irc_with_pso2
 from PSO2DataTools import replace_pso2_with_irc
 from twisted.internet import protocol
 from twisted.internet import reactor
+from twisted.internet import task
 from twisted.python import log
 from twisted.words.protocols import irc
 
@@ -110,8 +111,8 @@ if ircMode:
             for command in ircSettings.get_key('autoexec'):
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
-	    if ircServicePass == '':
-	        self.joinChan()
+	    d = task.deferLater(reactor, 20, joinChan, self)
+            reactor.run()
 			
         def privmsg(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
@@ -140,7 +141,7 @@ if ircMode:
                     ircBot = self
                     ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
                     print("[IRC] Sent identify command to %s." % (ircServiceName))
-	            self.joinChan()
+	            #self.joinChan()
 
         def action(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
