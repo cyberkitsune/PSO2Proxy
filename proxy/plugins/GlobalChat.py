@@ -111,7 +111,7 @@ if ircMode:
                 print("[IRC-AUTO] >>> %s" % command)
 	    task.deferLater(reactor, 15, self.joinChan)
 	    print("[GlobalChat] Joining channels in 15 seconds...")
-			
+
         def privmsg(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
                 return
