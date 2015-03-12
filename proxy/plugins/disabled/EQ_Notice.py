@@ -107,7 +107,7 @@ def load_eqJP_names():
         return
     for ship in config.globalConfig.get_key('enabledShips'):
         eqJPd = eqJP.get(data_eq[ship])
-        if eqJPd: # Is there a mapping?
+        if eqJPd:  # Is there a mapping?
             msg_eq[ship] = "%s (JP: %s@%s:%s JST)" % (eqJPd, data_eq[ship], hour_eq[ship], mins_eq[ship])
         else:
             msg_eq[ship] = "JP: %s@%s:%s JST" % (data_eq[ship], hour_eq[ship], mins_eq[ship])
@@ -146,7 +146,7 @@ def findmins_EQ(message):
     return message[hridx - 2:hridx]
 
 
-def cleanup_EQ(message, ship): # 0 is ship1
+def cleanup_EQ(message, ship):  # 0 is ship1
     ishour_eq[ship] = ishour_EQ(message)
     hour_eq[ship] = findhour_EQ(message)
     mins_eq[ship] = findmins_EQ(message)
@@ -177,14 +177,14 @@ def check_if_EQ_old(ship):
     return False
 
 
-def EQBody(body, ship): # 0 is ship1
+def EQBody(body, ship):  # 0 is ship1
     if not body.strip():
         logdebug("Ship %d: no data" % (ship + 1))
         return
     logdebug("Ship %d's Body: %s" % (ship + 1, body))
     if HTTP_Data[ship] == body:
         logdebug("Ship %d: Still have the same data" % (ship + 1))
-        return # same data, do not react on it
+        return  # same data, do not react on it
     logdebug("Ship %d: have the new data" % (ship + 1))
     HTTP_Data[ship] = body
 
@@ -201,7 +201,7 @@ def EQBody(body, ship): # 0 is ship1
         return
     logdebug("Ship %d: EQ is new" % (ship + 1))
 
-    load_eqJP_names() # Reload file
+    load_eqJP_names()  # Reload file
 
     print("[EQ Notice] Sending players MSG on Ship %02d : %s" % (ship + 1, msg_eq[ship]))
     SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
@@ -218,7 +218,7 @@ def EQBody(body, ship): # 0 is ship1
             logdebug("Ship %d: Got a dead client, skipping" % (ship + 1))
 
 
-def EQResponse(response, ship=-1): # 0 is ship1
+def EQResponse(response, ship=-1):  # 0 is ship1
     if response.code == 304:
         return
     logdebug("Ship %d: HTTP Status %d" % (ship + 1, response.code))
@@ -245,7 +245,7 @@ def EQResponse(response, ship=-1): # 0 is ship1
 def CheckupURL():
     #logdebug("Checking URL")
     HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']})
-    load_eqJP_names() # Reload file
+    load_eqJP_names()  # Reload file
     for shipNum in config.globalConfig.get_key('enabledShips'):
         if eqnotice_config.key_exists(str(shipNum)):
             eq_URL = eqnotice_config.get_key(str(shipNum))
@@ -275,7 +275,7 @@ def on_start():
         print("[EQ Notice] No pool, please update Twisted, %s" % e)
 
     if eq_mode:
-        taskrun.start(tasksec) # call every 60 seconds
+        taskrun.start(tasksec)  # call every 60 seconds
     else:
         print("EQ Notice is disabled by config")
 
