@@ -91,15 +91,6 @@ if ircMode:
             irc.IRCClient.connectionLost(self, reason)
             print("[GlobalChat] IRC Connection lost!")
 
-        def signedOn(self):
-            global ircBot
-            global ircServicePass
-            for command in ircSettings.get_key('autoexec'):
-                self.sendLine(command)
-                print("[IRC-AUTO] >>> %s" % command)
-	    if ircServicePass == '':
-	        joinChan(self)
-			
 	def joinChan(self):
 	    global ircBot
 	    try:
@@ -112,6 +103,15 @@ if ircMode:
             except NameError as ne:
                 print(ne)
                 log.msg(ne)
+
+        def signedOn(self):
+            global ircBot
+            global ircServicePass
+            for command in ircSettings.get_key('autoexec'):
+                self.sendLine(command)
+                print("[IRC-AUTO] >>> %s" % command)
+	    if ircServicePass == '':
+	        joinChan(self)
 			
         def privmsg(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
