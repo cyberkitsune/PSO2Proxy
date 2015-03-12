@@ -178,6 +178,9 @@ def check_if_EQ_old(ship):
 
 
 def EQBody(body, ship): # 0 is ship1
+    if not body.strip():
+        logdebug("Ship %d: no data" % (ship + 1))
+        return
     logdebug("Ship %d's Body: %s" % (ship + 1, body))
     if HTTP_Data[ship] == body:
         logdebug("Ship %d: Still have the same data" % (ship + 1))
