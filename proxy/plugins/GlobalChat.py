@@ -101,6 +101,7 @@ if ircMode:
 	        joinChan(self)
 			
 	def joinChan(self):
+	    global ircBot
 	    try:
                 if self.factory.channel[:1] in ["#", "!", "+", "&"]:
                     self.join(self.factory.channel)
@@ -136,6 +137,7 @@ if ircMode:
                 global ircServiceName
                 global ircBot
                 if ircServicePass is not '':
+                    ircBot = self
                     ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
                     print("[IRC] Sent identify command to %s." % (ircServiceName))
 	            joinChan(self)
