@@ -92,8 +92,8 @@ if ircMode:
             irc.IRCClient.connectionLost(self, reason)
             print("[GlobalChat] IRC Connection lost!")
 
-	def joinChan(self):
-	    global ircBot
+        def joinChan(self):
+            global ircBot
 	    try:
                 if self.factory.channel[:1] in ["#", "!", "+", "&"]:
                     self.join(self.factory.channel)
