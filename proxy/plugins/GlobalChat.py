@@ -111,7 +111,7 @@ if ircMode:
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
 	    if ircServicePass == '':
-	        joinChan(self)
+	        self.joinChan(self)
 			
         def privmsg(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
@@ -140,7 +140,7 @@ if ircMode:
                     ircBot = self
                     ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
                     print("[IRC] Sent identify command to %s." % (ircServiceName))
-	            joinChan(self)
+	            self.joinChan(self)
 
         def action(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
