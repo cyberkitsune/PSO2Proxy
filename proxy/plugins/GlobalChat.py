@@ -427,4 +427,4 @@ class GChat(commands.Command):
                     client.get_handle().send_crypto_packet(TCPacket)
                 else:
                     client.get_handle().send_crypto_packet(SMPacket)
-        return "[GlobalChat] <Console> %s" % sel
+        return "[GlobalChat] <Console> %s" % self
