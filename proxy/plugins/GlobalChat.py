@@ -112,7 +112,6 @@ if ircMode:
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
 	    task.deferLater(reactor, 15, self.joinChan)
-            #reactor.run()
 			
         def privmsg(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
@@ -141,7 +140,6 @@ if ircMode:
                     ircBot = self
                     ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
                     print("[IRC] Sent identify command to %s." % (ircServiceName))
-	            #self.joinChan()
 
         def action(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
@@ -427,4 +425,4 @@ class GChat(commands.Command):
                     client.get_handle().send_crypto_packet(TCPacket)
                 else:
                     client.get_handle().send_crypto_packet(SMPacket)
-        return "[GlobalChat] <Console> %s" % self
+        return "[GlobalChat] <Console> %s" % sel
