@@ -94,7 +94,7 @@ if ircMode:
 
         def joinChan(self):
             global ircBot
-	    try:
+            try:
                 if self.factory.channel[:1] in ["#", "!", "+", "&"]:
                     self.join(self.factory.channel)
                     print("[GlobalChat] Joined %s" % self.factory.channel)
@@ -109,8 +109,8 @@ if ircMode:
             for command in ircSettings.get_key('autoexec'):
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
-	    task.deferLater(reactor, 15, self.joinChan)
-	    print("[GlobalChat] Joining channels in 15 seconds...")
+            task.deferLater(reactor, 15, self.joinChan)
+            print("[GlobalChat] Joining channels in 15 seconds...")
 
         def privmsg(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
