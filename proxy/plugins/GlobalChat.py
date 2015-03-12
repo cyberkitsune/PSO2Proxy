@@ -111,7 +111,7 @@ if ircMode:
             for command in ircSettings.get_key('autoexec'):
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
-	    d = task.deferLater(reactor, 20, joinChan, self)
+	    d = task.deferLater(reactor, 20, self.joinChan, self)
             reactor.run()
 			
         def privmsg(self, user, channel, msg):
