@@ -106,8 +106,6 @@ if ircMode:
                 log.msg(ne)
 
         def signedOn(self):
-            global ircBot
-            global ircServicePass
             for command in ircSettings.get_key('autoexec'):
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
