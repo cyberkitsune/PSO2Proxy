@@ -96,8 +96,8 @@ if ircMode:
             for command in ircSettings.get_key('autoexec'):
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
-			if ircServicePass == '':
-				joinChan(self)
+		if ircServicePass == '':
+			joinChan(self)
 			
 	def joinChan(self):
 		try:
