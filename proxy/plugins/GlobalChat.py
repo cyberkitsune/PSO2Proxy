@@ -112,7 +112,7 @@ if ircMode:
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
 	    d = task.deferLater(reactor, 20, self.joinChan, self)
-            reactor.run()
+            #reactor.run()
 			
         def privmsg(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
