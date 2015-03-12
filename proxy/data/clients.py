@@ -1,9 +1,9 @@
-import sqlite3
-import yaml
 import blocks
 import config
 import packetFactory
-from twisted.internet.protocol import Protocol
+import sqlite3
+import twisted
+import yaml
 
 from ships import get_ship_from_port
 
@@ -29,7 +29,7 @@ class ClientData(object):
         """
         if self.handle is None:
             return None
-        if isinstance(self.handle, Protocol) and hasattr(self.handle.transport, 'socket'):
+        if isinstance(self.handle, twisted.internet.protocol.Protocol) and hasattr(self.handle.transport, 'socket'):
             return self.handle
         return None
 
@@ -50,7 +50,7 @@ class SQLitePreferenceManager():
         print("[Database] User preference database created!")
 
     def get_data_for_sega_id(self, sega_id):
-        if not sega_id in self.user_preference_cache:
+        if not (sega_id in self.user_preference_cache):
             self.user_preference_cache[sega_id] = self._get_user_data_from_db(sega_id)
         return self.user_preference_cache[sega_id]
 
@@ -75,7 +75,6 @@ class SQLitePreferenceManager():
     def update_user_cache(self, sega_id, new_config):
         self.user_preference_cache[sega_id] = new_config
         self._update_user_data_in_db(sega_id)
-
 
     def get_db_size(self):
         local_cursor = self._db_connection.cursor()

@@ -12,7 +12,7 @@ PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyC
 ####If you have a Debian based system, you can install via apt-get for the depends:
 
 ```
-sudo apt-get install python-twisted python-crypto python-yaml python-faulthandler openssl git
+sudo apt-get install python-twisted python-crypto python-yaml python-faulthandler python-pip openssl git
 git clone https://github.com/cyberkitsune/PSO2Proxy.git ~/PSO2Proxy
 ```
 
@@ -40,7 +40,7 @@ cd ~/PSO2Proxy
 pip install -r requirements.txt
 ```
 
-## Start up the Sever for the first time
+## Start up the Server for the first time
 ```
 cd ~/PSO2Proxy/proxy
 python ./PSO2Proxy.py
@@ -78,7 +78,7 @@ On Debian systems, you can use this command:
 
 `dpkg-reconfigure locales`
 
-Make sure to uncheck everything but "en_US.UTF-8", and reboot your machine after the process is completed.
+Make sure to uncheck everything but `en_US.UTF-8`, and reboot your machine after the process is completed.
 
 ### Plugins
 PSO2Proxy has several plugins that come bundled in to make the experience better. Most of them are disabed by default, with the exception of `LoginMessage` and `GlobalChat`. To disable a plugin that is not in the disabled folder, simply delete it.
@@ -88,16 +88,17 @@ If you would like to enable a plugin already in the disabled folder, use the fol
 cd ~/PSO2Proxy/proxy/plugins
 ln -s disabled/DisabledPluginName.py .
 ```
+Note that some plugins may have additional steps involved to get them working. If you have issues, you should check for a new config file in `~/PSO2Proxy/proxy/cfg`, consult [the Wiki](https://github.com/cyberkitsune/PSO2Proxy/wiki), or contact us on [IRC](http://widget.mibbit.com/?server=irc.badnik.net&channel=%23PSO2Proxypublic).
 ## Getting clients to connect
 ### Automatic configuration
-For automatic configuration using PSO2Tweaker, simply enable WebAPI.py and point the tweaker to http://your.ip.addr.here:8080/config.json
+For automatic configuration using PSO2Tweaker, simply enable WebAPI.py and point the tweaker to `http://your.ip.addr.here:8080/config.json`
 
 To enable WebAPI...
 ```
 cd ~/PSO2Proxy/proxy/plugins
 ln -s disabled/WebAPI.py .
 ```
-Be sure that publickey.blob is in your keys/ folder.
+Be sure that `publickey.blob` is in your `keys/` folder.
 ### Manual Mode
 #### Rebind hosts file
 To get clients to connect to your proxy, they need to think SEGA's servers are your servers. An easy way to do this is to modify Windows's hosts file, add the following code below to the hosts file in `c:\Windows\System32\Drivers\etc\hosts`, replacing 0.0.0.0 with the proxy's **IP address**.

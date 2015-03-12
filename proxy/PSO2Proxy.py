@@ -2,30 +2,37 @@
 from twisted.internet import epollreactor
 epollreactor.install()
 
-import time
-import os
-import sys
-import traceback
+import commands
 import config
+from config import bindIp
+from config import myIpAddress as myIp
+
+import data
+
+import os
+
+import plugins.plugins as plugin_manager
+
+from queryProtocols import BlockScraperFactory
+from queryProtocols import ShipAdvertiserFactory
+
+
+import sys
+
+import time
+import traceback
+from twisted.internet import endpoints
+from twisted.internet import reactor
+from twisted.internet import stdio
+from twisted.protocols import basic
+from twisted.python import log
+from twisted.python import logfile
 
 useFaulthandler = True
 try:
     import faulthandler
 except ImportError:
     useFaulthandler = False
-
-from twisted.internet import reactor, stdio
-from twisted.protocols import basic
-from twisted.python import log, logfile
-from twisted.internet.endpoints import TCP4ServerEndpoint
-
-from commands import commandList
-import data
-import data.clients as clients
-import plugins.plugins as plugin_manager
-from queryProtocols import BlockScraperFactory, ShipAdvertiserFactory
-from config import myIpAddress as myIp
-from config import bindIp
 
 
 class ServerConsole(basic.LineReceiver):
@@ -39,8 +46,8 @@ class ServerConsole(basic.LineReceiver):
         try:
             command = line.split(' ')[0]
             if command != "":
-                if command in commandList:
-                    f = commandList[command][0]
+                if command in commands.commandList:
+                    f = commands.commandList[command][0]
                     out = f(line).call_from_console()
                     if out is not None:
                         print(out)
@@ -51,7 +58,7 @@ class ServerConsole(basic.LineReceiver):
                         print(out)
                 else:
                     print("[Command] Command %s not found!" % command)
-        except:
+        except Exception as e:
             e = traceback.format_exc()
             print("[ShipProxy] Error Occurred: %s" % e)
         self.transport.write('>>> ')
@@ -91,13 +98,15 @@ def main():
         sys.exit(0)
 
     for shipNum in range(0, 10):  # PSO2 Checks all ships round robin, so sadly for max compatibility we have to open these no matter what ships are enabled...
-        ship_endpoint = TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=interface_ip)
+        ship_endpoint = endpoints.TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=interface_ip)
         ship_endpoint.listen(ShipAdvertiserFactory())
 
     for shipNum in config.globalConfig.get_key('enabledShips'):
-        query_endpoint = TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=interface_ip)
+        query_endpoint = endpoints.TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=interface_ip)
         query_endpoint.listen(BlockScraperFactory())
         print("[ShipProxy] Bound port %i for ship %i query server!" % ((12000 + (100 * shipNum)), shipNum))
+    query_endpoint = endpoints.TCP4ServerEndpoint(reactor, 13000, interface=interface_ip)
+    query_endpoint.listen(BlockScraperFactory())
     stdio.StandardIO(ServerConsole())
     print("[ShipProxy] Loading plugins...")
     import glob
@@ -121,5 +130,5 @@ if __name__ == "__main__":
         os.makedirs("log/")
     if useFaulthandler:
         faulthandler.enable(file=open('log/tracestack.log', 'w+'), all_threads=True)
-        #faulthandler.dump_traceback_later()
+#       faulthandler.dump_traceback_later()
     main()

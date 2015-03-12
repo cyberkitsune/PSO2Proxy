@@ -1,11 +1,11 @@
-import time
-from twisted.internet import threads
+import commands
 from config import YAMLConfig
 import data.clients
 import packetFactory
 import struct
+import time
+from twisted.internet import threads
 from unicodescript import script
-from commands import Command
 
 import plugins as p
 
@@ -20,6 +20,7 @@ else:
     provider = "Google"
     translator = goslate.Goslate()
 
+
 @p.on_initial_connect_hook
 def create_preferences(client):
     """
@@ -33,7 +34,7 @@ def create_preferences(client):
 
 
 @p.CommandHook("jpin", "Toggles proxy-end chat translation. (Powered by %s Translate, Incoming only.)" % provider)
-class ToggleTranslate(Command):
+class ToggleTranslateIn(commands.Command):
     def call_from_client(self, client):
         if client.playerId in data.clients.connectedClients:
             user_prefs = data.clients.connectedClients[client.playerId].preferences
@@ -43,8 +44,9 @@ class ToggleTranslate(Command):
             else:
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled incoming chat translation.", 0x3).build())
 
+
 @p.CommandHook("jpout", "Toggles outbound chat translation to japanese. (Powered by %s Translate, Outgoing only.)" % provider)
-class ToggleTranslate(Command):
+class ToggleTranslateOut(commands.Command):
     def call_from_client(self, client):
         if client.playerId in data.clients.connectedClients:
             user_prefs = data.clients.connectedClients[client.playerId].preferences
@@ -106,7 +108,8 @@ def generate_translated_message(player_id, channel_id, message, end_lang, start_
             message_string = "%s" % translator.translate(message, end_lang, start_lang)
         else:
             message_string = "%s {def}(%s)" % (translator.translate(message, end_lang, start_lang), message)
-    except:
+    except Exception as e:
+        print (str(e))
         message_string = message
 
     return packetFactory.ChatPacket(player_id, message_string, channel_id).build()

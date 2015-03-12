@@ -40,6 +40,7 @@ def on_start_hook(f):
     onStart.append(f)
     return f
 
+
 def on_stop_hook(f):
     global onStop
     onStop.append(f)

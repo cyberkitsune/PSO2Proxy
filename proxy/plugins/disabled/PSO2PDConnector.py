@@ -1,21 +1,23 @@
 # Connector for PSO2Proxy-Distributed. Requires redis.
-import threading
-import traceback
-import redis
+
+import commands
 import config
-import json
-from packetFactory import SystemMessagePacket
-import plugins
 
 import data.clients
 
-from commands import commandList, Command
+import json
+
+from packetFactory import SystemMessagePacket
+import plugins
+import redis
+import threading
+import traceback
 
 
 def servercom_handler(message):
     try:
         cmdObj = json.loads(message['data'])
-    except:
+    except Exception as e:
         print("[PSO2PD] Got unknown message on servercom channel: %s" % message['data'])
         return
     if cmdObj['command'] == "exec":
@@ -23,8 +25,8 @@ def servercom_handler(message):
         try:
             command = line.split(' ')[0]
             if command != "":
-                if command in commandList:
-                    f = commandList[command][0]
+                if command in commands.commandList:
+                    f = commands.commandList[command][0]
                     out = f(line).call_from_console()
                     if out is not None:
                         sendCommand({'command': "msg", 'msg': out})
@@ -35,7 +37,7 @@ def servercom_handler(message):
                         sendCommand({'command': "msg", 'msg': out})
                 else:
                     sendCommand({'command': "msg", 'msg': "[Command] Command %s not found!" % command})
-        except:
+        except Exception as e:
             e = traceback.format_exc()
             sendCommand({'command': "msg", 'msg': "[ShipProxy] Error Occurred: %s" % e})
     if cmdObj['command'] == "register":
@@ -44,7 +46,7 @@ def servercom_handler(message):
         sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': len(data.clients.connectedClients)})
 
 
-connector_conf = config.YAMLConfig("cfg/distributed.cfg.yml",{'db_host': 'localhost', 'db_port': 6379, 'db_id': 0, 'db_pass': '', 'server_name': 'changeme'}, True)
+connector_conf = config.YAMLConfig("cfg/distributed.cfg.yml", {'db_host': 'localhost', 'db_port': 6379, 'db_id': 0, 'db_pass': '', 'server_name': 'changeme'}, True)
 
 if connector_conf['db_pass'] is not '':
     db_conn = redis.StrictRedis(host=connector_conf['db_host'], port=connector_conf['db_port'], db=connector_conf['db_id'], password=connector_conf['db_pass'])
@@ -64,10 +66,12 @@ class RedisListenThread(threading.Thread):
         for item in self.pubsub.listen():
             print("[REDIS] MSG: %s" % item['data'])
 
+
 def sendCommand(command_dict):
     db_conn.publish("proxy-server-%s" % connector_conf['server_name'], json.dumps(command_dict))
 
 thread = RedisListenThread(db_conn)
+
 
 @plugins.on_start_hook
 def addServer():
@@ -85,15 +89,16 @@ def removeServer():
 
 
 @plugins.on_initial_connect_hook
-def notifyMaster(client):
+def adduser(client):
     sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': len(data.clients.connectedClients)})
 
+
 @plugins.on_client_remove_hook
-def notifyMaster(client):
+def removeuser(client):
     sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': len(data.clients.connectedClients) - 1})
 
 
 @plugins.CommandHook("server", "Shows the server you're currently connected to.")
-class ServerCommand(Command):
+class ServerCommand(commands.Command):
     def call_from_client(self, client):
         client.send_crypto_packet(SystemMessagePacket("You are currently connected to %s, on the IP address %s." % (connector_conf['server_name'], config.myIpAddress), 0x3).build())

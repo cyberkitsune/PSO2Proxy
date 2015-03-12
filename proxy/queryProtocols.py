@@ -1,8 +1,9 @@
-from twisted.internet import protocol, threads
-import data.ships as ships
 from config import myIpAddress
-import plugins.plugins
 from config import noisy as verbose
+import data.ships as ships
+import plugins.plugins
+from twisted.internet import protocol
+from twisted.internet import threads
 
 
 class BlockScraper(protocol.Protocol):

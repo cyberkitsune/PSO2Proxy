@@ -1,17 +1,18 @@
-import exceptions
-from twisted.internet import reactor
-from commands import Command
-import plugins as plugins
+import commands
 from data.clients import dbManager
-import struct
-import packetFactory
+import exceptions
 import json
 import os
+import packetFactory
+import plugins as plugins
+import struct
+from twisted.internet import reactor
 
 
 def write_file(filename, data, mode='wb'):
     with open(filename, mode) as f:
         f.write(data)
+
 
 @plugins.on_start_hook
 def on_start():
@@ -37,7 +38,7 @@ def notify_and_config(client):
 
 
 @plugins.CommandHook("optin", "Opts you into packet logging for the redpill project.")
-class OptIn(Command):
+class OptIn(commands.Command):
     def call_from_client(self, client):
         client_config = dbManager.get_data_for_sega_id(client.myUsername)
         client_config['logPackets'] = True
@@ -45,7 +46,7 @@ class OptIn(Command):
 
 
 @plugins.CommandHook("optout", "Opts you out of the packet logging for the redpill project.")
-class OptOut(Command):
+class OptOut(commands.Command):
     def call_from_client(self, client):
         archive_packets(client)
         client_config = dbManager.get_data_for_sega_id(client.myUsername)

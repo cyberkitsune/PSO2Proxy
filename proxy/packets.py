@@ -1,27 +1,24 @@
-import struct
-import io
-import traceback
-from twisted.internet import reactor
-from twisted.internet.endpoints import TCP4ServerEndpoint
-
-from twisted.python import log
-
-import data.blocks as blocks
-import data.players as players
-import data.clients as clients
-import packetFactory
-from PSOCryptoUtils import PSO2RSADecrypt, PSO2RC4, PSO2RSAEncrypt
 import commands
-import plugins.plugins as plugin_manager
-from config import myIpAddress as ipAddress
-from config import blockNameMode as bNameMode
-from config import noisy as verbose
-from config import myIpAddress as myIp
-from config import bindIp
 import config
+from config import bindIp
+from config import blockNameMode as bNameMode
+from config import myIpAddress as myIp
+from config import noisy as verbose
+import data.blocks as blocks
+import data.clients as clients
+import data.players as players
+import io
+import packetFactory
+import plugins.plugins as plugin_manager
+from PSOCryptoUtils import PSO2RC4
+from PSOCryptoUtils import PSO2RSADecrypt
+from PSOCryptoUtils import PSO2RSAEncrypt
+import struct
+import traceback
+from twisted.internet import endpoints
+from twisted.internet import reactor
 
-
-i0, i1, i2, i3 = ipAddress.split(".")
+i0, i1, i2, i3 = myIp.split(".")
 rsaDecrypter = PSO2RSADecrypt("keys/myKey.pem")
 rsaEncryptor = PSO2RSAEncrypt("keys/SEGAKey.pem")
 
@@ -85,7 +82,7 @@ def key_packet(context, data):
 def login_confirmation_packet(context, data):
     data = bytearray(data)
     return str(data)
-    string_length = (struct.unpack_from('<I', buffer(data), 0xC)[0] ^ 0x8BA4 ) - 0xB6
+    string_length = (struct.unpack_from('<I', buffer(data), 0xC)[0] ^ 0x8BA4) - 0xB6
     if string_length > 0:
         return str(data)
     block_port = context.peer.transport.getHost().port
@@ -101,7 +98,7 @@ def login_confirmation_packet(context, data):
             struct.pack_into('%is' % len(address_string), data, 0x1C, address_string)
             if len(address_string) < 0x40:
                 struct.pack_into('%ix' % (0x40 - len(address_string)), data, 0x1C + len(address_string))
-    player_id = struct.unpack_from("<I", buffer(data), 0x10)[0] # Should be at the same place as long as the string is empty.
+    player_id = struct.unpack_from("<I", buffer(data), 0x10)[0]  # Should be at the same place as long as the string is empty.
     context.playerId = player_id
     return str(data)
 
@@ -112,6 +109,7 @@ def team_room_info_packet(context, data):
     o1, o2, o3, o4 = struct.unpack_from('BBBB', buffer(data), 0x20)
     ip_string = "%i.%i.%i.%i" % (o1, o2, o3, o4)
     port = struct.unpack_from('H', buffer(data), 0x28)[0]
+
     if port not in blocks.blockList:
         if verbose:
             print("[BlockPacket] Discovered a 'Team Room' block at %s:%i!" % (ip_string, port))
@@ -122,7 +120,7 @@ def team_room_info_packet(context, data):
             interface_ip = myIp
         else:
             interface_ip = bindIp
-        block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
+        block_endpoint = endpoints.TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
         blocks.listeningPorts.append(port)
@@ -147,7 +145,7 @@ def my_room_info_packet(context, data):
             interface_ip = myIp
         else:
             interface_ip = bindIp
-        block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
+        block_endpoint = endpoints.TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
         blocks.listeningPorts.append(port)
@@ -186,7 +184,7 @@ def chat_packet(context, data):
                         return
                     cmd_class = commands.commandList[command][0]
                     cmd_class(message).call_from_client(context)  # Lazy...
-                except:
+                except Exception as e:
                     context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}An error occured when trying to run this command.", 0x3).build())
                     e = traceback.format_exc()
                     context.send_crypto_packet(packetFactory.SystemMessagePacket("[{red}ERROR{def}] %s" % e, 0x3).build())
@@ -198,7 +196,7 @@ def chat_packet(context, data):
                         return
                     cmd_class = plugin_manager.commands[command][0]
                     cmd_class(message).call_from_client(context)
-                except:
+                except Exception as e:
                     context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}An error occured when trying to run this command.", 0x3).build())
                     e = traceback.format_exc()
                     context.send_crypto_packet(packetFactory.SystemMessagePacket("[{red}ERROR{def}] %s" % e, 0x3).build())
@@ -219,6 +217,8 @@ def block_list_packet(context, data):
         name = data[pos:pos + 0x40].decode('utf-16le')
         o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), pos + 0x40)
         ip_string = "%i.%i.%i.%i" % (o1, o2, o3, o4)
+        if context.peer.transport.getHost().port > 12999:
+            port += 1000
         if port not in blocks.blockList:
             if verbose:
                 print("[BlockList] Discovered new block %s at address %s:%i! Recording..." % (name, ip_string, port))
@@ -244,13 +244,16 @@ def block_reply_packet(context, data):
     data = bytearray(data)
     struct.pack_into('BBBB', data, 0x14, int(i0), int(i1), int(i2), int(i3))
     port = struct.unpack_from("H", buffer(data), 0x18)[0]
+    if context.peer.transport.getHost().port > 12999:
+        port += 1000
+        struct.pack_into("H", data, 0x14+4, port)
     if port in blocks.blockList and port not in blocks.listeningPorts:
         from ShipProxy import ProxyFactory
         if bindIp == "0.0.0.0":
             interface_ip = myIp
         else:
             interface_ip = bindIp
-        block_endpoint = TCP4ServerEndpoint(reactor, port, interface=interface_ip)
+        block_endpoint = endpoints.TCP4ServerEndpoint(reactor, port, interface=interface_ip)
         block_endpoint.listen(ProxyFactory())
         print("[ShipProxy] Opened listen socked on port %i for new ship." % port)
         blocks.listeningPorts.append(port)
@@ -271,9 +274,18 @@ def player_info_packet(context, data):
 @PacketHandler(0x1c, 0x1f)
 def player_name_packet(context, data):
     player_id = struct.unpack_from('I', data, 0xC)[0]
-    if player_id not in players.playerList and player_id in clients.connectedClients: # Only log for connected clients. UNTESTED?!
+    if player_id not in players.playerList and player_id in clients.connectedClients:  # Only log for connected clients. UNTESTED?!
         player_name = data[0x14:0x56].decode('utf-16').rstrip("\0")
         if verbose:
             print("[PlayerData] Found new player %s with player ID %i" % (player_name, player_id))
         players.playerList[player_id] = (player_name,)  # For now
     return data
+
+
+@PacketHandler(0x11, 0x21)
+def shared_ship_packet(context, data):
+    data = bytearray(data)
+    struct.pack_into("BBBB", data, 0x8, int(i0), int(i1), int(i2), int(i3))
+    if context.peer.transport.getHost().port < 13000: # If not already on challenge...
+        struct.pack_into("H", data, 0xC, 13000) # Maybe incorrect?
+    return str(data)

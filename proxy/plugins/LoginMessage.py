@@ -1,11 +1,8 @@
+import commands
 import config
 import data.clients
-import plugins
 import packetFactory
-import subprocess
-
-from commands import Command
-
+import plugins
 
 login_config = config.YAMLConfig("cfg/loginmessage.config.yml", {'message': "{{yel}}Welcome to PSO2Proxy build {proxy_ver} {client_name}! There are currently {client_count} clients connected. Use {command_prefix}help for a list of commands!", 'messageType': 0x3}, True)
 
@@ -23,6 +20,6 @@ def login_message(sender):
 
 
 @plugins.CommandHook("reloadloginmessage")
-class ReloadConfig(Command):
+class ReloadConfig(commands.Command):
     def call_from_console(self):
         login_config._load_config()

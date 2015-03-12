@@ -1,17 +1,11 @@
+import commands
 import json
 import os
-import plugins
 import packetFactory
-
 from packetFactory import SystemMessagePacket
-
-from twisted.protocols import basic
-from commands import Command
-
 import plugins
-
-
 whitelist = []
+
 
 @plugins.on_start_hook
 def load_whitelist():
@@ -36,13 +30,13 @@ def save_whitelist():
 
 
 @plugins.CommandHook("whitelist", "[Admin Only] Adds or removes someone to the connection whitelist.", True)
-class Whitelist(Command):
+class Whitelist(commands.Command):
     def call_from_console(self):
         global whitelist
         params = self.args.split(" ")
         if len(params) < 3:
             return "[Whitelist] Invalid usage. (Usage: whitelist <add/del> <SegaID>)"
-        if params[1] == "add" or params[1]== "ADD":
+        if params[1] == "add" or params[1] == "ADD":
             if params[2] not in whitelist:
                 whitelist.append(params[2])
                 save_whitelist()
@@ -58,7 +52,7 @@ class Whitelist(Command):
                 return "[Whitelist] %s is not in the whitelist, can not delete!" % params[2]
         else:
             return "[Whitelist] Invalid usage. (Usage: whitelist <add/del> <SegaID>)"
-            
+
     def call_from_client(self, client):
         """
         :param client: ShipProxy.ShipProxy
@@ -68,7 +62,7 @@ class Whitelist(Command):
         if len(params) < 3:
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. (Usage: whitelist <add/del> <SegaID>)", 0x3).build())
             return
-        if params[1] == "add" or params[1]== "ADD":
+        if params[1] == "add" or params[1] == "ADD":
             if params[2] not in whitelist:
                 whitelist.append(params[2])
                 save_whitelist()

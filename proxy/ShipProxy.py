@@ -1,13 +1,13 @@
 import calendar
-import struct
-import datetime
-from twisted.internet import protocol, reactor
+from config import noisy as verbose
+from data import blocks
 from data import clients
+import datetime
 import packets
 import plugins.plugins as plugin_manager
-from data import blocks
-
-from config import noisy as verbose
+import struct
+from twisted.internet import protocol
+from twisted.internet import reactor
 
 
 class ShipProxy(protocol.Protocol):
@@ -74,8 +74,8 @@ class ShipProxy(protocol.Protocol):
         while len(self.readBuffer) >= 8:
             packet_size = struct.unpack_from('i', self.readBuffer)[0]
             packet_type = struct.unpack_from('BB', self.readBuffer, 4)
-            #If the packets reported size is less than a normal packet header, wrap it up to 8 as it should NEVER be that way.
-            #This prevents an infinite loop.
+#           If the packets reported size is less than a normal packet header, wrap it up to 8 as it should NEVER be that way.
+#           This prevents an infinite loop.
             if packet_size < 8:
                 print("[ShipProxy] Warning! Got invalid packet size %i. Resetting to 8 to prevent infinite loop..." % packet_size)
                 packet_size = 8
@@ -193,7 +193,7 @@ class ProxyServer(ShipProxy):
         client.set_server(self)
 
         self.reactor = reactor
-        self.reactor.connectTCP(address, port, client)
+        self.reactor.connectTCP(address, port if port < 13000 else port - 1000, client)
 
 
 class ProxyFactory(protocol.Factory):

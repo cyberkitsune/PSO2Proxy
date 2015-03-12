@@ -1,10 +1,14 @@
-import cProfile
 import calendar
-import glob
-import pstats
+import cProfile
+import data.blocks
+import data.clients
+import data.players
 import datetime
+import pstats
 import shutil
 import sys
+from twisted.internet import reactor
+from twisted.python import rebuild
 
 useFaulthandler = True
 
@@ -13,18 +17,10 @@ try:
 except ImportError:
     useFaulthandler = False
 
-from ShipProxy import ShipProxy
-
-from twisted.protocols import basic
-from twisted.internet import reactor
-from twisted.python import rebuild
-
-import plugins.plugins as plugin_manager
-import packetFactory
 import config
-import data.clients
-import data.players
-import data.blocks
+import packetFactory
+import plugins.plugins as plugin_manager
+from ShipProxy import ShipProxy
 
 
 commandList = {}
@@ -293,7 +289,7 @@ class Kick(Command):
                 client.send_crypto_packet(
                     packetFactory.SystemMessagePacket("[Command] {gre}%s has been disconnected." % args[1], 0x3).build())
             else:
-                 return "[Command] {red}%s could not be found." % args[1]
+                return "[Command] {red}%s could not be found." % args[1]
         else:
             client.send_crypto_packet(
                 packetFactory.SystemMessagePacket("[Command] {red}%s could not be found." % args[1], 0x3).build())
@@ -396,7 +392,7 @@ class GlobalMessage(Command):
 
         if message is None:
             message = self.args.split(' ', 2)[2]
-        SMPacket = packetFactory.SystemMessagePacket("[Proxy Global Message] %s" % message, mode).build();
+        SMPacket = packetFactory.SystemMessagePacket("[Proxy Global Message] %s" % message, mode).build()
         for client in data.clients.connectedClients.values():
             if client.get_handle() is not None:
                 client.get_handle().send_crypto_packet(SMPacket)
@@ -409,6 +405,7 @@ class Exit(Command):
         reactor.callFromThread(reactor.stop)
         return "[ShipProxy] Stopping proxy server..."
 
+
 @CommandHandler("reloadblocknames")
 class ReloadBlockNames(Command):
     def call_from_console(self):
@@ -417,6 +414,7 @@ class ReloadBlockNames(Command):
 
 
 profile = None
+
 
 @CommandHandler("profile", "[Admin Only] Turn on profiling mode", True)
 class Profiler(Command):
@@ -461,7 +459,7 @@ class ReloadPlugins(Command):
 
 if useFaulthandler:
     @CommandHandler("dumptraceback", "[Admin Only] Dump stacktrack of Proxy", True)
-    class ReloadPlugins(Command):
+    class Fault(Command):
         def call_from_console(self):
             faulthandler.dump_traceback(file=open('log/tracestack.log', 'w+'), all_threads=True)
             return "[Trackback] dumpped state of Proxy"
