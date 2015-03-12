@@ -96,17 +96,21 @@ if ircMode:
             for command in ircSettings.get_key('autoexec'):
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
-            try:
-                if self.factory.channel[:1] in ["#", "!", "+", "&"]:
-                    self.join(self.factory.channel)
-                    print("[GlobalChat] Joined %s" % self.factory.channel)
-                    ircBot = self
-                else:
-                    raise NameError("[GlobalChat] Failed to join %s channel must contain a #, !, + or & before the channel name" % self.factory.channel)
+			if ircServicePass == '':
+				joinChan(self)
+			
+	def joinChan(self):
+		try:
+            if self.factory.channel[:1] in ["#", "!", "+", "&"]:
+                self.join(self.factory.channel)
+                print("[GlobalChat] Joined %s" % self.factory.channel)
+                ircBot = self
+            else:
+        raise NameError("[GlobalChat] Failed to join %s channel must contain a #, !, + or & before the channel name" % self.factory.channel)
             except NameError as ne:
                 print(ne)
                 log.msg(ne)
-
+			
         def privmsg(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
                 return
@@ -132,6 +136,7 @@ if ircMode:
                 if ircServicePass is not '':
                     ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
                     print("[IRC] Sent identify command to %s." % (ircServiceName))
+					joinChan(self)
 
         def action(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
@@ -417,4 +422,4 @@ class GChat(commands.Command):
                     client.get_handle().send_crypto_packet(TCPacket)
                 else:
                     client.get_handle().send_crypto_packet(SMPacket)
-        return "[GlobalChat] <Console> %s" % self.args[2:]
+        return "[GlobalChat] <Console> %s" % sel
