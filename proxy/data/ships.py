@@ -22,7 +22,7 @@ blockShipList = {
     12800: "210.189.208.106",
     12900: "210.189.208.121",
     12000: "210.189.208.136",
-    13000: "210.189.208.181", # SHARED SHIP
+    13000: "210.189.208.181",  # SHARED SHIP
 }
 
 queryShipArr = [(12199, "210.189.208.1"),
@@ -114,9 +114,9 @@ def scrape_block_packet(ship_ip, ship_port, destination_ip):
 #   namelog = name.encode('ascii', errors='ignore').rstrip('\0')
     o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), 0x68)
     ip_string = '%i.%i.%i.%i' % (o1, o2, o3, o4)
-    if ship_ip == blockShipList[13000]: #Shared ship hack
-        port += 1000  # Bump port up to 13000
-        struct.pack_into('H', data, 0x68+4, port)
+    if ship_ip == blockShipList[13000]:  # Shared ship hack
+        port += 1000   # Bump port up to 13000
+        struct.pack_into('H', data, (0x68 + 0x04), port)
     if port not in blocks.blockList:
         # log.msg("[BlockList] Discovered new block %s at addr %s:%i! Recording..." % (namelog, ip_string, port))
         blocks.blockList[port] = (ip_string, name)
