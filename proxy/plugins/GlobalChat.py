@@ -12,6 +12,7 @@ from PSO2DataTools import replace_irc_with_pso2
 from PSO2DataTools import replace_pso2_with_irc
 from twisted.internet import protocol
 from twisted.internet import reactor
+from twisted.internet import task
 from twisted.python import log
 from twisted.words.protocols import irc
 
@@ -91,11 +92,8 @@ if ircMode:
             irc.IRCClient.connectionLost(self, reason)
             print("[GlobalChat] IRC Connection lost!")
 
-        def signedOn(self):
+        def joinChan(self):
             global ircBot
-            for command in ircSettings.get_key('autoexec'):
-                self.sendLine(command)
-                print("[IRC-AUTO] >>> %s" % command)
             try:
                 if self.factory.channel[:1] in ["#", "!", "+", "&"]:
                     self.join(self.factory.channel)
@@ -106,6 +104,13 @@ if ircMode:
             except NameError as ne:
                 print(ne)
                 log.msg(ne)
+
+        def signedOn(self):
+            for command in ircSettings.get_key('autoexec'):
+                self.sendLine(command)
+                print("[IRC-AUTO] >>> %s" % command)
+            task.deferLater(reactor, 15, self.joinChan)
+            print("[GlobalChat] Joining channels in 15 seconds...")
 
         def privmsg(self, user, channel, msg):
             if not check_irc_with_pso2(msg):
@@ -130,7 +135,7 @@ if ircMode:
                 global ircServicePass
                 global ircServiceName
                 if ircServicePass is not '':
-                    ircBot.msg(ircServiceName, "identify %s" % (ircServicePass))
+                    self.msg(ircServiceName, "identify %s" % (ircServicePass))
                     print("[IRC] Sent identify command to %s." % (ircServiceName))
 
         def action(self, user, channel, msg):
