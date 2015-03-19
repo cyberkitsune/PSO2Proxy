@@ -307,9 +307,9 @@ class RequestEQNoitce(Command):
     def call_from_console(self):
         try:
             args = self.args.split(' ')
-            shipArg = int(args[1])-1
+            shipArg = int(args[1]) - 1
         except Exception as e:
-            return("[EQ Notice] Please enter the ship number to check.")
+            return("[EQ Notice] Please enter the ship number to check. %s" % e)
         if 0 <= shipArg <= 9:
             if data_eq[shipArg] and not check_if_EQ_old(shipArg):
                 return("[EQ_Notice] Incoming EQ Report from PSO2es: %s" % (msg_eq[shipArg]))
