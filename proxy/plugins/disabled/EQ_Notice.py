@@ -314,7 +314,7 @@ class RequestEQNoitce(Command):
             if data_eq[shipArg] and not check_if_EQ_old(shipArg):
                 return("[EQ_Notice] Incoming EQ Report from PSO2es: %s" % (msg_eq[shipArg]))
             else:
-                return("[EQ_Notice] No new EQ Report from PSO2es: %s" % (msg_eq[shipArg]))
+                return("[EQ_Notice] No new EQ Report from PSO2es.")
         else:
             return("[EQ_Notice] Please enter a valid ship number.")
 
