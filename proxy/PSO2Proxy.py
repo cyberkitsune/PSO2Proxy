@@ -118,7 +118,7 @@ def main():
         __import__(plug)
     for f in plugin_manager.onStart:
         f()
-    reactor.suggestThreadPoolSize(30)  # We got 2 cores, screw it!
+    reactor.suggestThreadPoolSize(30)
     reactor.run()
     data.clients.dbManager.close_db()
     for f in plugin_manager.onStop:

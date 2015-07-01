@@ -1,3 +1,5 @@
+#Should this file even be in here?
+
 PSO2_IRC = [
     ("{red}", "\x03""04"),  # Red
 

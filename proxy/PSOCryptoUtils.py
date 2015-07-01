@@ -5,7 +5,7 @@ from twisted.python import log
 
 
 class PSO2RC4(object):
-    """docstring for PSO2RC4Decrypter"""
+    """Holds a single RC4 crypto sequence."""
 
     def __init__(self, key):
         self.rc4key = key
@@ -20,7 +20,7 @@ class PSO2RC4(object):
 
 
 class PSO2RSADecrypt(object):
-    """docstring for PSO2RSADecrypt"""
+    """Holds one RSA Decryption object."""
 
     def __init__(self, private_key):
         try:
@@ -40,7 +40,7 @@ class PSO2RSADecrypt(object):
 
 
 class PSO2RSAEncrypt(object):
-    """docstring for PSO2RSAEncrypt"""
+    """Holds one RSA Encryption object."""
 
     def __init__(self, pubkey):
         try:
