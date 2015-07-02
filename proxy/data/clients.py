@@ -4,6 +4,7 @@ import packetFactory
 import sqlite3
 import twisted
 import yaml
+from threading import Lock
 
 from ships import get_ship_from_port
 
@@ -36,7 +37,6 @@ class ClientData(object):
     def set_handle(self, handle):
         self.handle = handle
 
-
 class SQLitePreferenceManager():
 
     user_preference_cache = {}
@@ -47,6 +47,7 @@ class SQLitePreferenceManager():
         setup_cursor.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, sega_id TEXT, data TEXT)")
         self._db_connection.row_factory = sqlite3.Row
         self._db_connection.commit()
+        self._db_lock = Lock()
         print("[Database] User preference database created!")
 
     def get_data_for_sega_id(self, sega_id):
@@ -56,6 +57,7 @@ class SQLitePreferenceManager():
 
     def _get_user_data_from_db(self, segaid):
         user_data = {}
+        
         local_cursor = self._db_connection.cursor()
         local_cursor.execute("SELECT data FROM users WHERE sega_id = ?", (str(segaid), ))
         user_row = local_cursor.fetchone()
@@ -63,6 +65,7 @@ class SQLitePreferenceManager():
             user_data = yaml.load(user_row['data'])
         else:
             local_cursor.execute("INSERT INTO users (sega_id, data) VALUES  (?,?)", (str(segaid), yaml.dump({})))
+
         return user_data
 
     def _update_user_data_in_db(self, sega_id):
@@ -96,6 +99,7 @@ class ClientPreferences():
         self._config = dbManager.get_data_for_sega_id(segaid)
         self.segaid = segaid
 
+
     def has_preference(self, preference):
         if preference in self._config:
             return True
@@ -117,6 +121,9 @@ class ClientPreferences():
 
     def __setitem__(self, key, value):
         self.set_preference(key, value)
+
+    def __del__(self):
+        dbManager.update_user_cache(self.segaid, self._config) # Incase it doesn't stick I guess
 
 
 def add_client(handle):
