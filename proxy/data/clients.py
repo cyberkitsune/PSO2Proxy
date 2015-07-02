@@ -57,7 +57,7 @@ class SQLitePreferenceManager():
 
     def _get_user_data_from_db(self, segaid):
         user_data = {}
-        
+        self._db_lock.acquire(True)
         local_cursor = self._db_connection.cursor()
         local_cursor.execute("SELECT data FROM users WHERE sega_id = ?", (str(segaid), ))
         user_row = local_cursor.fetchone()
@@ -65,23 +65,27 @@ class SQLitePreferenceManager():
             user_data = yaml.load(user_row['data'])
         else:
             local_cursor.execute("INSERT INTO users (sega_id, data) VALUES  (?,?)", (str(segaid), yaml.dump({})))
-
+        self._db_lock.release()
         return user_data
 
     def _update_user_data_in_db(self, sega_id):
         if sega_id not in self.user_preference_cache:
             raise KeyError("User data isn't even cached, can't update data!")
+        self._db_lock.acquire(True)
         local_cursor = self._db_connection.cursor()
         local_cursor.execute("UPDATE users SET data = ? WHERE sega_id = ?", (yaml.dump(self.user_preference_cache[sega_id]), str(sega_id)))
         self._db_connection.commit()
+        self._db_lock.release()
 
     def update_user_cache(self, sega_id, new_config):
         self.user_preference_cache[sega_id] = new_config
         self._update_user_data_in_db(sega_id)
 
     def get_db_size(self):
+        self._db_lock.acquire(True)
         local_cursor = self._db_connection.cursor()
         local_cursor.execute("SELECT COUNT(*) FROM users")
+        self._db_lock.release()
         return local_cursor.fetchone()[0]
 
     def close_db(self):
