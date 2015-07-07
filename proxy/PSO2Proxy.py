@@ -116,7 +116,7 @@ def main():
 
     for plug in glob.glob("plugins/*.py"):
         plug = plug[:-3]
-        plug = plug.replace('/', '.')
+        plug = plug.replace(os.sep, '.')
         print("[ShipProxy] Importing %s..." % plug)
         __import__(plug)
     for f in plugin_manager.onStart:
