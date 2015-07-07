@@ -20,7 +20,9 @@ from queryProtocols import BlockScraperFactory
 from queryProtocols import ShipAdvertiserFactory
 
 
-import sys
+import sys, codecs, locale
+
+sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout, 'replace')
 
 import time
 import traceback
