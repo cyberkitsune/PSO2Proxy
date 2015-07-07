@@ -1,6 +1,9 @@
 #!/usr/bin/python
-from twisted.internet import epollreactor
-epollreactor.install()
+try:
+    from twisted.internet import epollreactor
+    epollreactor.install()
+except ImportError:
+    from twisted.internet import reactor
 
 import commands
 import config
