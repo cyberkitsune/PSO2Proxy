@@ -6,6 +6,7 @@ import data.players
 import json
 import packetFactory
 import plugins
+import struct
 from PSO2DataTools import check_irc_with_pso2
 from PSO2DataTools import check_pso2_with_irc
 from PSO2DataTools import replace_irc_with_pso2
@@ -233,14 +234,14 @@ def do_gchat(senderName, senderId, senderShip, msg):
                 client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (senderShip, senderName, "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), msg)), 0x3).build())
 
 @plugins.PacketHook(0x7, 0x0)
-def handle_raw_chat(context, data):
-    player_id = struct.unpack_from('I', data, 0x8)[0]
+def handle_raw_chat(context, packet):
+    player_id = struct.unpack_from('I', packet, 0x8)[0]
     if player_id != 0:
-        return data
+        return packet
     if not context.loaded or data.clients.connectedClients[context.playerId].preferences['gLock'] != True:
-        return data
+        return packet
     # This is technically improper. Should use the xor byte to check string length (See packetReader)
-    message = data[0x1C:].decode('utf-16')
+    message = packet[0x1C:].decode('utf-16')
     do_gchat(data.players[context.playerId][0], context.playerId, data.clients.connectedClients[context.playerId].ship, message)
 
 
