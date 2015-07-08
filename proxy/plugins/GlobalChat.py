@@ -217,6 +217,32 @@ def check_config(user):
         if not client_preferences.has_preference("gchatMode"):
             client_preferences['gchatMode'] = -1
 
+def do_gchat(senderName, senderId, senderShip, msg):
+    print("[GlobalChat] <%s> %s" % (senderName, msg))
+    if redisEnabled:
+                PSO2PDConnector.db_conn.publish("plugin-message-gchat", json.dumps({'sender': 0, 'text': msg, 'server': PSO2PDConnector.connector_conf['server_name'], 'playerName': senderName, 'playerId': senderId, 'ship': senderShip}))
+    if ircMode:
+        global ircBot
+        if ircBot is not None:
+            ircBot.send_global_message(senderShip, senderName.encode('utf-8'), msg.encode('utf-8'))
+    for client_data in data.clients.connectedClients.values():
+        if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
+            if lookup_gchatmode(client_data.preferences) == 0:
+                client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(senderId, "[G-%02i] %s" % (senderShip, senderName), "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), msg)).build())
+            else:
+                client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (senderShip, senderName, "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), msg)), 0x3).build())
+
+@plugins.PacketHook(0x7, 0x0)
+def handle_raw_chat(context, data):
+    player_id = struct.unpack_from('I', data, 0x8)[0]
+    if player_id != 0:
+        return data
+    if not context.loaded or data.clients.connectedClients[context.playerId].preferences['gLock'] != True:
+        return data
+    # This is technically improper. Should use the xor byte to check string length (See packetReader)
+    message = data[0x1C:].decode('utf-16')
+    do_gchat(data.players[context.playerId][0], context.playerId, data.clients.connectedClients[context.playerId].ship, message)
+
 
 @plugins.CommandHook("gmode", "Sets your global chat display mode")
 class GChatModeCommand(commands.Command):
@@ -382,21 +408,6 @@ class UnmuteSomebody(commands.Command):
                 else:
                     return "[Command] %s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0")
 
-
-def do_gchat(senderName, senderId, senderShip, msg):
-    print("[GlobalChat] <%s> %s" % (senderName, msg))
-    if redisEnabled:
-                PSO2PDConnector.db_conn.publish("plugin-message-gchat", json.dumps({'sender': 0, 'text': msg, 'server': PSO2PDConnector.connector_conf['server_name'], 'playerName': senderName, 'playerId': senderId, 'ship': senderShip}))
-    if ircMode:
-        global ircBot
-        if ircBot is not None:
-            ircBot.send_global_message(senderShip, senderName.encode('utf-8'), msg.encode('utf-8'))
-    for client_data in data.clients.connectedClients.values():
-        if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
-            if lookup_gchatmode(client_data.preferences) == 0:
-                client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(senderId, "[G-%02i] %s" % (senderShip, senderName), "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), msg)).build())
-            else:
-                client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (senderShip, senderName, "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), msg)), 0x3).build())
 
 @plugins.CommandHook("g", "Chat in global chat.")
 class GChat(commands.Command):
