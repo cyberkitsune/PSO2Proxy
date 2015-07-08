@@ -383,6 +383,21 @@ class UnmuteSomebody(commands.Command):
                     return "[Command] %s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0")
 
 
+def do_gchat(senderName, senderId, senderShip, msg):
+    print("[GlobalChat] <%s> %s" % (senderName, msg))
+    if redisEnabled:
+                PSO2PDConnector.db_conn.publish("plugin-message-gchat", json.dumps({'sender': 0, 'text': msg, 'server': PSO2PDConnector.connector_conf['server_name'], 'playerName': senderName, 'playerId': senderId, 'ship': senderShip}))
+    if ircMode:
+        global ircBot
+        if ircBot is not None:
+            ircBot.send_global_message(senderShip, senderName.encode('utf-8'), msg.encode('utf-8'))
+    for client_data in data.clients.connectedClients.values():
+        if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
+            if lookup_gchatmode(client_data.preferences) == 0:
+                client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(senderId, "[G-%02i] %s" % (senderShip, senderName), "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), msg)).build())
+            else:
+                client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (senderShip, senderName, "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), msg)), 0x3).build())
+
 @plugins.CommandHook("g", "Chat in global chat.")
 class GChat(commands.Command):
     def call_from_client(self, client):
@@ -394,32 +409,9 @@ class GChat(commands.Command):
         if data.clients.connectedClients[client.playerId].preferences.has_preference("chatMuted") and data.clients.connectedClients[client.playerId].preferences['chatMuted']:
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[GChat] {red}You have been muted from GChat and can not talk in it. :(", 0x3).build())
             return
-        print("[GlobalChat] <%s> %s" % (data.players.playerList[client.playerId][0], self.args[3:]))
-        if redisEnabled:
-                    PSO2PDConnector.db_conn.publish("plugin-message-gchat", json.dumps({'sender': 0, 'text': self.args[3:], 'server': PSO2PDConnector.connector_conf['server_name'], 'playerName': data.players.playerList[client.playerId][0], 'playerId': client.playerId, 'ship': data.clients.connectedClients[client.playerId].ship}))
-        if ircMode:
-            global ircBot
-            if ircBot is not None:
-                ircBot.send_global_message(data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0].encode('utf-8'), self.args[3:].encode('utf-8'))
-        for client_data in data.clients.connectedClients.values():
-            if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
-                if lookup_gchatmode(client_data.preferences) == 0:
-                    client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(client.playerId, "[G-%02i] %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0]), "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), self.args[3:])).build())
-                else:
-                    client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), self.args[3:])), 0x3).build())
+        do_gchat(data.players.playerList[client.playerId][0], client.playerId,
+            data.clients.connectedClients[client.playerId].ship, self.args[3:])
 
     def call_from_console(self):
-        global ircMode
-        if ircMode:
-            global ircBot
-            if ircBot is not None:
-                ircBot.send_global_message(0, "Console", self.args[2:].encode('utf-8'))
-        TCPacket = packetFactory.TeamChatPacket(0x999, "[GCONSOLE]", self.args[2:]).build()
-        SMPacket = packetFactory.SystemMessagePacket("[GCONSOLE] %s%s" % (gchatSettings['prefix'], self.args[2:]), 0x3).build()
-        for client in data.clients.connectedClients.values():
-            if client.preferences.get_preference("globalChat") and client.get_handle() is not None:
-                if lookup_gchatmode(client.preferences) == 0:
-                    client.get_handle().send_crypto_packet(TCPacket)
-                else:
-                    client.get_handle().send_crypto_packet(SMPacket)
-        return "[GlobalChat] <Console> %s" % self.args[2:]
+        do_gchat("Console", 0x999, 0x0, self.args[2:])
+        return None
