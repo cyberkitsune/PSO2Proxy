@@ -97,7 +97,7 @@ class TeamChatPacket(object):
         buf = bytearray()
         buf += PlayerHeader(self.senderId).build()
         buf += struct.pack('<I', 0x2)
-        buf += struct.pack('<I', 0x0) #SEGA PLS STOP THE PADDING
+        buf += struct.pack('<I', 0x0)  # SEGA PLS STOP THE PADDING
         buf += encode_string_utf16(self.senderName, 0x7ED7, 0x41)
         buf += encode_string_utf16(self.senderName, 0x7ED7, 0x41)
         buf += encode_string_utf16(self.message, 0x7ED7, 0x41)

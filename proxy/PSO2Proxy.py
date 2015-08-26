@@ -2,16 +2,18 @@
 try:
     from twisted.internet import epollreactor
     epollreactor.install()
+    from twisted.internet import reactor
 except ImportError:
     from twisted.internet import reactor
 
+import codecs
 import commands
 import config
 from config import bindIp
 from config import myIpAddress as myIp
 
 import data
-
+import locale
 import os
 
 import plugins.plugins as plugin_manager
@@ -19,15 +21,13 @@ import plugins.plugins as plugin_manager
 from queryProtocols import BlockScraperFactory
 from queryProtocols import ShipAdvertiserFactory
 
-
-import sys, codecs, locale
+import sys
 
 sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout, 'replace')
 
 import time
 import traceback
 from twisted.internet import endpoints
-from twisted.internet import reactor
 from twisted.internet import stdio
 from twisted.protocols import basic
 from twisted.python import log

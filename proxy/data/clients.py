@@ -2,9 +2,9 @@ import blocks
 import config
 import packetFactory
 import sqlite3
+from threading import Lock
 import twisted
 import yaml
-from threading import Lock
 
 from ships import get_ship_from_port
 
@@ -36,6 +36,7 @@ class ClientData(object):
 
     def set_handle(self, handle):
         self.handle = handle
+
 
 class SQLitePreferenceManager():
 
@@ -103,7 +104,6 @@ class ClientPreferences():
         self._config = dbManager.get_data_for_sega_id(segaid)
         self.segaid = segaid
 
-
     def has_preference(self, preference):
         if preference in self._config:
             return True
@@ -127,7 +127,7 @@ class ClientPreferences():
         self.set_preference(key, value)
 
     def __del__(self):
-        dbManager.update_user_cache(self.segaid, self._config) # Incase it doesn't stick I guess
+        dbManager.update_user_cache(self.segaid, self._config)  # Incase it doesn't stick I guess
 
 
 def add_client(handle):
