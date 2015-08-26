@@ -178,8 +178,9 @@ def check_if_EQ_old(ship):
 
 
 def EQBody(body, ship):  # 0 is ship1
-    if not body.strip():
-        logdebug("Ship %d: no data" % (ship + 1))
+    if not body.strip() or body == "null":
+        logdebug("Ship %d: no data, clearing EQ data" % (ship + 1))
+        data_eq[ship] = None
         return
     logdebug("Ship %d's Body: %s" % (ship + 1, body))
     if HTTP_Data[ship] == body:
