@@ -214,7 +214,7 @@ def EQBody(body, ship):  # 0 is ship1
     for client in clients.connectedClients.values():
         try:
             chandle = client.get_handle()
-            if chandle is not None and client.preferences.get_preference('eqnotice') and ((ship + 1) == clients.get_ship_from_port(chandle.transport.getHost().port)):
+            if chandle is not None and client.preferences.get_preference('eqnotice') and ship == (client.preferences.get_preference('eqnotice_ship') - 1):
                 chandle.send_crypto_packet(SMPacket)
         except AttributeError:
             logdebug("Ship %d: Got a dead client, skipping" % (ship + 1))
@@ -291,6 +291,10 @@ def notify_and_config(client):
     if not client_preferences.has_preference("eqnotice"):
         client_preferences.set_preference("eqnotice", True)
     ship = clients.get_ship_from_port(client.transport.getHost().port) - 1
+    if not client_preferences.has_preference("eqnotice_ship"):
+        client_preferences.set_preference("eqnotice_ship", 2)  # good default
+    if ship != 10:
+        client_preferences.set_preference("eqnotice_ship", (ship + 1))  # record the real ship
     if client_preferences.get_preference('eqnotice') and data_eq[ship] and not check_if_EQ_old(ship):
         SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
         client.send_crypto_packet(SMPacket)
@@ -299,7 +303,8 @@ def notify_and_config(client):
 @plugins.CommandHook("checkeq", "Redisplay of EQ notices from PSO2es sources")
 class RequestEQNoitce(Command):
     def call_from_client(self, client):
-        ship = clients.get_ship_from_port(client.transport.getHost().port) - 1
+        client_preferences = clients.connectedClients[client.playerId].preferences
+        ship = (client_preferences.get_preference('eqnotice_ship') - 1)
         if data_eq[ship] and not check_if_EQ_old(ship):
             SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
         else:
