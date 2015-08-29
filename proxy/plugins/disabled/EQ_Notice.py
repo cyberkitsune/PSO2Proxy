@@ -53,22 +53,22 @@ except ImportError:
 
 eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True, 'timer': 60, 'debug': False, '1': "http://acf.me.uk/Public/PSO2EQ/pso2eq.txt"}, True)
 
-#HTTP Headers
+# HTTP Headers
 ETag_Headers     = ['', '', '', '', '', '', '', '', '', '', '']
 Modified_Headers = ['', '', '', '', '', '', '', '', '', '', '']
-#HTTP Modified in time
+# HTTP Modified in time
 Modified_time    = ['', '', '', '', '', '', '', '', '', '', '']
-#HTTP Data
+# HTTP Data
 HTTP_Data        = ['', '', '', '', '', '', '', '', '', '', '']
-#was "【1時間前】" in the data?
+# was "【1時間前】" in the data?
 ishour_eq        = [False, False, False, False, False, False, False, False, False, False, False]
-#Hour of EQ
+# Hour of EQ
 hour_eq          = ['', '', '', '', '', '', '', '', '', '', '']
-#Mins of EQ
+# Mins of EQ
 mins_eq          = ['', '', '', '', '', '', '', '', '', '', '']
-#EQ Data
+# EQ Data
 data_eq          = ['', '', '', '', '', '', '', '', '', '', '']
-#EQ Data
+# EQ Data
 msg_eq           = ['', '', '', '', '', '', '', '', '', '', '']
 
 eqJP             = []
@@ -158,22 +158,14 @@ def old_seconds(td):
 
 
 def check_if_EQ_old(ship):
-    #logdebug("Ship %d: Checking time" %(ship + 1))
     if not Modified_Headers[ship]:
-        #logdebug("Ship %d: no TimeStamp" %(ship + 1))
         return False
     timediff = (datetime.utcnow() - Modified_time[ship])
     if ishour_eq[ship]:
         if old_seconds(timediff) > 55 * 60:
-            #logdebug("Ship %d: EQ is 55 mins too old"%(ship + 1))
             return True
     else:
-        # Short EQ notice is no good
-        #logdebug("Ship %d: short EQ" %(ship + 1))
         return True
-        #if old_seconds(timediff) > 10*60:
-        #    #logdebug("Ship %d: Short EQ is older then 10 mins" %(ship + 1))
-        #    return True
     return False
 
 
@@ -245,7 +237,6 @@ def EQResponse(response, ship=-1):  # 0 is ship1
 
 
 def CheckupURL():
-    #logdebug("Checking URL")
     HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']})
     load_eqJP_names()  # Reload file
     for shipNum in config.globalConfig.get_key('enabledShips'):
@@ -254,13 +245,11 @@ def CheckupURL():
         else:
             eq_URL = None
         if eq_URL:
-            #logdebug("Ship %d: Checking URL %s" % (shipNum + 1, eq_URL))
             HTTPHeaderX = HTTPHeader0.copy()
             if ETag_Headers[shipNum]:
                 HTTPHeaderX.addRawHeader('If-None-Match', ETag_Headers[shipNum])
             if Modified_Headers[shipNum]:
                 HTTPHeaderX.addRawHeader('If-Modified-Since', Modified_Headers[shipNum])
-            #logdebug(pformat(list(HTTPHeaderX.getAllRawHeaders())))
             EQ0 = agent.request('GET', eq_URL, HTTPHeaderX)
             EQ0.addCallback(EQResponse, shipNum)
             EQ0.addErrback(log.err)
