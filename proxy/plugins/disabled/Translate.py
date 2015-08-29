@@ -99,6 +99,115 @@ def get_chat_packet(context, packet):
     return packet
 
 
+def decode_string_utf16_len(prefix, xor_value, sub_value):
+    #  prefix = ((len(string) + 1) + sub_value) ^ xor_value
+    #  prefix ^ xor_value = ((len(string) + 1) + sub_value)
+    #  ((prefix ^ xor_value) - sub_value) = len + 1
+    #  ((prefix ^ xor_value) - sub_value) - 1 = len
+    return ((prefix ^ xor_value) - sub_value) - 1
+
+
+@p.PacketHook(0x7, 0x11)
+def get_team_chat_packet(context, packet):
+    """
+    :type context: ShipProxy.ShipProxy
+    """
+    if context.peer.transport.getHost().port < 13000:
+        return packet
+    try:
+        if context.psoClient and context.playerId and data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out'):
+            player_id = struct.unpack_from("<I", packet, 0x8)[0]
+            if player_id != 0:  # ???
+                return
+
+            pis = 0x8  # read the playerid
+            player_id = struct.unpack_from("<I", packet, 0x8)[0]
+            pis += 0x14  # let skip to the first unicode string len
+
+            wlen = decode_string_utf16_len(struct.unpack_from("<I", packet, pis)[0], 0x7ED7, 0x41)
+            wlen += 1
+            if (wlen % 2) == 1:
+                wlen += 1
+
+            pis += 0x04  # skipping to start of utf-16 string
+            account = packet[pis:pis + (wlen * 2)].decode('utf-16').rstrip("\0")
+            pis += (wlen * 2)  # skipping to the end of utf-16 string
+
+            wlen = decode_string_utf16_len(struct.unpack_from("<I", packet, pis)[0], 0x7ED7, 0x41)
+            wlen += 1
+            if (wlen % 2) == 1:
+                wlen += 1
+
+            pis += 0x04  # skipping to start of utf-16 string
+            charname = packet[pis:pis + (wlen * 2)].decode('utf-16').rstrip("\0")
+            pis += (wlen * 2)  # skipping to the end of utf-16 string
+
+            wlen = decode_string_utf16_len(struct.unpack_from("<I", packet, pis)[0], 0x7ED7, 0x41)
+            wlen += 1
+            if (wlen % 2) == 1:
+                wlen += 1
+
+            pis += 0x04  # skipping to start of utf-16 string
+            message = packet[pis:pis + (wlen * 2)].decode('utf-16').rstrip("\0")
+            pis += (wlen * 2)  # skipping to the end of utf-16 string
+
+            d = threads.deferToThread(generate_translated_team_message, player_id, account, charname, message, "ja", "en")
+            d.addCallback(context.peer.send_crypto_packet)
+            return None
+    except KeyError:
+        return packet
+    if context.peer.psoClient and context.peer.playerId in data.clients.connectedClients:
+        user_prefs = data.clients.connectedClients[context.peer.playerId].preferences
+        if not user_prefs.get_preference('translate_chat'):
+            return packet
+
+        pis = 0x8  # read the playerid
+        player_id = struct.unpack_from("<I", packet, 0x8)[0]
+        pis += 0x14  # let skip to the first unicode string len
+
+        wlen = decode_string_utf16_len(struct.unpack_from("<I", packet, pis)[0], 0x7ED7, 0x41)
+        wlen += 1
+        if (wlen % 2) == 1:
+            wlen += 1
+
+        pis += 0x04  # skipping to start of utf-16 string
+        account = packet[pis:pis + (wlen * 2)].decode('utf-16').rstrip("\0")
+        pis += (wlen * 2)  # skipping to the end of utf-16 string
+
+        wlen = decode_string_utf16_len(struct.unpack_from("<I", packet, pis)[0], 0x7ED7, 0x41)
+        wlen += 1
+        if (wlen % 2) == 1:
+            wlen += 1
+
+        pis += 0x04  # skipping to start of utf-16 string
+        charname = packet[pis:pis + (wlen * 2)].decode('utf-16').rstrip("\0")
+        pis += (wlen * 2)  # skipping to the end of utf-16 string
+
+        wlen = decode_string_utf16_len(struct.unpack_from("<I", packet, pis)[0], 0x7ED7, 0x41)
+        wlen += 1
+        if (wlen % 2) == 1:
+            wlen += 1
+
+        pis += 0x04  # skipping to start of utf-16 string
+        message = packet[pis:pis + (wlen * 2)].decode('utf-16').rstrip("\0")
+        pis += (wlen * 2)  # skipping to the end of utf-16 string
+
+        if message.startswith("/"):
+            return packet  # Command
+        japanese = False
+        for char in message:
+            char_script = script(unicode(char))
+            if char_script != 'Latin' and char_script != 'Common':
+                japanese = True
+                break
+        if not japanese:
+            return packet
+        d = threads.deferToThread(generate_translated_team_message, player_id, account, charname, message, "en", "ja")
+        d.addCallback(context.peer.send_crypto_packet)
+        return None
+    return packet
+
+
 def generate_translated_message(player_id, channel_id, message, end_lang, start_lang):
     if provider == "Bing" and time.time() - lastKeyTime >= 600:
         translator.access_token = translator.get_access_token()
@@ -113,3 +222,19 @@ def generate_translated_message(player_id, channel_id, message, end_lang, start_
         message_string = message
 
     return packetFactory.ChatPacket(player_id, message_string, channel_id).build()
+
+
+def generate_translated_team_message(player_id, account, charname, message, end_lang, start_lang):
+    if provider == "Bing" and time.time() - lastKeyTime >= 600:
+        translator.access_token = translator.get_access_token()
+
+    try:
+        if end_lang == "ja":
+            message_string = "%s" % translator.translate(message, end_lang, start_lang)
+        else:
+            message_string = "%s {def}(%s)" % (translator.translate(message, end_lang, start_lang), message)
+    except Exception as e:
+        print (str(e))
+        message_string = message
+
+    return packetFactory.TeamChatPacket(player_id, account, charname, message_string, True).build()
