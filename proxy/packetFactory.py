@@ -88,17 +88,22 @@ class UnknownPacket1902(object):
 class TeamChatPacket(object):
     """docstring for TeamChatPacket"""
 
-    def __init__(self, sender_id, sender_name, message):
+    def __init__(self, sender_id, account, charname, message, shared=False):
         self.senderId = sender_id
-        self.senderName = sender_name
+        self.shared = shared
+        self.account = account
+        self.charname = charname
         self.message = message
 
     def build(self):
         buf = bytearray()
-        buf += PlayerHeader(self.senderId).build()
-        buf += struct.pack('<I', 0x2)
-        buf += struct.pack('<I', 0x0)  # SEGA PLS STOP THE PADDING
-        buf += encode_string_utf16(self.senderName, 0x7ED7, 0x41)
-        buf += encode_string_utf16(self.senderName, 0x7ED7, 0x41)
+        buf += PlayerHeader(self.senderId).build()  # 0x0B
+        if (self.shared):
+            buf += struct.pack('<I', 0x0)  # 0x0F
+        else:
+            buf += struct.pack('<I', 0x2)  # 0x0F
+        buf += struct.pack('<I', 0x0)  # 0x14
+        buf += encode_string_utf16(self.account, 0x7ED7, 0x41)
+        buf += encode_string_utf16(self.charname, 0x7ED7, 0x41)
         buf += encode_string_utf16(self.message, 0x7ED7, 0x41)
         return Packet(0x7, 0x11, 0x4, 0x00, buf).build()
