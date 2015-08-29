@@ -178,18 +178,19 @@ def check_if_EQ_old(ship):
 
 
 def EQBody(body, ship):  # 0 is ship1
-    if not body.strip() or body == "null":
+    unibody = unicode(body, 'utf-8-sig', 'replace')
+    if not unibody.strip() or unibody.strip() == "null":
         logdebug("Ship %d: no data, clearing EQ data" % (ship + 1))
         data_eq[ship] = None
         return
-    logdebug("Ship %d's Body: %s" % (ship + 1, body))
+    logdebug("Ship %d's Body: %s" % (ship + 1, unibody))
     if HTTP_Data[ship] == body:
         logdebug("Ship %d: Still have the same data" % (ship + 1))
         return  # same data, do not react on it
     logdebug("Ship %d: have the new data" % (ship + 1))
     HTTP_Data[ship] = body
 
-    data_eq[ship] = cleanup_EQ(unicode(body, 'utf-8-sig', 'replace'), ship)
+    data_eq[ship] = cleanup_EQ(unibody, ship)
 
     logdebug("Ship %d: %s@%s:%s JST" % (ship + 1, data_eq[ship], hour_eq[ship], mins_eq[ship]))
 
