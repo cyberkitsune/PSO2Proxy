@@ -151,6 +151,9 @@ def get_team_chat_packet(context, packet):
             message = packet[pis:pis + (wlen * 2)].decode('utf-16').rstrip("\0")
             pis += (wlen * 2)  # skipping to the end of utf-16 string
 
+            if message.startswith("/"):
+                return packet  # Command
+
             d = threads.deferToThread(generate_translated_team_message, player_id, account, charname, message, "ja", "en")
             d.addCallback(context.peer.send_crypto_packet)
             return None
