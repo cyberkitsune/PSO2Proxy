@@ -66,7 +66,7 @@ def get_chat_packet(context, packet):
         if context.psoClient and context.playerId and data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out'):
             player_id = struct.unpack_from("I", packet, 0x8)[0]
             if player_id != 0:  # ???
-                return
+                return None
             channel_id = struct.unpack_from("I", packet, 0x14)[0]
             message = packet[0x1C:].decode('utf-16').rstrip("\0")
             d = threads.deferToThread(generate_translated_message, player_id, channel_id, message, "ja", "en")
@@ -118,7 +118,7 @@ def get_team_chat_packet(context, packet):
         if context.psoClient and context.playerId and data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out'):
             player_id = struct.unpack_from("<I", packet, 0x8)[0]
             if player_id != 0:  # ???
-                return
+                return None
 
             pis = 0x8  # read the playerid
             player_id = struct.unpack_from("<I", packet, 0x8)[0]
