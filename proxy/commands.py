@@ -150,7 +150,7 @@ class CountCommand(Command):
 @CommandHandler("reloadbans")
 class ReloadBans(Command):
     def call_from_console(self):
-        config.load_bans()
+        return config.load_bans()
 
 
 @CommandHandler("listbans", "[Admin Only] Prints a list of banned users.", True)
@@ -280,6 +280,8 @@ class Kick(Command):
                 packetFactory.SystemMessagePacket("[Command] {red}Invalid usage.\n(Usage: %skick <PlayerID>)" % config.globalConfig.get_key('commandPrefix'),
                                                   0x3).build())
             return
+        if not args[1].isdigit():
+            return "[Command] {red}%s is not an number." % args[1]
         if int(args[1]) in data.clients.connectedClients:
             if data.clients.connectedClients[int(args[1])].get_handle() is not None:
                 data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet(
@@ -298,6 +300,8 @@ class Kick(Command):
         args = self.args.split(' ')
         if len(args) < 2:
             return "[Command] Invalid usage. (Usage: kick <PlayerID>)"
+        if not args[1].isdigit():
+            return "[Command] {red}%s is not a number." % args[1]
         if int(args[1]) in data.clients.connectedClients:
             if data.clients.connectedClients[int(args[1])].get_handle() is not None:
                 data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet(
@@ -409,8 +413,7 @@ class Exit(Command):
 @CommandHandler("reloadblocknames")
 class ReloadBlockNames(Command):
     def call_from_console(self):
-        config.load_block_names()
-        return
+        return config.load_block_names()
 
 
 profile = None
