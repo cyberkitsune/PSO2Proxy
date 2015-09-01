@@ -88,9 +88,12 @@ class UnknownPacket1902(object):
 class TeamChatPacket(object):
     """docstring for TeamChatPacket"""
 
-    def __init__(self, sender_id, account, charname, message, shared=False):
+    def __init__(self, sender_id, account, charname, message, cm=False):
         self.senderId = sender_id
-        self.shared = shared
+        if (cm):
+            self.cm = 0x00
+        else:
+            self.cm = 0x02
         self.account = account
         self.charname = charname
         self.message = message
@@ -98,10 +101,7 @@ class TeamChatPacket(object):
     def build(self):
         buf = bytearray()
         buf += PlayerHeader(self.senderId).build()  # 0x0B
-        if (self.shared):
-            buf += struct.pack('<I', 0x0)  # 0x0F
-        else:
-            buf += struct.pack('<I', 0x2)  # 0x0F
+        buf += struct.pack('<I', self.cm)  # 0x0F
         buf += struct.pack('<I', 0x0)  # 0x14
         buf += encode_string_utf16(self.account, 0x7ED7, 0x41)
         buf += encode_string_utf16(self.charname, 0x7ED7, 0x41)
