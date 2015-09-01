@@ -329,7 +329,7 @@ class ToggleEQNoitce(Command):
     def call_from_console(self):
         if taskrun.running:
             taskrun.stop()
-            print("[EQ Notice] Stop EQ Notice Ticker")
+            return "[EQ Notice] Stop EQ Notice Ticker"
         else:
             taskrun.start(tasksec)
-            print("[EQ Notice] Started EQ Notice Ticker")
+            return "[EQ Notice] Started EQ Notice Ticker"
