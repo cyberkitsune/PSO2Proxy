@@ -23,3 +23,4 @@ def login_message(sender):
 class ReloadConfig(commands.Command):
     def call_from_console(self):
         login_config._load_config()
+        return "[LoginMessage] Message file reloaded"
