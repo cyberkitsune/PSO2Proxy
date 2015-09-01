@@ -413,8 +413,7 @@ class Exit(Command):
 @CommandHandler("reloadblocknames")
 class ReloadBlockNames(Command):
     def call_from_console(self):
-        config.load_block_names()
-        return
+        return config.load_block_names()
 
 
 profile = None

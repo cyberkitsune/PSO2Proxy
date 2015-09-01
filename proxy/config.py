@@ -101,11 +101,15 @@ def is_admin(sega_id):
 
 def load_block_names():
     global blockNames
-    if os.path.exists("cfg/blocknames.resources.json") and globalConfig.get_key('blockNameMode') == 1:
+    if globalConfig.get_key('blockNameMode') == 0:
+        return "[ShipProxy] Blocks are not renamed"
+    if os.path.exists("cfg/blocknames.resources.json"):
         f = open("cfg/blocknames.resources.json", 'r')
         blockNames = json.load(f)
         f.close()
-        print("[ShipProxy] %s Block names loaded!" % len(blockNames))
+        return ("[ShipProxy] %s Block names loaded!" % len(blockNames))
+    else:
+        return "[ShipProxy] BlockName file does not exists"
 
 load_block_names()
 
