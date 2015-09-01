@@ -150,7 +150,7 @@ class CountCommand(Command):
 @CommandHandler("reloadbans")
 class ReloadBans(Command):
     def call_from_console(self):
-        config.load_bans()
+        return config.load_bans()
 
 
 @CommandHandler("listbans", "[Admin Only] Prints a list of banned users.", True)

@@ -124,7 +124,7 @@ def load_bans():
     bans = f.read()
     f.close()
     banList = json.loads(bans)
-    print("[Bans] %i bans loaded!" % len(bans))
+    return ("[Bans] %i bans loaded!" % len(bans))
 
 
 def save_bans():
