@@ -282,7 +282,9 @@ def notify_and_config(client):
     ship = clients.get_ship_from_port(client.transport.getHost().port) - 1
     if not client_preferences.has_preference("eqnotice_ship"):
         client_preferences.set_preference("eqnotice_ship", 2)  # good default
-    if ship != 10:
+    if ship == 10:
+        ship = client_preferences.get_preference('eqnotice_ship')
+    else:
         client_preferences.set_preference("eqnotice_ship", (ship + 1))  # record the real ship
     if client_preferences.get_preference('eqnotice') and data_eq[ship] and not check_if_EQ_old(ship):
         SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
