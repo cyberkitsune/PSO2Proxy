@@ -283,7 +283,7 @@ def notify_and_config(client):
     if not client_preferences.has_preference("eqnotice_ship"):
         client_preferences.set_preference("eqnotice_ship", 2)  # good default
     if ship == 10:
-        ship = client_preferences.get_preference('eqnotice_ship')
+        ship = client_preferences.get_preference('eqnotice_ship') - 1
     else:
         client_preferences.set_preference("eqnotice_ship", (ship + 1))  # record the real ship
     if client_preferences.get_preference('eqnotice') and data_eq[ship] and not check_if_EQ_old(ship):
