@@ -112,7 +112,7 @@ def get_team_chat_packet(context, packet):
     """
     :type context: ShipProxy.ShipProxy
     """
-    if struct.unpack_from("<I", packet, 0xF)[0] == 0x2:
+    if context.peer.transport.getHost().port < 13000:
         return packet
     try:
         if context.psoClient and context.playerId and data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out'):
