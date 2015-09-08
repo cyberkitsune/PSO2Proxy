@@ -69,6 +69,8 @@ def get_chat_packet(context, packet):
                 return None
             channel_id = struct.unpack_from("<I", packet, 0x14)[0]
             message = packet[0x1C:].decode('utf-16').rstrip("\0")
+            if message.startswith("/"):
+                return packet  # Command
             d = threads.deferToThread(generate_translated_message, player_id, channel_id, message, "ja", "en")
             d.addCallback(context.peer.send_crypto_packet)
             return None
