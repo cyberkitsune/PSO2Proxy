@@ -166,6 +166,8 @@ def get_team_chat_packet(context, packet):
 
         pis = 0x8  # read the playerid
         player_id = struct.unpack_from("<I", packet, 0x8)[0]
+        if player_id == 0:  # We sent it
+            return packet
         pis += 0x14  # let skip to the first unicode string len
 
         wlen = decode_string_utf16_len(struct.unpack_from("<I", packet, pis)[0], 0x7ED7, 0x41)
