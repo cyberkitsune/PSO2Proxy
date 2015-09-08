@@ -68,6 +68,8 @@ def get_chat_packet(context, packet):
             if player_id != 0:  # ???
                 return None
             channel_id = struct.unpack_from("<I", packet, 0x14)[0]
+            if channel_id == 2:
+                return packet  # skip team chat
             message = packet[0x1C:].decode('utf-16').rstrip("\0")
             if message.startswith("/"):
                 return packet  # Command
