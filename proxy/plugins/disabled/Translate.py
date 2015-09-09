@@ -68,7 +68,11 @@ def get_chat_packet(context, packet):
             if player_id != 0:  # ???
                 return None
             channel_id = struct.unpack_from("<I", packet, 0x14)[0]
+            if channel_id == 2:
+                return packet  # skip team chat
             message = packet[0x1C:].decode('utf-16').rstrip("\0")
+            if message.startswith("/"):
+                return packet  # Command
             d = threads.deferToThread(generate_translated_message, player_id, channel_id, message, "ja", "en")
             d.addCallback(context.peer.send_crypto_packet)
             return None
@@ -112,7 +116,7 @@ def get_team_chat_packet(context, packet):
     """
     :type context: ShipProxy.ShipProxy
     """
-    if struct.unpack_from("<I", packet, 0xF)[0] == 0x2:
+    if context.peer.transport.getHost().port < 13000:
         return packet
     try:
         if context.psoClient and context.playerId and data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out'):
@@ -166,6 +170,8 @@ def get_team_chat_packet(context, packet):
 
         pis = 0x8  # read the playerid
         player_id = struct.unpack_from("<I", packet, 0x8)[0]
+        if player_id == 0:  # We sent it
+            return packet
         pis += 0x14  # let skip to the first unicode string len
 
         wlen = decode_string_utf16_len(struct.unpack_from("<I", packet, pis)[0], 0x7ED7, 0x41)
