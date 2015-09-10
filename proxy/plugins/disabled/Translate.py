@@ -2,6 +2,7 @@ import commands
 from config import YAMLConfig
 import data.clients
 import packetFactory
+from PSO2DataTools import split_cmd_msg
 import struct
 import time
 from twisted.internet import threads
@@ -55,69 +56,6 @@ class ToggleTranslateOut(commands.Command):
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Enabled outgoing chat translation.", 0x3).build())
             else:
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled outgoing chat translation.", 0x3).build())
-
-
-def ci_switchs(cmd):  # decode /ci[1-9] {[1-5]} {t[1-5]} {nw} {s[0-99]}
-    count = 0
-    cmdl = cmd.split(" ", 5)
-    if cmdl[count + 1].isalnum():
-        count += 1
-    if not cmdl[count + 1]:
-        return count
-    if cmdl[count + 1][0] == "t":
-        count += 1
-    if not cmdl[count + 1]:
-        return count
-    if cmdl[count + 1] == "nw":
-        count += 1
-    if not cmdl[count + 1]:
-        return count
-    if cmdl[count + 1][0] == "s":
-        count += 1
-    return count
-
-
-def need_switchs(msg):  # return the max number of swtichs for the command
-    if msg.startswith("toge") or msg.startswith("moya") or msg.startswith("mn"):
-        return 0  # Text Bubble Emotes
-    if msg.startswith("mainpalette") or msg.startswith("mpal"):
-        return 0  # Switch Main Palette to %1
-    if msg.startswith("subpalette") or msg.startswith("spal"):
-        return 0  # Switch Sub Palette
-    if msg.startswith("costume") or msg.startswith("cs"):
-        return 1  # Switch Costume %1
-    if msg.startswith("camouflage") or msg.startswith("cmf"):
-        return 1  # Switch Camos %1
-    if msg.startswith("la") or msg.startswith("mla") or msg.startswith("fla") or msg.startswith("cla"):
-        return 1  # Lobby action %1
-    if msg.startswith("ci"):
-        return ci_switchs(msg)  # Cut-ins need special handling
-    if msg.startswith("symbol"):
-        return 0  # Symbol Art (symbol#)
-    if msg.startswith("vo"):
-        return 0  # Voice Clips (vo#)
-    return -1  # Unknown
-
-
-def split_cmd_msg(message):
-    cmd = ""
-    msg = message
-    if not message.strip() or message.strip() == "null":
-        return (cmd, "")
-    cmd, split, msg = message.rpartition("/")  # Let process that last command
-    if split:
-        args = need_switchs(msg)  # how many switchs does the last command need?
-        if args == -1:  # not a vaild command, let look again
-            cmdr, msgr = split_cmd_msg(cmd)
-            return (cmdr, msgr + split + msg)
-        else:  # so it is a vaild command, let add back togther
-            msgl = msg.split(u" ", args + 1)   # let break apart msg strings into a list
-            msg = msgl[len(msgl) - 1]  # the string at the end of the list is the text
-            cmdl = []  # Start a new list, with cmd
-            cmdl.extend(msgl[0:args + 1])  # Add the command and all the switchs
-            cmd = split + u" ".join(cmdl)  # join the list into a string
-    return (cmd, msg)
-
 
 @p.PacketHook(0x7, 0x0)
 def get_chat_packet(context, packet):
