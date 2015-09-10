@@ -96,8 +96,7 @@ def need_switchs(msg):  # return the max number of swtichs for the command
         return 0  # Symbol Art (symbol#)
     if msg.startswith("vo"):
         return 0  # Voice Clips (vo#)
-    print("Translate BUG: need handle for cmd %s" % msg.split()[0])
-    return 0  # Unknown
+    return -1  # Unknown
 
 
 def split_cmd_msg(message):
@@ -108,11 +107,15 @@ def split_cmd_msg(message):
     cmd, split, msg = message.rpartition("/")  # Let process that last command
     if split:
         args = need_switchs(msg)  # how many switchs does the last command need?
-        msgl = msg.split(u" ", args + 1)   # let break apart msg strings into a list
-        msg = msgl[len(msgl) - 1]  # the string at the end of the list is the text
-        cmdl = []  # Start a new list, with cmd
-        cmdl.extend(msgl[0:args + 1])  # Add the command and all the switchs
-        cmd = split + u" ".join(cmdl)  # join the list into a string
+        if args == -1:  # not a vaild command, let look again
+            cmdr, msgr = split_cmd_msg(cmd)
+            return (cmdr, msgr + split + msg)
+        else:  # so it is a vaild command, let add back togther
+            msgl = msg.split(u" ", args + 1)   # let break apart msg strings into a list
+            msg = msgl[len(msgl) - 1]  # the string at the end of the list is the text
+            cmdl = []  # Start a new list, with cmd
+            cmdl.extend(msgl[0:args + 1])  # Add the command and all the switchs
+            cmd = split + u" ".join(cmdl)  # join the list into a string
     return (cmd, msg)
 
 
