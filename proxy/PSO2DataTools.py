@@ -513,6 +513,6 @@ def split_cmd_msg(message):
             cmdl = []  # Start a new list, with cmd
             cmdl.extend(msgl[0:args + 1])  # Add the command and all the switchs
             cmd = split + u" ".join(cmdl)  # join the list into a string
-            if cmd:
-               cmd += "u "
+            if cmd and msg.rstrip():
+                cmd += u" "
     return (cmd, msg.rstrip())
