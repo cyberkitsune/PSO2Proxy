@@ -472,26 +472,47 @@ def ci_switchs(cmd):  # decode /ci[1-9] {[1-5]} {t[1-5]} {nw} {s[0-99]}
         count += 1
     return count
 
+PSO2_Commands = [
+    # Text Bubble Emotes
+    ("toge", 0),
+    ("moya", 0),
+    ("mn", 0),  # (mn#)
+    # Switch Main Palette (mpal#)
+    ("mainpalette", 0),
+    ("mpal", 0),
+    ("subpalette", 0),
+    ("spal", 0),
+    # Switch Consume %1
+    ("costume", 1),
+    ("cs", 1),
+    # Switch Camos %1
+    ("camouflage", 1),
+    ("cmf", 1),
+    # Lobby action %1
+    ("la", 1),
+    ("mla", 1),
+    ("fla", 1),
+    ("cla", 1),
+    # Symbol Art (symbol#)
+    ("symbol", 0),
+    # Voice Clip (vo#)
+    ("vo", 0),
+    # All chat
+    ("a", 0),
+    # Party chat
+    ("p", 0),
+    # Team Chat
+    ("t", 0)
+    # EOL
+]
+
 
 def need_switchs(msg):  # return the max number of swtichs for the command
-    if msg.startswith("toge") or msg.startswith("moya") or msg.startswith("mn"):
-        return 0  # Text Bubble Emotes
-    if msg.startswith("mainpalette") or msg.startswith("mpal"):
-        return 0  # Switch Main Palette to %1
-    if msg.startswith("subpalette") or msg.startswith("spal"):
-        return 0  # Switch Sub Palette
-    if msg.startswith("costume") or msg.startswith("cs"):
-        return 1  # Switch Costume %1
-    if msg.startswith("camouflage") or msg.startswith("cmf"):
-        return 1  # Switch Camos %1
-    if msg.startswith("la") or msg.startswith("mla") or msg.startswith("fla") or msg.startswith("cla"):
-        return 1  # Lobby action %1
+    for s, n in PSO2_Commands:
+        if msg.startswith(s):
+            return n
     if msg.startswith("ci"):
         return ci_switchs(msg)  # Cut-ins need special handling
-    if msg.startswith("symbol"):
-        return 0  # Symbol Art (symbol#)
-    if msg.startswith("vo"):
-        return 0  # Voice Clips (vo#)
     return -1  # Unknown
 
 
