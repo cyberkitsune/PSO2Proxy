@@ -57,6 +57,65 @@ class ToggleTranslateOut(commands.Command):
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled outgoing chat translation.", 0x3).build())
 
 
+def ci_switchs(cmd):  # decode /ci[1-9] {[1-5]} {t[1-5]} {nw} {s[0-99]}
+    count = 0
+    cmdl = cmd.split(" ", 5)
+    if cmdl[count + 1].isalnum():
+        count += 1
+    if not cmdl[count + 1]:
+        return count
+    if cmdl[count + 1][0] == "t":
+        count += 1
+    if not cmdl[count + 1]:
+        return count
+    if cmdl[count + 1] == "nw":
+        count += 1
+    if not cmdl[count + 1]:
+        return count
+    if cmdl[count + 1][0] == "s":
+        count += 1
+    return count
+
+
+def need_switchs(msg):  # return the max number of swtichs for the command
+    if msg.startswith("toge") or msg.startswith("moya") or msg.startswith("mn"):
+        return 0  # Text Bubble Emotes
+    if msg.startswith("mainpalette") or msg.startswith("mpal"):
+        return 0  # Switch Main Palette to %1
+    if msg.startswith("subpalette") or msg.startswith("spal"):
+        return 0  # Switch Sub Palette
+    if msg.startswith("costume") or msg.startswith("cs"):
+        return 1  # Switch Costume %1
+    if msg.startswith("camouflage") or msg.startswith("cmf"):
+        return 1  # Switch Camos %1
+    if msg.startswith("la") or msg.startswith("mla") or msg.startswith("fla") or msg.startswith("cla"):
+        return 1  # Lobby action %1
+    if msg.startswith("ci"):
+        return ci_switchs(msg)  # Cut-ins need special handling
+    if msg.startswith("symbol"):
+        return 0  # Symbol Art (symbol#)
+    if msg.startswith("vo"):
+        return 0  # Voice Clips (vo#)
+    print("Translate BUG: need handle for cmd %s" % msg.split()[0])
+    return 0  # Unknown
+
+
+def split_cmd_msg(message):
+    cmd = ""
+    msg = message
+    if not message.strip() or message.strip() == "null":
+        return (cmd, "")
+    cmd, split, msg = message.rpartition("/")  # Let process that last command
+    if split:
+        args = need_switchs(msg)  # how many switchs does the last command need?
+        msgl = msg.split(u" ", args + 1)   # let break apart msg strings into a list
+        msg = msgl[len(msgl) - 1]  # the string at the end of the list is the text
+        cmdl = []  # Start a new list, with cmd
+        cmdl.extend(msgl[0:args + 1])  # Add the command and all the switchs
+        cmd = split + u" ".join(cmdl)  # join the list into a string
+    return (cmd, msg)
+
+
 @p.PacketHook(0x7, 0x0)
 def get_chat_packet(context, packet):
     """
@@ -71,9 +130,10 @@ def get_chat_packet(context, packet):
             if channel_id == 2:
                 return packet  # skip team chat
             message = packet[0x1C:].decode('utf-16').rstrip("\0")
-            if message.startswith("/"):
+            cmd, msg = split_cmd_msg(message)
+            if not msg:
                 return packet  # Command
-            d = threads.deferToThread(generate_translated_message, player_id, channel_id, message, "ja", "en")
+            d = threads.deferToThread(generate_translated_message, player_id, channel_id, cmd, msg, "ja", "en")
             d.addCallback(context.peer.send_crypto_packet)
             return None
     except KeyError:
@@ -87,17 +147,18 @@ def get_chat_packet(context, packet):
             return packet
         channel_id = struct.unpack_from("<I", packet, 0x14)[0]
         message = packet[0x1C:].decode('utf-16').rstrip("\0")
-        if message.startswith("/"):
+        cmd, msg = split_cmd_msg(message)
+        if not msg:
             return packet  # Command
         japanese = False
-        for char in message:
+        for char in msg:
             char_script = script(unicode(char))
             if char_script != 'Latin' and char_script != 'Common':
                 japanese = True
                 break
         if not japanese:
             return packet
-        d = threads.deferToThread(generate_translated_message, player_id, channel_id, message, "en", "ja")
+        d = threads.deferToThread(generate_translated_message, player_id, channel_id, cmd, msg, "en", "ja")
         d.addCallback(context.peer.send_crypto_packet)
         return None
     return packet
@@ -153,10 +214,12 @@ def get_team_chat_packet(context, packet):
             message = packet[pis:pis + (wlen * 2)].decode('utf-16').rstrip("\0")
             pis += (wlen * 2)  # skipping to the end of utf-16 string
 
-            if message.startswith("/"):
+            cmd, msg = split_cmd_msg(message)
+
+            if not msg:
                 return packet  # Command
 
-            d = threads.deferToThread(generate_translated_team_message, player_id, account, charname, message, "ja", "en")
+            d = threads.deferToThread(generate_translated_team_message, player_id, account, charname, cmd, msg, "ja", "en")
             d.addCallback(context.peer.send_crypto_packet)
             return None
     except KeyError:
@@ -199,31 +262,34 @@ def get_team_chat_packet(context, packet):
         message = packet[pis:pis + (wlen * 2)].decode('utf-16').rstrip("\0")
         pis += (wlen * 2)  # skipping to the end of utf-16 string
 
-        if message.startswith("/"):
+        cmd, msg = split_cmd_msg(message)
+
+        if not msg:
             return packet  # Command
+
         japanese = False
-        for char in message:
+        for char in msg:
             char_script = script(unicode(char))
             if char_script != 'Latin' and char_script != 'Common':
                 japanese = True
                 break
         if not japanese:
             return packet
-        d = threads.deferToThread(generate_translated_team_message, player_id, account, charname, message, "en", "ja")
+        d = threads.deferToThread(generate_translated_team_message, player_id, account, charname, cmd, msg, "en", "ja")
         d.addCallback(context.peer.send_crypto_packet)
         return None
     return packet
 
 
-def generate_translated_message(player_id, channel_id, message, end_lang, start_lang):
+def generate_translated_message(player_id, channel_id, cmd, message, end_lang, start_lang):
     if provider == "Bing" and time.time() - lastKeyTime >= 600:
         translator.access_token = translator.get_access_token()
 
     try:
         if end_lang == "ja":
-            message_string = "%s" % translator.translate(message, end_lang, start_lang)
+            message_string = "%s%s" % (cmd, translator.translate(message, end_lang, start_lang))
         else:
-            message_string = "%s {def}(%s)" % (translator.translate(message, end_lang, start_lang), message)
+            message_string = "%s%s {def}(%s)" % (cmd, translator.translate(message, end_lang, start_lang), message)
     except Exception as e:
         print (str(e))
         message_string = message
@@ -231,15 +297,15 @@ def generate_translated_message(player_id, channel_id, message, end_lang, start_
     return packetFactory.ChatPacket(player_id, message_string, channel_id).build()
 
 
-def generate_translated_team_message(player_id, account, charname, message, end_lang, start_lang):
+def generate_translated_team_message(player_id, account, charname, cmd, message, end_lang, start_lang):
     if provider == "Bing" and time.time() - lastKeyTime >= 600:
         translator.access_token = translator.get_access_token()
 
     try:
         if end_lang == "ja":
-            message_string = "%s" % translator.translate(message, end_lang, start_lang)
+            message_string = "%s%s" % (cmd, translator.translate(message, end_lang, start_lang))
         else:
-            message_string = "%s {def}(%s)" % (translator.translate(message, end_lang, start_lang), message)
+            message_string = "%s%s {def}(%s)" % (cmd, translator.translate(message, end_lang, start_lang), message)
     except Exception as e:
         print (str(e))
         message_string = message
