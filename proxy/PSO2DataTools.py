@@ -34,7 +34,6 @@ PSO2_IRC = [
     ("{gry}", "\x03""14"),  # grey
     ("{bla}", "\x03""14"),  # grey
     ("{ble}", "\x03""14"),  # grey
-    ("{ble}", "\x03""14"),  # grey
     ("{bra}", "\x03""14"),  # grey
 
     ("{whi}", "\x03""00"),  # white
