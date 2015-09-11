@@ -2,6 +2,8 @@ import commands
 from config import YAMLConfig
 import data.clients
 import packetFactory
+from PSO2DataTools import color_hide
+from PSO2DataTools import color_show
 from PSO2DataTools import split_cmd_msg
 import struct
 import time
@@ -56,6 +58,7 @@ class ToggleTranslateOut(commands.Command):
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Enabled outgoing chat translation.", 0x3).build())
             else:
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled outgoing chat translation.", 0x3).build())
+
 
 @p.PacketHook(0x7, 0x0)
 def get_chat_packet(context, packet):
@@ -222,33 +225,29 @@ def get_team_chat_packet(context, packet):
     return packet
 
 
-def generate_translated_message(player_id, channel_id, cmd, message, end_lang, start_lang):
+def translate_message(cmd, message, end_lang, start_lang):
     if provider == "Bing" and time.time() - lastKeyTime >= 600:
         translator.access_token = translator.get_access_token()
 
     try:
+        translate_msg = color_show(translator.translate(color_hide(message), end_lang, start_lang))
+
         if end_lang == "ja":
-            message_string = "%s%s" % (cmd, translator.translate(message, end_lang, start_lang))
+            message_string = "%s%s" % (cmd, translate_msg)
         else:
-            message_string = "%s%s {def}(%s)" % (cmd, translator.translate(message, end_lang, start_lang), message)
+            message_string = "%s%s {def}(%s)" % (cmd, translate_msg, message)
     except Exception as e:
         print (str(e))
         message_string = message
 
+    return message_string
+
+
+def generate_translated_message(player_id, channel_id, cmd, message, end_lang, start_lang):
+    message_string = translate_message(cmd, message, end_lang, start_lang)
     return packetFactory.ChatPacket(player_id, message_string, channel_id).build()
 
 
 def generate_translated_team_message(player_id, account, charname, cmd, message, end_lang, start_lang):
-    if provider == "Bing" and time.time() - lastKeyTime >= 600:
-        translator.access_token = translator.get_access_token()
-
-    try:
-        if end_lang == "ja":
-            message_string = "%s%s" % (cmd, translator.translate(message, end_lang, start_lang))
-        else:
-            message_string = "%s%s {def}(%s)" % (cmd, translator.translate(message, end_lang, start_lang), message)
-    except Exception as e:
-        print (str(e))
-        message_string = message
-
+    message_string = translate_message(cmd, message, end_lang, start_lang)
     return packetFactory.TeamChatPacket(player_id, account, charname, message_string, True).build()
