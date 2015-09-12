@@ -409,7 +409,10 @@ IRC_PSO2 = [
 
 
 def replace_with_table(pIncoming, table, debug=0, check=0):
-    lIncoming = unicode(pIncoming, 'utf-8-sig', 'replace')
+    if isinstance(pIncoming, str):
+        lIncoming = unicode(pIncoming, 'utf-8-sig', 'replace')
+    else:
+        lIncoming = pIncoming
 
     if debug > 0:
         print ("Incoming object:  {}".format(repr(pIncoming)))
@@ -427,7 +430,10 @@ def replace_with_table(pIncoming, table, debug=0, check=0):
     if (check):
         lIncoming = lIncoming.strip()
 
-    outtext = lIncoming.encode('utf-8', 'replace')
+    if isinstance(pIncoming, str):
+        outtext = lIncoming.encode('utf-8', 'replace')
+    else:
+        outtext = lIncoming
 
     if debug > 0:
         print ("Outgoing replace: {}".format(repr(lIncoming)))
