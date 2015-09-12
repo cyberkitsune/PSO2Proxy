@@ -408,7 +408,7 @@ IRC_PSO2 = [
 ]
 
 
-def replace_with_table(pIncoming, table, debug=0, check=0, rev=0, space=0):
+def replace_with_table(pIncoming, table, debug=0, check=0):
     if isinstance(pIncoming, str):
         lIncoming = unicode(pIncoming, 'utf-8-sig', 'replace')
     else:
@@ -421,14 +421,6 @@ def replace_with_table(pIncoming, table, debug=0, check=0, rev=0, space=0):
     if (check):
         for i, o in table:
             outtext = lIncoming.replace(i, "")
-            lIncoming = outtext
-    elif (rev):
-        for o, i in table:
-            outtext = lIncoming.replace(i, o)
-            lIncoming = outtext
-    elif (space):
-        for i, o in table:
-            outtext = lIncoming.replace(i, " " + o + " ")
             lIncoming = outtext
     else:
         for i, o in table:
@@ -550,58 +542,3 @@ def split_cmd_msg(message):
             if cmd and msg.rstrip():
                 cmd += u" "
     return (cmd, msg.rstrip())
-
-color_hide_list = [
-    ("{red}", "_R_D_"),  # Red
-
-    ("{blu}", "_B_E_"),  # Blue
-    ("{blue}", "_B_E_"),  # Blue
-
-    ("{gre}", "_G_N_"),  # green
-    ("{green}", "_G_N_"),  # green
-    ("{grn}", "_G_N_"),  # green
-    ("{gree}", "_G_N_"),  # green
-
-    ("{yel}", "_Y_W_"),  # yellow
-    ("{yellow}", "_Y_W_"),  # yellow
-
-    ("{ora}", "_O_E_"),  # orange (olive)
-    ("{orange}", "_O_E_"),  # orange (olive)
-    ("{org}", "_O_E_"),  # orange (olive)
-
-    ("{pur}", "_P_E_"),  # purple
-    ("{purple}", "_P_E_"),  # purple
-    ("{vir}", "_P_E_"),  # purple
-
-    ("{vio}", "_V_L_"),  # Violet
-    ("{violet}", "_V_L_"),  # Violet
-
-    ("{bei}", "_B_E_"),  # Beige
-    ("{beige}", "_B_E_"),  # Beige
-
-    ("{gra}", "_G_Y_"),  # grey
-    ("{gray}", "_G_Y_"),  # grey
-    ("{gra}", "_G_Y_"),  # grey
-    ("{gry}", "_G_Y_"),  # grey
-    ("{bla}", "_G_Y_"),  # grey
-    ("{ble}", "_G_Y_"),  # grey
-    ("{bra}", "_G_Y_"),  # grey
-
-    ("{whi}", "_W_E_"),  # white
-    ("{white}", "_W_E_"),  # white
-    ("{whit}", "_W_E_"),  # white
-
-    ("{blk}", "_B_K_"),  # black
-    ("{black}", "_B_K_"),  # black
-    ("{pla}", "_B_K_"),  # black
-
-    ("{def}", "_D_F_"),  # colour reset
-]
-
-
-def color_hide(pIncoming, debug=0):
-    return replace_with_table(pIncoming, color_hide_list, debug, space=1).strip()
-
-
-def color_show(pIncoming, debug=0):
-    return replace_with_table(pIncoming, color_hide_list, debug, rev=1).strip()

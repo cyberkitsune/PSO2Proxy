@@ -2,8 +2,7 @@ import commands
 from config import YAMLConfig
 import data.clients
 import packetFactory
-from PSO2DataTools import color_hide
-from PSO2DataTools import color_show
+from PSO2DataTools import check_pso2_with_irc
 from PSO2DataTools import split_cmd_msg
 import struct
 import time
@@ -230,8 +229,8 @@ def translate_message(cmd, message, end_lang, start_lang):
         translator.access_token = translator.get_access_token()
 
     try:
-        if "{" in message:
-            translate_msg = color_show(translator.translate(color_hide(message), end_lang, start_lang))
+        if "}" in message:
+            translate_msg = translator.translate(check_pso2_with_irc(message), end_lang, start_lang)
         else:
             translate_msg = translator.translate(message, end_lang, start_lang)
 
