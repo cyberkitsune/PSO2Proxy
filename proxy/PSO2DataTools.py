@@ -600,8 +600,8 @@ color_hide_list = [
 
 
 def color_hide(pIncoming, debug=0):
-    return replace_with_table(pIncoming, color_hide_list, debug, space=1)
+    return replace_with_table(pIncoming, color_hide_list, debug, space=1).strip()
 
 
 def color_show(pIncoming, debug=0):
-    return replace_with_table(pIncoming, color_hide_list, debug, rev=1)
+    return replace_with_table(pIncoming, color_hide_list, debug, rev=1).strip()
