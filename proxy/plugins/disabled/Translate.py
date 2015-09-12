@@ -238,7 +238,7 @@ def translate_message(cmd, message, end_lang, start_lang):
         if end_lang == "ja":
             message_string = "%s%s" % (cmd, translate_msg)
         else:
-            message_string = "%s%s {def}(%s)" % (cmd, translate_msg, message)
+            message_string = "%s%s {def}(%s{def})" % (cmd, translate_msg, message)
     except Exception as e:
         print (str(e))
         message_string = message
