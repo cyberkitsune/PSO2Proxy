@@ -230,7 +230,10 @@ def translate_message(cmd, message, end_lang, start_lang):
         translator.access_token = translator.get_access_token()
 
     try:
-        translate_msg = color_show(translator.translate(color_hide(message), end_lang, start_lang))
+        if "{" in message:
+            translate_msg = color_show(translator.translate(color_hide(message), end_lang, start_lang))
+        else:
+            translate_msg = translator.translate(message, end_lang, start_lang)
 
         if end_lang == "ja":
             message_string = "%s%s" % (cmd, translate_msg)
