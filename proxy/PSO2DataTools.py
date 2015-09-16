@@ -34,7 +34,6 @@ PSO2_IRC = [
     ("{gry}", "\x03""14"),  # grey
     ("{bla}", "\x03""14"),  # grey
     ("{ble}", "\x03""14"),  # grey
-    ("{ble}", "\x03""14"),  # grey
     ("{bra}", "\x03""14"),  # grey
 
     ("{whi}", "\x03""00"),  # white
@@ -410,7 +409,10 @@ IRC_PSO2 = [
 
 
 def replace_with_table(pIncoming, table, debug=0, check=0):
-    lIncoming = unicode(pIncoming, 'utf-8-sig', 'replace')
+    if isinstance(pIncoming, str):
+        lIncoming = unicode(pIncoming, 'utf-8-sig', 'replace')
+    else:
+        lIncoming = pIncoming
 
     if debug > 0:
         print ("Incoming object:  {}".format(repr(pIncoming)))
@@ -428,7 +430,10 @@ def replace_with_table(pIncoming, table, debug=0, check=0):
     if (check):
         lIncoming = lIncoming.strip()
 
-    outtext = lIncoming.encode('utf-8', 'replace')
+    if isinstance(pIncoming, str):
+        outtext = lIncoming.encode('utf-8', 'replace')
+    else:
+        outtext = lIncoming
 
     if debug > 0:
         print ("Outgoing replace: {}".format(repr(lIncoming)))
@@ -451,3 +456,89 @@ def replace_pso2_with_irc(pIncoming, debug=0):
 
 def replace_irc_with_pso2(pIncoming, debug=0):
     return replace_with_table(pIncoming, IRC_PSO2, debug)
+
+
+def ci_switchs(cmd):  # decode /ci[1-9] {[1-5]} {t[1-5]} {nw} {s[0-99]}
+    count = 0
+    cmdl = cmd.split(" ", 5)
+    if cmdl[count + 1].isdigit():
+        count += 1
+    if not cmdl[count + 1]:
+        return count
+    if cmdl[count + 1][0] == "t":
+        count += 1
+    if not cmdl[count + 1]:
+        return count
+    if cmdl[count + 1] == "nw":
+        count += 1
+    if not cmdl[count + 1]:
+        return count
+    if cmdl[count + 1][0] == "s":
+        count += 1
+    return count
+
+PSO2_Commands = [
+    # Text Bubble Emotes
+    ("toge", 0),
+    ("moya", 0),
+    ("mn", 0),  # (mn#)
+    # Switch Main Palette (mpal#)
+    ("mainpalette", 0),
+    ("mpal", 0),
+    ("subpalette", 0),
+    ("spal", 0),
+    # Switch Consume %1
+    ("costume", 1),
+    ("cs", 1),
+    # Switch Camos %1
+    ("camouflage", 1),
+    ("cmf", 1),
+    # Lobby action %1
+    ("la", 1),
+    ("mla", 1),
+    ("fla", 1),
+    ("cla", 1),
+    # Symbol Art (symbol#)
+    ("symbol", 0),
+    # Voice Clip (vo#)
+    ("vo", 0),
+    # All chat
+    ("a", 0),
+    # Party chat
+    ("p", 0),
+    # Team Chat
+    ("t", 0),
+    # EOL
+]
+
+
+def need_switchs(msg):  # return the max number of swtichs for the command
+    for s, n in PSO2_Commands:
+        if msg.startswith(s):
+            return n
+    if msg.startswith("ci"):
+        return ci_switchs(msg)  # Cut-ins need special handling
+    return -1  # Unknown
+
+
+def split_cmd_msg(message):
+    cmd = ""
+    msg = message
+    if not message.strip() or message.strip() == "null":
+        return (cmd, "")
+    cmd, split, msg = message.rpartition("/")  # Let process that last command
+    if split:
+        args = need_switchs(msg)  # how many switchs does the last command need?
+        if args == -1:  # not a vaild command, let look again
+            cmdr, msgr = split_cmd_msg(cmd)
+            return (cmdr, msgr + split + msg)
+        else:  # so it is a vaild command, let add back togther
+            msg += u" "
+            msgl = msg.split(u" ", args + 1)   # let break apart msg strings into a list
+            msg = msgl[-1]  # the string at the end of the list is the text
+            cmdl = []  # Start a new list, with cmd
+            cmdl.extend(msgl[0:args + 1])  # Add the command and all the switchs
+            cmd = split + u" ".join(cmdl)  # join the list into a string
+            if cmd and msg.rstrip():
+                cmd += u" "
+    return (cmd, msg.rstrip())

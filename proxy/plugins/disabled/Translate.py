@@ -2,6 +2,8 @@ import commands
 from config import YAMLConfig
 import data.clients
 import packetFactory
+from PSO2DataTools import check_pso2_with_irc
+from PSO2DataTools import split_cmd_msg
 import struct
 import time
 from twisted.internet import threads
@@ -71,9 +73,10 @@ def get_chat_packet(context, packet):
             if channel_id == 2:
                 return packet  # skip team chat
             message = packet[0x1C:].decode('utf-16').rstrip("\0")
-            if message.startswith("/"):
+            cmd, msg = split_cmd_msg(message)
+            if not msg:
                 return packet  # Command
-            d = threads.deferToThread(generate_translated_message, player_id, channel_id, message, "ja", "en")
+            d = threads.deferToThread(generate_translated_message, player_id, channel_id, cmd, msg, "ja", "en")
             d.addCallback(context.peer.send_crypto_packet)
             return None
     except KeyError:
@@ -87,17 +90,18 @@ def get_chat_packet(context, packet):
             return packet
         channel_id = struct.unpack_from("<I", packet, 0x14)[0]
         message = packet[0x1C:].decode('utf-16').rstrip("\0")
-        if message.startswith("/"):
+        cmd, msg = split_cmd_msg(message)
+        if not msg:
             return packet  # Command
         japanese = False
-        for char in message:
+        for char in msg:
             char_script = script(unicode(char))
             if char_script != 'Latin' and char_script != 'Common':
                 japanese = True
                 break
         if not japanese:
             return packet
-        d = threads.deferToThread(generate_translated_message, player_id, channel_id, message, "en", "ja")
+        d = threads.deferToThread(generate_translated_message, player_id, channel_id, cmd, msg, "en", "ja")
         d.addCallback(context.peer.send_crypto_packet)
         return None
     return packet
@@ -116,8 +120,6 @@ def get_team_chat_packet(context, packet):
     """
     :type context: ShipProxy.ShipProxy
     """
-    if context.peer.transport.getHost().port < 13000:
-        return packet
     try:
         if context.psoClient and context.playerId and data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out'):
             player_id = struct.unpack_from("<I", packet, 0x8)[0]
@@ -155,10 +157,12 @@ def get_team_chat_packet(context, packet):
             message = packet[pis:pis + (wlen * 2)].decode('utf-16').rstrip("\0")
             pis += (wlen * 2)  # skipping to the end of utf-16 string
 
-            if message.startswith("/"):
+            cmd, msg = split_cmd_msg(message)
+
+            if not msg:
                 return packet  # Command
 
-            d = threads.deferToThread(generate_translated_team_message, player_id, account, charname, message, "ja", "en")
+            d = threads.deferToThread(generate_translated_team_message, player_id, account, charname, cmd, msg, "ja", "en")
             d.addCallback(context.peer.send_crypto_packet)
             return None
     except KeyError:
@@ -201,49 +205,51 @@ def get_team_chat_packet(context, packet):
         message = packet[pis:pis + (wlen * 2)].decode('utf-16').rstrip("\0")
         pis += (wlen * 2)  # skipping to the end of utf-16 string
 
-        if message.startswith("/"):
+        cmd, msg = split_cmd_msg(message)
+
+        if not msg:
             return packet  # Command
+
         japanese = False
-        for char in message:
+        for char in msg:
             char_script = script(unicode(char))
             if char_script != 'Latin' and char_script != 'Common':
                 japanese = True
                 break
         if not japanese:
             return packet
-        d = threads.deferToThread(generate_translated_team_message, player_id, account, charname, message, "en", "ja")
+        d = threads.deferToThread(generate_translated_team_message, player_id, account, charname, cmd, msg, "en", "ja")
         d.addCallback(context.peer.send_crypto_packet)
         return None
     return packet
 
 
-def generate_translated_message(player_id, channel_id, message, end_lang, start_lang):
+def translate_message(cmd, message, end_lang, start_lang):
     if provider == "Bing" and time.time() - lastKeyTime >= 600:
         translator.access_token = translator.get_access_token()
 
     try:
-        if end_lang == "ja":
-            message_string = "%s" % translator.translate(message, end_lang, start_lang)
+        if "}" in message:
+            translate_msg = translator.translate(check_pso2_with_irc(message), end_lang, start_lang)
         else:
-            message_string = "%s {def}(%s)" % (translator.translate(message, end_lang, start_lang), message)
+            translate_msg = translator.translate(message, end_lang, start_lang)
+
+        if end_lang == "ja":
+            message_string = "%s%s" % (cmd, translate_msg)
+        else:
+            message_string = "%s%s {def}(%s{def})" % (cmd, translate_msg, message)
     except Exception as e:
         print (str(e))
         message_string = message
 
+    return message_string
+
+
+def generate_translated_message(player_id, channel_id, cmd, message, end_lang, start_lang):
+    message_string = translate_message(cmd, message, end_lang, start_lang)
     return packetFactory.ChatPacket(player_id, message_string, channel_id).build()
 
 
-def generate_translated_team_message(player_id, account, charname, message, end_lang, start_lang):
-    if provider == "Bing" and time.time() - lastKeyTime >= 600:
-        translator.access_token = translator.get_access_token()
-
-    try:
-        if end_lang == "ja":
-            message_string = "%s" % translator.translate(message, end_lang, start_lang)
-        else:
-            message_string = "%s {def}(%s)" % (translator.translate(message, end_lang, start_lang), message)
-    except Exception as e:
-        print (str(e))
-        message_string = message
-
+def generate_translated_team_message(player_id, account, charname, cmd, message, end_lang, start_lang):
+    message_string = translate_message(cmd, message, end_lang, start_lang)
     return packetFactory.TeamChatPacket(player_id, account, charname, message_string, True).build()
