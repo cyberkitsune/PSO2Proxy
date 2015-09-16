@@ -88,6 +88,7 @@ globalConfig = YAMLConfig("cfg/pso2proxy.config.yml",
                            'noisy': False, 'admins': [], 'enabledShips': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'commandPrefix': '!'}, True)
 
 blockNames = {}
+ShipLabel = {}
 
 proxy_ver = subprocess.Popen(["git", "describe", "--always"], stdout=subprocess.PIPE).communicate()[0].rstrip("\n")
 
@@ -112,6 +113,24 @@ def load_block_names():
         return "[ShipProxy] BlockName file does not exists"
 
 load_block_names()
+
+
+def load_ship_names():
+    global ShipLabel
+    ShipLabel.clear()  # Clear list
+
+    ShipLabel["Console"] = "Console"
+
+    if os.path.exists("cfg/shipslabel.resources.json"):
+        f = open("cfg/shipslabel.resources.json", 'r')
+        for key, val in json.load(f).items():
+            ShipLabel[key] = val.encode("utf8", 'ignore')
+        f.close()
+        return ("[GlobalChat] %s ship labels names loaded!" % len(ShipLabel))
+    else:
+        return "[GlobalChat] shipslabel file does not exists"
+
+load_ship_names()
 
 
 def load_bans():

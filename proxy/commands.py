@@ -416,6 +416,12 @@ class ReloadBlockNames(Command):
         return config.load_block_names()
 
 
+@CommandHandler("reloadshiplabels")
+class ReloadShipLables(Command):
+    def call_from_console(self):
+        return config.load_ship_names()
+
+
 profile = None
 
 

@@ -1,5 +1,6 @@
 import commands
 import config
+from config import ShipLabel
 from config import YAMLConfig
 import data.clients
 import data.players
@@ -39,6 +40,8 @@ gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePre
 
 def doRedisGchat(message):
     gchatMsg = json.loads(message['data'])
+    fb = ("G-%02i") % gchatMsg['ship']
+    shipl = ShipLabel.get(fb, fb)
     strgchatmsg = str(gchatMsg['text'].encode('utf-8'))
     if not check_irc_with_pso2(strgchatmsg):
         return
@@ -59,9 +62,9 @@ def doRedisGchat(message):
         for client_data in data.clients.connectedClients.values():
                 if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
                     if lookup_gchatmode(client_data.preferences) == 0:
-                        client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(gchatMsg['playerId'], "(%s) [G-%02i] %s" % (gchatMsg['server'], gchatMsg['ship'], gchatMsg['playerName']), gchatMsg['playerName'], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), gchatMsg['text'])).build())
+                        client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(gchatMsg['playerId'], "(%s) [%s] %s" % (gchatMsg['server'], shipl, gchatMsg['playerName']), gchatMsg['playerName'], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), gchatMsg['text'])).build())
                     else:
-                        client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("(%s) [G-%02i] <%s> %s" % (gchatMsg['server'], gchatMsg['ship'], gchatMsg['playerName'], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), gchatMsg['text'])), 0x3).build())
+                        client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("(%s) [%s] <%s> %s" % (gchatMsg['server'], shipl, gchatMsg['playerName'], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), gchatMsg['text'])), 0x3).build())
 
 
 if redisEnabled:
@@ -154,10 +157,12 @@ if ircMode:
         def send_global_message(self, ship, user, message, server=None):
             if not check_pso2_with_irc(message):
                 return
+            fb = ("G-%02i") % ship
+            shipl = ShipLabel.get(fb, fb)
             if server is None:
-                self.msg(self.factory.channel, "[G-%02i] <%s> %s" % (ship, user, replace_pso2_with_irc(message)))
+                self.msg(self.factory.channel, "[%s] <%s> %s" % (shipl, user, replace_pso2_with_irc(message)))
             else:
-                self.msg(self.factory.channel, "(%s) [G-%02i] <%s> %s" % (server, ship, user, replace_pso2_with_irc(message)))
+                self.msg(self.factory.channel, "(%s) [%s] <%s> %s" % (server, shipl, user, replace_pso2_with_irc(message)))
 
         def send_channel_message(self, message):
             self.msg(self.factory.channel, message)
@@ -401,25 +406,28 @@ class GChat(commands.Command):
             global ircBot
             if ircBot is not None:
                 ircBot.send_global_message(data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0].encode('utf-8'), self.args[3:].encode('utf-8'))
+        fb = ("G-%02i") % data.clients.connectedClients[client.playerId].ship
+        shipl = ShipLabel.get(fb, fb)
         for client_data in data.clients.connectedClients.values():
             if client_data.preferences.get_preference('globalChat') and client_data.get_handle() is not None:
                 if lookup_gchatmode(client_data.preferences) == 0:
-                    client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(client.playerId, "[G-%02i] %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0]), data.players.playerList[client.playerId][0], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), self.args[3:])).build())
+                    client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(client.playerId, "[%s] %s" % (shipl, data.players.playerList[client.playerId][0]), data.players.playerList[client.playerId][0], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), self.args[3:])).build())
                 else:
-                    client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[G-%02i] <%s> %s" % (data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), self.args[3:])), 0x3).build())
+                    client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[%s] <%s> %s" % (shipl, data.players.playerList[client.playerId][0], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), self.args[3:])), 0x3).build())
 
     def call_from_console(self):
         global ircMode
+        gconsole = ("[%s]") % ShipLabel["Console"]
         if ircMode:
             global ircBot
             if ircBot is not None:
-                ircBot.send_global_message(0, "Console", self.args[2:].encode('utf-8'))
-        TCPacket = packetFactory.TeamChatPacket(0x999, "[GCONSOLE]", "[GCONSOLE]", self.args[2:]).build()
-        SMPacket = packetFactory.SystemMessagePacket("[GCONSOLE] %s%s" % (gchatSettings['prefix'], self.args[2:]), 0x3).build()
+                ircBot.send_global_message(0, ShipLabel["Console"], self.args[2:].encode('utf-8'))
+        TCPacket = packetFactory.TeamChatPacket(0x999, gconsole, gconsole, self.args[2:]).build()
+        SMPacket = packetFactory.SystemMessagePacket("%s %s%s" % (gconsole, gchatSettings['prefix'], self.args[2:]), 0x3).build()
         for client in data.clients.connectedClients.values():
             if client.preferences.get_preference("globalChat") and client.get_handle() is not None:
                 if lookup_gchatmode(client.preferences) == 0:
                     client.get_handle().send_crypto_packet(TCPacket)
                 else:
                     client.get_handle().send_crypto_packet(SMPacket)
-        return "[GlobalChat] <Console> %s" % self.args[2:]
+        return "[GlobalChat] %s %s" % (gconsole, self.args[2:])
