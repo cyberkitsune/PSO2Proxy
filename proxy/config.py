@@ -106,9 +106,14 @@ def load_block_names():
         return "[ShipProxy] Blocks are not renamed"
     if os.path.exists("cfg/blocknames.resources.json"):
         f = open("cfg/blocknames.resources.json", 'r')
-        blockNames = json.load(f)
-        f.close()
-        return ("[ShipProxy] %s Block names loaded!" % len(blockNames))
+        try:
+            blockNames = json.load(f)
+            f.close()
+            return ("[ShipProxy] %s Block names loaded!" % len(blockNames))
+        except ValueError:
+            f.close()
+            return ("[ShipProxy] Failed to load blockname file")
+
     else:
         return "[ShipProxy] BlockName file does not exists"
 
@@ -123,10 +128,14 @@ def load_ship_names():
 
     if os.path.exists("cfg/shipslabel.resources.json"):
         f = open("cfg/shipslabel.resources.json", 'r')
-        for key, val in json.load(f).items():
-            ShipLabel[key] = val.encode("utf8", 'ignore')
-        f.close()
-        return ("[GlobalChat] %s ship labels names loaded!" % len(ShipLabel))
+        try:
+            for key, val in json.load(f).items():
+                ShipLabel[key] = val.encode("utf8", 'ignore')
+            f.close()
+            return ("[GlobalChat] %s ship labels names loaded!" % len(ShipLabel))
+        except ValueError:
+            f.close()
+            return ("[GlobalChat] Failed to load ship  labels!")
     else:
         return "[GlobalChat] shipslabel file does not exists"
 
