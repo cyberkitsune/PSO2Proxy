@@ -461,6 +461,8 @@ def replace_irc_with_pso2(pIncoming, debug=0):
 def ci_switchs(cmd):  # decode /ci[1-9] {[1-5]} {t[1-5]} {nw} {s[0-99]}
     count = 0
     cmdl = cmd.split(" ", 5)
+    if len(cmdl) == 1:
+        return 0
     if cmdl[count + 1].isdigit():
         count += 1
     if not cmdl[count + 1]:
