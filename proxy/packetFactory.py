@@ -10,6 +10,7 @@ def encode_string_utf16(string, xor_value, sub_value):
 
     return struct.pack('<I', prefix) + data
 
+
 def encode_string_utf8(string, xor_value, sub_value):
     prefix = ((len(string) + 4) + sub_value) ^ xor_value
 

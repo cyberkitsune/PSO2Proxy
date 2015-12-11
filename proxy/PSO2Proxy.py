@@ -19,7 +19,8 @@ import os
 import plugins.plugins as plugin_manager
 
 from queryProtocols import BlockScraperFactory
-from queryProtocols import ShipAdvertiserFactory
+from queryProtocols import ShipAdvertiserFactoryPC
+from queryProtocols import ShipAdvertiserFactoryVita
 
 import sys
 
@@ -104,7 +105,11 @@ def main():
 
     for shipNum in range(0, 10):  # PSO2 Checks all ships round robin, so sadly for max compatibility we have to open these no matter what ships are enabled...
         ship_endpoint = endpoints.TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=interface_ip)
-        ship_endpoint.listen(ShipAdvertiserFactory())
+        ship_endpoint.listen(ShipAdvertiserFactoryPC())
+
+    for shipNum in range(0, 10):  # PSO2 Checks all ships round robin, so sadly for max compatibility we have to open these no matter what ships are enabled...
+        ship_endpoint = endpoints.TCP4ServerEndpoint(reactor, 12094 + (100 * shipNum), interface=interface_ip)
+        ship_endpoint.listen(ShipAdvertiserFactoryVita())
 
     for shipNum in config.globalConfig.get_key('enabledShips'):
         query_endpoint = endpoints.TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=interface_ip)
