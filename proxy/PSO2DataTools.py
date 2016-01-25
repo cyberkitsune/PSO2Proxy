@@ -464,6 +464,8 @@ def ci_switchs(cmd):  # decode /ci[1-9] {[1-5]} {t[1-5]} {nw} {s[0-99]}
     lcmd = len(cmdl)
     if lcmd == count + 1:
         return count
+    if not (cmdl[count + 1]):
+        return count
     if cmdl[count + 1].isdigit():
         count += 1
     if lcmd == count + 1:
