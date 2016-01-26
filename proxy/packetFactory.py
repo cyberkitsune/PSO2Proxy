@@ -11,6 +11,14 @@ def encode_string_utf16(string, xor_value, sub_value):
     return struct.pack('<I', prefix) + data
 
 
+def encode_string_utf8(string, xor_value, sub_value):
+    prefix = ((len(string) + 4) + sub_value) ^ xor_value
+
+    data = string.encode('utf-8') + '\0\0\0\0'
+
+    return struct.pack('<I', prefix) + data
+
+
 class Packet(object):
     """docstring for PacketFactory"""
 
@@ -107,3 +115,15 @@ class TeamChatPacket(object):
         buf += encode_string_utf16(self.charname, 0x7ED7, 0x41)
         buf += encode_string_utf16(self.message, 0x7ED7, 0x41)
         return Packet(0x7, 0x11, 0x4, 0x00, buf).build()
+
+
+class LUAPacket(object):
+    """docstring for LUAPacket"""
+    def __init__(self, command):
+        self.command = command
+
+    def build(self):
+        buf = bytearray()
+        buf += struct.pack('<I', 0x010001)
+        buf += encode_string_utf8(self.command, 0xD975, 0x2F)
+        return Packet(0x10, 0x03, 0x04, 0x00, buf).build()

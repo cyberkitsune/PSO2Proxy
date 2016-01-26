@@ -33,14 +33,14 @@ class BlockScraperFactory(protocol.Factory):
         return BlockScraper()
 
 
-class ShipAdvertiser(protocol.Protocol):
+class ShipAdvertiserPC(protocol.Protocol):
     def __init__(self):
         pass
 
     def connectionMade(self):
         for f in plugins.plugins.onQueryConnection:
             f(self)
-        print("[ShipStatus] Client connected " + str(self.transport.getPeer()) + "! Sending ship list packet...")
+        print("[ShipStatus]  PC Client connected " + str(self.transport.getPeer()) + "! Sending ship list packet...")
         d = threads.deferToThread(ships.get_ship_query, myIpAddress)
         d.addCallback(self.send_ship_list)
 
@@ -49,7 +49,21 @@ class ShipAdvertiser(protocol.Protocol):
         self.transport.loseConnection()
 
 
-class ShipAdvertiserFactory(protocol.Factory):
+class ShipAdvertiserVita(protocol.Protocol):
+    def __init__(self):
+        pass
+
+    def connectionMade(self):
+        print("[ShipStatus] Vita Client connected " + str(self.transport.getPeer()) + "! Rejecting client...")
+        d = threads.deferToThread(ships.reject_vita, myIpAddress)
+        d.addCallback(self.send_ship_list)
+
+    def send_ship_list(self, data):
+        self.transport.write(data)
+        self.transport.loseConnection()
+
+
+class ShipAdvertiserFactoryPC(protocol.Factory):
     noisy = False
 
     def __init__(self):
@@ -57,4 +71,15 @@ class ShipAdvertiserFactory(protocol.Factory):
         pass
 
     def buildProtocol(self, address):
-        return ShipAdvertiser()
+        return ShipAdvertiserPC()
+
+
+class ShipAdvertiserFactoryVita(protocol.Factory):
+    noisy = False
+
+    def __init__(self):
+        self.noisy = verbose
+        pass
+
+    def buildProtocol(self, address):
+        return ShipAdvertiserVita()
