@@ -386,6 +386,7 @@ class UnmuteSomebody(commands.Command):
                     return "[Command] Unmuted %s." % player_data[0].rstrip("\0")
                 else:
                     return "[Command] %s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0")
+        return "[Command] %s either is not connected or is not part of the proxy." % user_to_mute
 
 
 @plugins.CommandHook("g", "Chat in global chat.")
