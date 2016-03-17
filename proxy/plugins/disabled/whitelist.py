@@ -1,10 +1,16 @@
 import commands
+from config import YAMLConfig
 import json
 import os
 import packetFactory
 from packetFactory import SystemMessagePacket
 import plugins
 whitelist = []
+
+ircSettings = YAMLConfig("cfg/pso2proxy.whitelist.config.yml",
+                         {'enabled': True}, True)
+
+whitelistmode = ircSettings.get_key('enabled')
 
 
 @plugins.on_start_hook
@@ -27,6 +33,25 @@ def save_whitelist():
     f.write(json.dumps(whitelist))
     f.close()
     print('[Whitelist] Saved whitelist.')
+
+
+@plugins.CommandHook("whitelistmode", "Toggle whitelist mode", True)
+class DisableGChat(commands.Command):
+    def call_from_client(self, client):
+        global whitelistmode
+        whitelistmode = not whitelistmode
+        if whitelistmode:
+            return "[Whitelist] Whitelist turn on."
+        else:
+            return "[Whitelist] Whitelist turn off."
+
+    def call_from_console(self):
+        global whitelistmode
+        whitelistmode = not whitelistmode
+        if whitelistmode:
+            return "[Whitelist] Whitelist turn on."
+        else:
+            return "[Whitelist] Whitelist turn off."
 
 
 @plugins.CommandHook("whitelist", "[Admin Only] Adds or removes someone to the connection whitelist.", True)
@@ -92,6 +117,9 @@ def whitelist_check(context, data):
     :type context: ShipProxy.ShipProxy
     """
     global whitelist
+    global whitelistmode
+    if not whitelistmode:
+        return data
     start = len(data) - 132  # Skip password
     username = data[start:start + 0x40].decode('utf-8')
     username = username.rstrip('\0')
