@@ -41,9 +41,11 @@ class DisableGChat(commands.Command):
         global whitelistmode
         whitelistmode = not whitelistmode
         if whitelistmode:
-            return "[Whitelist] Whitelist turn on."
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Whitelist] Whitelist turn on.", 0x3).build())
+            return
         else:
-            return "[Whitelist] Whitelist turn off."
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Whitelist] Whitelist turn off.", 0x3).build())
+            return
 
     def call_from_console(self):
         global whitelistmode
