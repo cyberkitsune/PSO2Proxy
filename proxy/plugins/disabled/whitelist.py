@@ -35,8 +35,8 @@ def save_whitelist():
     print('[Whitelist] Saved whitelist.')
 
 
-@plugins.CommandHook("whitelistmode", "Toggle whitelist mode", True)
-class DisableGChat(commands.Command):
+@plugins.CommandHook("whitelistmode", "[Admin Only] Toggle whitelist mode", True)
+class Whitelistmode(commands.Command):
     def call_from_client(self, client):
         global whitelistmode
         whitelistmode = not whitelistmode
