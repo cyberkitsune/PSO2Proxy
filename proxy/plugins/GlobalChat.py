@@ -223,7 +223,7 @@ def check_config(user):
             client_preferences['gchatMode'] = -1
 
 
-@plugins.CommandHook("gmode", "Sets your global chat display mode")
+@plugins.CommandHook("gmode", "Sets your Global Chat display mode.")
 class GChatModeCommand(commands.Command):
     def call_from_client(self, client):
         if client.playerId is not None:
@@ -242,7 +242,7 @@ class GChatModeCommand(commands.Command):
                     client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Global chat will now come through system chat. (Default)", 0x3).build())
 
 
-@plugins.CommandHook("gprefix", "Changes your chat prefix / color.")
+@plugins.CommandHook("gprefix", "Changes your Global Chat prefix / color.")
 class GPrefixCommand(commands.Command):
     def call_from_client(self, client):
         if client.playerId is not None:
@@ -277,13 +277,13 @@ class IdentCommand(commands.Command):
             return "[IRC] Sent identify command to %s." % (ircServiceName)
 
 
-@plugins.CommandHook("gon", "Enable global chat.")
+@plugins.CommandHook("gon", "Enable Global Chat.")
 class EnableGChat(commands.Command):
     def call_from_client(self, client):
         preferences = data.clients.connectedClients[client.playerId].preferences
         if not preferences['globalChat']:
             preferences['globalChat'] = True
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] Global chat enabled for you.", 0x3).build())
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] Global chat has been enabled for you.", 0x3).build())
         else:
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] You already have global chat enabled.", 0x3).build())
 
@@ -295,13 +295,13 @@ class EnableGChat(commands.Command):
         return "[GlobalChat] Global chat enabled for Console."
 
 
-@plugins.CommandHook("goff", "Disable global chat.")
+@plugins.CommandHook("goff", "Disable Global Chat.")
 class DisableGChat(commands.Command):
     def call_from_client(self, client):
         preferences = data.clients.connectedClients[client.playerId].preferences
         if preferences["globalChat"]:
             preferences['globalChat'] = False
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] Global chat disabled for you.", 0x3).build())
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] Global chat has been disabled for you.", 0x3).build())
         else:
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] You already have global chat disabled.", 0x3).build())
 
@@ -313,7 +313,7 @@ class DisableGChat(commands.Command):
         return "[GlobalChat] Global chat disabled for Console."
 
 
-@plugins.CommandHook("gmute", "[Admin Only] Mutes or somebody in gchat.", True)
+@plugins.CommandHook("gmute", "[Admin Only] Mutes a client in global chat.", True)
 class MuteSomebody(commands.Command):
     def call_from_client(self, client):
         """
@@ -357,7 +357,7 @@ class MuteSomebody(commands.Command):
         return "[Command] %s either is not connected or is not part of the proxy." % user_to_mute
 
 
-@plugins.CommandHook("gunmute", "[Admin Only] Mutes or unmutes somebody in gchat.", True)
+@plugins.CommandHook("gunmute", "[Admin Only] Unmutes a client in global chat.", True)
 class UnmuteSomebody(commands.Command):
     def call_from_client(self, client):
         """
@@ -367,6 +367,12 @@ class UnmuteSomebody(commands.Command):
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. gunmute <Player Name>").build())
             return
         user_to_mute = self.args.split(" ", 1)[1]
+        if user_to_mute.isdigit() and int(user_to_mute) in data.clients.connectedClients:
+            data.clients.connectedClients[int(user_to_mute)].preferences['chatMuted'] = False
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Unmuted %s." % user_to_mute, 0x3).build())
+        else:
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s either is not connected or is not part of the proxy." % user_to_mute, 0x3).build())
+
         for player_id, player_data in data.players.playerList.iteritems():
             if player_data[0].rstrip("\0") == user_to_mute:
                 if player_id in data.clients.connectedClients:
@@ -379,6 +385,9 @@ class UnmuteSomebody(commands.Command):
         if len(self.args.split(" ", 1)) < 2:
             return "[Command] Invalid usage. gunmute <Player Name>"
         user_to_mute = self.args.split(" ", 1)[1]
+        if user_to_mute.isdigit() and int(user_to_mute) in data.clients.connectedClients:
+            data.clients.connectedClients[int(user_to_mute)].preferences['chatMuted'] = False
+            return "Unmuted %s by Player #" % user_to_mute
         for player_id, player_data in data.players.playerList.iteritems():
             if player_data[0].rstrip("\0") == user_to_mute:
                 if player_id in data.clients.connectedClients:
@@ -389,7 +398,7 @@ class UnmuteSomebody(commands.Command):
         return "[Command] %s either is not connected or is not part of the proxy." % user_to_mute
 
 
-@plugins.CommandHook("g", "Chat in global chat.")
+@plugins.CommandHook("g", "Send a message in global chat.")
 class GChat(commands.Command):
     def call_from_client(self, client):
         global ircMode
