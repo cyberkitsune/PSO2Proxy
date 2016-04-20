@@ -41,7 +41,7 @@ class ShipAdvertiserPC(protocol.Protocol):
         for f in plugins.plugins.onQueryConnection:
             f(self)
         print("[ShipStatus]  PC Client connected " + str(self.transport.getPeer()) + "! Sending ship list packet...")
-        d = threads.deferToThread(ships.get_ship_query, myIpAddress)
+        d = threads.deferToThread(ships.get_ship_query, myIpAddress, self.transport.getPeer().host)
         d.addCallback(self.send_ship_list)
 
     def send_ship_list(self, data):
