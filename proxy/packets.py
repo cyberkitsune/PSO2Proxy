@@ -2,6 +2,7 @@ import commands
 import config
 from config import bindIp
 from config import blockNameMode as bNameMode
+from config import brokenlist
 from config import myIpAddress as myIp
 from config import noisy as verbose
 import data.blocks as blocks
@@ -62,6 +63,7 @@ def key_packet(context, data):
     if decrypted is None:
         print(
             "[KeyPacket] Could not decrypt RSA for client %s, Perhaps their client's key is unmodified? Hanging up." % context.transport.getPeer().host)
+        brokenlist.append(context.transport.getPeer().host)
         context.transport.loseConnection()
         return None
     if verbose:
