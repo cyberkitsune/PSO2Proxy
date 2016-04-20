@@ -5,25 +5,25 @@ import plugins
 maintmode = False
 
 
-@plugins.CommandHook("maint", "[Admin Only] Toggle maint mode", True)
+@plugins.CommandHook("maint", "[Admin Only] Toggle maintenance mode", True)
 class maintmode(commands.Command):
     def call_from_client(self, client):
         global maintmode
         maintmode = not maintmode
         if maintmode:
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Maint] maintenance mode turned on.", 0x3).build())
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Maint] Maintenance mode turned on.", 0x3).build())
             return
         else:
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Maint] maintenance mode turned off.", 0x3).build())
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Maint] Maintenance mode turned off.", 0x3).build())
             return
 
     def call_from_console(self):
         global maintmode
         maintmode = not maintmode
         if maintmode:
-            return "[Maint] maintenance mode turned on."
+            return "[Maint] Maintenance mode turned on."
         else:
-            return "[Maint] maintenance mode turned off."
+            return "[Maint] Maintenance mode turned off."
 
 
 @plugins.PacketHook(0x11, 0x0)
@@ -35,6 +35,6 @@ def Maint_check(context, data):
     global maintmode
     if not maintmode:
         return data
-    context.send_crypto_packet(SystemMessagePacket("PSO2 Servers/Proxy is in maintenance mode", 0x1).build())
+    context.send_crypto_packet(SystemMessagePacket("The PSO2 or PSO2Proxy server is currently undergoing maintenance. Please try again later.", 0x1).build())
     context.transport.loseConnection()
     return data
