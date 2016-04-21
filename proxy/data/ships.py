@@ -70,7 +70,7 @@ def get_first_block(ship_port, destination_ip):
 
 
 def reject_vita(my_ip_address):
-    return packetFactory.SystemMessagePacket("Vita systems are not supported on this proxy", 0x1).build()
+    return packetFactory.SystemMessagePacket("Vita systems are not supported on this proxy.", 0x1).build()
 
 
 def get_ship_query(my_ip_address, client_ip_address):
@@ -79,7 +79,7 @@ def get_ship_query(my_ip_address, client_ip_address):
     if client_ip_address in brokenlist:
         brokenlist.remove(client_ip_address)
         print("[ShipQuery] Rejecting broken client %s" % client_ip_address)
-        return packetFactory.SystemMessagePacket("PSO2Proxy.dll is not loaded on PC or you are using a PS4 system", 0x1).build()
+        return packetFactory.SystemMessagePacket("PSO2Proxy.dll is not loaded on your PC or you are using a PS4 system.", 0x1).build()
     data = scrape_ship_packet(ship_address, ship_port, my_ip_address)
     curShipIndex += 1
     if curShipIndex >= len(queryShipArr):
