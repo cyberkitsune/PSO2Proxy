@@ -70,7 +70,7 @@ def get_first_block(ship_port, destination_ip):
 
 
 def reject_vita(my_ip_address):
-    return packetFactory.SystemMessagePacket("Vita systems are not supported on this proxy.", 0x1).build()
+    return packetFactory.SystemMessagePacket("PSO2Proxy: PSVita systems are not supported on this proxy.", 0x1).build()
 
 
 def get_ship_query(my_ip_address, client_ip_address):
