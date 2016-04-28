@@ -51,7 +51,7 @@ try:
 except ImportError:
     agent = RedirectAgent(Agent(reactor))
 
-eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True, 'timer': 60, 'debug': False, '1': "http://acf.me.uk/Public/PSO2EQ/pso2eq.txt"}, True)
+eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True, 'timer': 60, 'debug': False, '1': "http://pso2.acf.me.uk/pso2eq.txt"}, True)
 
 # HTTP Headers
 ETag_Headers     = ['', '', '', '', '', '', '', '', '', '']
