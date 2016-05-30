@@ -5,6 +5,7 @@ import yaml
 
 brokenlist = list()
 
+
 class YAMLConfig(object):
     _config_values = {}
 
