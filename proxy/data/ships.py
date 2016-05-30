@@ -74,7 +74,7 @@ def reject_vita(my_ip_address):
 
 
 def get_ship_query(my_ip_address, client_ip_address):
-    global curShipIndex, queryShipArr, brokenlist
+    global curShipIndex, queryShipArr
     ship_port, ship_address = queryShipArr[curShipIndex]
     if client_ip_address in brokenlist:
         brokenlist.remove(client_ip_address)
