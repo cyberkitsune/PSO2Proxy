@@ -5,7 +5,7 @@ PSO2Proxy is a open source protocol proxy for the Japanese MMORPG, Phantasy Star
 This program allows you to host your own PSO2Proxy on a server you have access to. 
 **If you just want to play the game via the proxy, a public PSO2Proxy server is available for users who can't connect to PSO2 and users who want to contribute data for packet analysis. This server can be found at [pso2proxy.cyberkitsune.net](http://pso2proxy.cyberkitsune.net/). Below are the instructions for installing and setting up your own PSO2Proxy server.**
 
-If you require assistance, feel free to contact us on [IRC](irc://irc.badnik.net/pso2proxypublic): irc.badnik.net, #pso2proxypublic
+If you require assistance, feel free to contact us on [IRC](irc://irc.rustedlogic.net/pso2proxypublic): irc.rustedlogic.net, #pso2proxypublic
 ## Installing
 PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyCrypto](https://www.dlitz.net/software/pycrypto/). Please install these from their respective websites or use the commands below depending on your distribution.
 
@@ -88,7 +88,7 @@ If you would like to enable a plugin already in the disabled folder, use the fol
 cd ~/PSO2Proxy/proxy/plugins
 ln -s disabled/DisabledPluginName.py .
 ```
-Note that some plugins may have additional steps involved to get them working. If you have issues, you should check for a new config file in `~/PSO2Proxy/proxy/cfg`, consult [the Wiki](https://github.com/cyberkitsune/PSO2Proxy/wiki), or contact us on [IRC](http://widget.mibbit.com/?server=irc.badnik.net&channel=%23PSO2Proxypublic).
+Note that some plugins may have additional steps involved to get them working. If you have issues, you should check for a new config file in `~/PSO2Proxy/proxy/cfg`, consult [the Wiki](https://github.com/cyberkitsune/PSO2Proxy/wiki), or contact us on [IRC](http://widget.mibbit.com/?server=irc.rustedlogic.net&channel=%23PSO2Proxypublic).
 ## Getting clients to connect
 ### Automatic configuration
 For automatic configuration using PSO2Tweaker, simply enable WebAPI.py and point the tweaker to `http://your.ip.addr.here:8080/config.json`
