@@ -198,10 +198,10 @@ def EQBody(body, ship):  # 0 is ship1
     load_eqJP_names()  # Reload file
 
     print("[EQ Notice] Sending players MSG on Ship %02d : %s" % (ship + 1, msg_eq[ship]))
-    SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
+    SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report: %s" % (msg_eq[ship]), 0x0).build()
     if useGlobalChat:
         if GlobalChat.ircMode and GlobalChat.ircBot is not None:
-            msg = "[EQ Notice Ship %02d] Incoming EQ Report from PSO2es: %s" % (ship + 1, msg_eq[ship])
+            msg = "[EQ Notice Ship %02d] Incoming EQ Report: %s" % (ship + 1, msg_eq[ship])
             GlobalChat.ircBot.send_channel_message(msg.encode('utf-8'))
     for client in clients.connectedClients.values():
         try:
@@ -287,7 +287,7 @@ def notify_and_config(client):
     else:
         client_preferences.set_preference("eqnotice_ship", (ship + 1))  # record the real ship
     if client_preferences.get_preference('eqnotice') and data_eq[ship] and not check_if_EQ_old(ship):
-        SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
+        SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report: %s" % (msg_eq[ship]), 0x0).build()
         client.send_crypto_packet(SMPacket)
 
 
@@ -297,9 +297,9 @@ class RequestEQNoitce(Command):
         client_preferences = clients.connectedClients[client.playerId].preferences
         ship = (client_preferences.get_preference('eqnotice_ship') - 1)
         if data_eq[ship] and not check_if_EQ_old(ship):
-            SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report from PSO2es: %s" % (msg_eq[ship]), 0x0).build()
+            SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report: %s" % (msg_eq[ship]), 0x0).build()
         else:
-            SMPacket = packetFactory.SystemMessagePacket("[Proxy] No new EQ Report from PSO2es", 0x0).build()
+            SMPacket = packetFactory.SystemMessagePacket("[Proxy] There is no incoming EQ.", 0x0).build()
         client.send_crypto_packet(SMPacket)
 
     def call_from_console(self):
@@ -310,9 +310,9 @@ class RequestEQNoitce(Command):
             return("[EQ Notice] Please enter the ship number to check. %s" % e)
         if 0 <= shipArg <= 9:
             if data_eq[shipArg] and not check_if_EQ_old(shipArg):
-                return("[EQ_Notice] Incoming EQ Report from PSO2es: %s" % (msg_eq[shipArg]))
+                return("[EQ_Notice] Incoming EQ Report: %s" % (msg_eq[shipArg]))
             else:
-                return("[EQ_Notice] No new EQ Report from PSO2es.")
+                return("[EQ_Notice] There is no incoming EQ.")
         else:
             return("[EQ_Notice] Please enter a valid ship number.")
 
