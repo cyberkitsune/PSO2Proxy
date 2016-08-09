@@ -1,4 +1,5 @@
 # Should this file even be in here?
+# -*- coding: utf-8 -*-
 from twisted.python import log
 
 PSO2_IRC = [
@@ -408,6 +409,11 @@ IRC_PSO2 = [
     ("\x1E", ""),
 ]
 
+Bad_Unicode = [
+    "👌",
+    "👉 ",
+]
+
 
 def replace_with_table(pIncoming, table, debug=0, check=0):
     if isinstance(pIncoming, str):
@@ -433,6 +439,8 @@ def replace_with_table(pIncoming, table, debug=0, check=0):
 
     if isinstance(pIncoming, str):
         outtext = lIncoming.encode('utf-8', 'replace')
+        for i in Bad_Unicode:
+            outtext = outtext.replace(i, "")
     else:
         outtext = lIncoming
 
