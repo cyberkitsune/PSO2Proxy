@@ -1,4 +1,5 @@
 # Should this file even be in here?
+from twisted.python import log
 
 PSO2_IRC = [
     ("{red}", "\x03""04"),  # Red
@@ -470,8 +471,12 @@ def ci_switchs(cmd):  # decode /ci[1-9] {[1-5]} {t[1-5]} {nw} {s[0-99]}
         count += 1
     if lcmd == count + 1:
         return count
-    if cmdl[count + 1][0] == "t":
-        count += 1
+    try:
+        if cmdl[count + 1][0] == "t":
+            count += 1
+    except Exception:
+        log.msg("issue with ci string: %s" % cmd)
+        return count
     if lcmd == count + 1:
         return count
     if cmdl[count + 1] == "nw":
