@@ -65,8 +65,6 @@ def doRedisGchat(message):
                         client_data.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(gchatMsg['playerId'], "(%s) [%s] %s" % (gchatMsg['server'], shipl, gchatMsg['playerName']), gchatMsg['playerName'], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), gchatMsg['text'])).build())
                     else:
                         client_data.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("(%s) [%s] <%s> %s" % (gchatMsg['server'], shipl, gchatMsg['playerName'], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), gchatMsg['text'])), 0x3).build())
-
-
 if redisEnabled:
     PSO2PDConnector.thread.pubsub.subscribe(**{'plugin-message-gchat': doRedisGchat})
 
@@ -295,6 +293,18 @@ class EnableGChat(commands.Command):
         return "[GlobalChat] Global chat enabled for Console."
 
 
+@plugins.CommandHook("glock", "Toggle Global Chat Lock.")
+class GChatLockCmd(commands.Command):
+    def call_from_client(self, client):
+        preferences = data.client.connectedClients[client.playerId].preferences
+        if not preferences['gLock'] or preferences['gLock'] == False:
+            preferences['gLock'] = True
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] GLock enabled! All messages will now go to gchat.", 0x3).build())
+        else:
+            preferences['gLock'] = False
+            client.send_crypto_packet(packetFactory.SystemMessagePacket("[GlobalChat] GLock disabled! Messages will no longer all go to gchat", 0x3).build())
+
+
 @plugins.CommandHook("goff", "Disable Global Chat.")
 class DisableGChat(commands.Command):
     def call_from_client(self, client):
@@ -441,3 +451,19 @@ class GChat(commands.Command):
                 else:
                     client.get_handle().send_crypto_packet(SMPacket)
         return "[GlobalChat] %s %s" % (gconsole, self.args[2:])
+
+@plugins.PacketHook(0x7, 0x0)        
+def GCHatPacketHook(context, data):
+    message = data[0x1C:].decode('utf-16')  # This is technically improper. Should use the xor byte to check string length (See packetReader)
+    preferences = data.client.connectedClients[context.playerId].preferences
+    if not preferences['gLock']:
+        return data
+    else:
+        # wow is this a hack or what
+        message = "!g" + message # can I even do this in python how do I computer
+        data = packetFactory.ChatPacket(context.playerId, message).build()
+        return data
+
+
+
+    
