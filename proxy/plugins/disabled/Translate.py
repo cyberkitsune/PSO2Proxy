@@ -226,8 +226,8 @@ def get_team_chat_packet(context, packet):
 
 def translate_message(cmd, message, end_lang, start_lang):
     try:
-    if provider == "Bing" and time.time() - lastKeyTime >= 600:
-        translator.access_token = translator.get_access_token()
+        if provider == "Bing" and time.time() - lastKeyTime >= 600:
+            translator.access_token = translator.get_access_token()
 
         if "}" in message:
             translate_msg = translator.translate(check_pso2_with_irc(message), end_lang, start_lang)
