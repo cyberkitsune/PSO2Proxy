@@ -14,6 +14,7 @@ import plugins.plugins as plugin_manager
 from PSOCryptoUtils import PSO2RC4
 from PSOCryptoUtils import PSO2RSADecrypt
 from PSOCryptoUtils import PSO2RSAEncrypt
+from PSO2DataTools import replace_with_table
 import struct
 import traceback
 from twisted.internet import endpoints
@@ -90,17 +91,14 @@ def login_confirmation_packet(context, data):
     block_port = context.peer.transport.getHost().port
     if block_port in blocks.blockList:
         block_info = blocks.blockList[block_port]
-        try:
-            print("block_info: %s" % (block_info[1]))
-        except:
-            print("block_info: %s" % "ERROR")
         if bNameMode == 0:
             address_string = ('%s%s:%i' % ((block_info[1])[:6], block_info[0], block_port)).encode('utf-16le')
             struct.pack_into('%is' % len(address_string), data, 0x1C, address_string)
             if len(address_string) < 0x40:
                 struct.pack_into('%ix' % (0x40 - len(address_string)), data, 0x1C + len(address_string))
-        elif bNameMode == 1 and ((block_info[1])[:5]) in config.blockNames:
-            address_string = config.blockNames[(block_info[1])[:5]].encode('utf-16le')
+        elif bNameMode == 1:
+            enname = replace_with_table((block_info[1]), config.blockNames.items())
+            address_string = enname.encode('utf-16le')
             struct.pack_into('%is' % len(address_string), data, 0x1C, address_string)
             if len(address_string) < 0x40:
                 struct.pack_into('%ix' % (0x40 - len(address_string)), data, 0x1C + len(address_string))
@@ -221,14 +219,6 @@ def block_list_packet(context, data):
     pos = 0x1C
     while pos < len(data) and data[pos] != 0:
         name = data[pos:pos + 0x40].decode('utf-16le')
-        enname = name;
-        try:
-            for key, val in config.blockNames.items():
-                if name.find(val) != -1:
-                   enname = name [:6] + val
-        except Exception as e:
-            print("[BlockList] Error: %s" % (e))
-            pass
         o1, o2, o3, o4, port = struct.unpack_from('BBBBH', buffer(data), pos + 0x40)
         ip_string = "%i.%i.%i.%i" % (o1, o2, o3, o4)
         if context.peer.transport.getHost().port > 12999:
@@ -243,6 +233,7 @@ def block_list_packet(context, data):
             if len(block_string) < 0x40:
                 struct.pack_into('%ix' % (0x40 - len(block_string)), data, pos + len(block_string))
         elif bNameMode == 1:
+            enname = replace_with_table(name, config.blockNames.items())
             block_string = enname.encode('utf-16le')
             struct.pack_into('%is' % len(block_string), data, pos, block_string)
             if len(block_string) < 0x40:

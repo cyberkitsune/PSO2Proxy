@@ -1,6 +1,5 @@
 import json
 import os.path
-import pprint
 import subprocess
 import yaml
 
@@ -103,24 +102,6 @@ def is_admin(sega_id):
         return False
 
 
-_escape = dict((q, dict((c, unicode(repr(chr(c)))[1:-1])
-                        for c in range(32) + [ord('\\')] +
-                        range(128, 161),
-                        **{ord(q): u'\\' + q}))
-               for q in ["'", '"'])
-
-class MyPrettyPrinter(pprint.PrettyPrinter):
-    def format(self, object, context, maxlevels, level):
-        if type(object) is unicode:
-            q = "'" if "'" not in object or '"' in object \
-                else '"'
-            return ("u" + q + object.translate(_escape[q]) +
-                    q, True, False)
-        return pprint.PrettyPrinter.format(
-            self, object, context, maxlevels, level)
-
-pp = MyPrettyPrinter()
-
 def load_block_names():
     global blockNames
     if globalConfig.get_key('blockNameMode') == 0:
@@ -130,7 +111,6 @@ def load_block_names():
         try:
             blockNames = json.load(f, encoding='utf-8')
             f.close()
-            pp.pprint(blockNames)
             return ("[ShipProxy] %s Block names loaded!" % len(blockNames))
         except ValueError:
             f.close()
@@ -151,8 +131,7 @@ def load_ship_names():
     if os.path.exists("cfg/shipslabel.resources.json"):
         f = open("cfg/shipslabel.resources.json", 'r')
         try:
-            for key, val in json.load(f).items():
-                ShipLabel[key] = val.encode("utf8", 'ignore')
+            ShipLabel = json.load(f, encoding='utf-8')
             f.close()
             return ("[GlobalChat] %s ship labels names loaded!" % len(ShipLabel))
         except ValueError:
