@@ -89,8 +89,7 @@ def EQBody(body):  # 0 is ship1
         print("[EQ Alert] Bad API response, %s" % e)
         return
 
-	global HTTP_Data
-	
+    global HTTP_Data
 
     if HTTP_Data == APIResponse:
         logdebug("API data has not changed.")
@@ -100,7 +99,7 @@ def EQBody(body):  # 0 is ship1
 
     for ship in config.globalConfig.get_key('enabledShips'):
         if eqalert_config.key_exists(str(ship)):
-            
+
             hour_eq[ship] = APIResponse['JST']
 
             try: #We need to check these in the proper order
