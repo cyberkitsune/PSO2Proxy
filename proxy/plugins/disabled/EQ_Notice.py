@@ -258,6 +258,7 @@ def CheckupURL():
 @plugins.on_start_hook
 def on_start():
     global taskrun
+    print("[EQ Notice][Warning] This plugin is discontinued! Please use EQ_Alert.py instead.")
     taskrun = task.LoopingCall(CheckupURL)
     try:
         pool.cachedConnectionTimeout = (tasksec / 2) + tasksec + 1
