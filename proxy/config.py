@@ -109,7 +109,7 @@ def load_block_names():
     if os.path.exists("cfg/blocknames.resources.json"):
         f = open("cfg/blocknames.resources.json", 'r')
         try:
-            blockNames = json.load(f)
+            blockNames = json.load(f, encoding='utf-8')
             f.close()
             return ("[ShipProxy] %s Block names loaded!" % len(blockNames))
         except ValueError:
@@ -131,8 +131,7 @@ def load_ship_names():
     if os.path.exists("cfg/shipslabel.resources.json"):
         f = open("cfg/shipslabel.resources.json", 'r')
         try:
-            for key, val in json.load(f).items():
-                ShipLabel[key] = val.encode("utf8", 'ignore')
+            ShipLabel = json.load(f, encoding='utf-8')
             f.close()
             return ("[GlobalChat] %s ship labels names loaded!" % len(ShipLabel))
         except ValueError:

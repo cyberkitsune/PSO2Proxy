@@ -14,6 +14,7 @@ import plugins.plugins as plugin_manager
 from PSOCryptoUtils import PSO2RC4
 from PSOCryptoUtils import PSO2RSADecrypt
 from PSOCryptoUtils import PSO2RSAEncrypt
+from PSO2DataTools import replace_with_table
 import struct
 import traceback
 from twisted.internet import endpoints
@@ -95,8 +96,9 @@ def login_confirmation_packet(context, data):
             struct.pack_into('%is' % len(address_string), data, 0x1C, address_string)
             if len(address_string) < 0x40:
                 struct.pack_into('%ix' % (0x40 - len(address_string)), data, 0x1C + len(address_string))
-        elif bNameMode == 1 and ((block_info[1])[:5]) in config.blockNames:
-            address_string = config.blockNames[(block_info[1])[:5]].encode('utf-16le')
+        elif bNameMode == 1:
+            enname = replace_with_table((block_info[1]), config.blockNames.items())
+            address_string = enname.encode('utf-16le')
             struct.pack_into('%is' % len(address_string), data, 0x1C, address_string)
             if len(address_string) < 0x40:
                 struct.pack_into('%ix' % (0x40 - len(address_string)), data, 0x1C + len(address_string))
@@ -230,8 +232,9 @@ def block_list_packet(context, data):
             struct.pack_into('%is' % len(block_string), data, pos, block_string)
             if len(block_string) < 0x40:
                 struct.pack_into('%ix' % (0x40 - len(block_string)), data, pos + len(block_string))
-        elif bNameMode == 1 and name[:5] in config.blockNames:
-            block_string = config.blockNames[name[:5]].encode('utf-16le')
+        elif bNameMode == 1:
+            enname = replace_with_table(name, config.blockNames.items())
+            block_string = enname.encode('utf-16le')
             struct.pack_into('%is' % len(block_string), data, pos, block_string)
             if len(block_string) < 0x40:
                 struct.pack_into('%ix' % (0x40 - len(block_string)), data, pos + len(block_string))
