@@ -84,11 +84,17 @@ def old_seconds(td):
 
 def EQBody(body):  # 0 is ship1
     try:
-        APIResponse = json.loads(str(body.decode("utf-8")))
+        APIData = json.loads(str(body.decode("utf-8")))
     except Exception as e: #If we can't load a JSON then something went wrong with the API
         print("[EQ Alert] Bad API response, %s" % e)
         return
 
+    try:
+        APIResponse = APIData[0]
+    except Exception as e:
+        logdebug("Falling back")
+        APIResponse = APIData
+    
     global HTTP_Data
 
     if HTTP_Data == APIResponse:
@@ -100,7 +106,11 @@ def EQBody(body):  # 0 is ship1
     for ship in config.globalConfig.get_key('enabledShips'):
         if eqalert_config.key_exists(str(ship)):
 
-            hour_eq[ship] = APIResponse['JST']
+            try:
+                hour_eq[ship] = APIResponse['JST']
+            except Exception as e:
+                print("[EQ Alert] Unable to get data, %s" % e)
+                return
 
             try: #We need to check these in the proper order
                 if not APIResponse['Ship' + str(ship + 1)] == "": #Check the Ship first
@@ -117,6 +127,9 @@ def EQBody(body):  # 0 is ship1
                     data_eq[ship] = ""
             except KeyError as e:
                 print("[EQ Alert] Could not find key, %s" % e)
+                return
+            except Exception as e:
+                print("[EQ Alert] Unable to get data, %s" % e)
                 return
 
             if not data_eq[ship] == "":
