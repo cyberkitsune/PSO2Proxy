@@ -78,10 +78,6 @@ def logdebug(message):
         print ("[EQ Alert Debug] %s" % message)
 
 
-def old_seconds(td):
-    return td.seconds + td.days * 24 * 3600
-
-
 def EQBody(body):  # 0 is ship1
     try:
         APIData = json.loads(str(body.decode("utf-8")))
