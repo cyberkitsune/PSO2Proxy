@@ -131,7 +131,8 @@ def load_ship_names():
     if os.path.exists("cfg/shipslabel.resources.json"):
         f = open("cfg/shipslabel.resources.json", 'r')
         try:
-            ShipLabel = json.load(f, encoding='utf-8')
+            for key, val in json.load(f, encoding='utf-8').items():
+                ShipLabel[key] = val.encode("utf8", 'ignore')
             f.close()
             return ("[GlobalChat] %s ship labels names loaded!" % len(ShipLabel))
         except ValueError:
