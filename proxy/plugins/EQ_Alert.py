@@ -128,7 +128,7 @@ def EQBody(body):  # 0 is ship1
                 print("[EQ Alert] Unable to get data, %s" % e)
                 return
 
-            if not data_eq[ship] == "":
+            if not data_eq[ship] == "" and not "no Emergency Quests" in data_eq[ship]:
                 logdebug("Ship %d: %s" % (ship + 1, data_eq[ship]))
 
                 logdebug("Time  : %s" % (datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')))
