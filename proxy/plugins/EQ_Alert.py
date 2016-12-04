@@ -113,8 +113,8 @@ def EQBody(body):  # 0 is ship1
                     data_eq[ship] = APIResponse['Ship' + str(ship + 1)] + " at " + hour_eq[ship] + " JST."
                 elif not APIResponse['HalfHour'] == "": #Check what's coming at :30 next
                     data_eq[ship] = APIResponse['HalfHour'] + " at half past."
-                elif not APIResponse['AllShips'] == "": #Check responses for all ships
-                    data_eq[ship] = APIResponse['AllShips'] + " at " + hour_eq[ship] + " JST."
+                elif not APIResponse['OneLater'] == "": #Check responses for all ships
+                    data_eq[ship] = APIResponse['OneLater'] + " at " + hour_eq[ship] + " JST."
                 elif not APIResponse['TwoLater'] == "": #Check what's coming in 2 hours
                     data_eq[ship] = APIResponse['TwoLater'] + " in two hours."
                 elif not APIResponse['ThreeLater'] == "": #Finally check what's coming in 3 hours
