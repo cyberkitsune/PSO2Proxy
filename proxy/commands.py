@@ -124,17 +124,49 @@ class HelpCommand(Command):
         user_command_count = 0
         for command, cData in commandList.iteritems():
             if cData[1] is not None:
-                user_command_count += 1
-                string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
+                if cData[2] is not None:
+                    if not cData[2]:
+                        user_command_count += 1
+                        string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
+                else:
+                    user_command_count += 1
+                    string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
         for command, cData in plugin_manager.commands.iteritems():
             if cData[1] is not None:
-                user_command_count += 1
-                string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
+                if cData[2] is not None:
+                    if not cData[2]:
+                        user_command_count += 1
+                        string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
+                else:
+                    user_command_count += 1
+                    string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
+        string += "%ssuhelp - [Admin Only] Display proxy administrator command list.\n\n" % config.globalConfig.get_key('commandPrefix') #i add this manually because don't know how to get specific command.
         string += "=== %i commands in total ===" % user_command_count
         client.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
 
     def call_from_console(self):
         return "=== PSO2Proxy Commands ===\n -- %s\n -- %s\n=== PSO2Proxy Commands ===" % ('\n -- '.join(commandList.keys()), '\n -- '.join(plugin_manager.commands.keys()))
+
+
+@CommandHandler("suhelp", "[Admin Only] Display proxy administrator command list.", True)
+class HelpCommandADM(Command):
+    def call_from_client(self, client):
+        string = "=== PSO2Proxy Commands ===\n"
+        user_command_count = 0
+        for command, cData in commandList.iteritems():
+            if cData[1] is not None:
+                if cData[2] is not None:
+                    if cData[2]:
+                        user_command_count += 1
+                        string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
+        for command, cData in plugin_manager.commands.iteritems():
+            if cData[1] is not None:
+                if cData[2] is not None:
+                    if cData[2]:
+                        user_command_count += 1
+                        string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
+        string += "=== %i commands in total ===" % user_command_count
+        client.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
 
 
 @CommandHandler("count", "Prints number of connected clients.")
