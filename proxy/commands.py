@@ -122,7 +122,7 @@ class HelpCommand(Command):
     def call_from_client(self, client):
         string = "=== PSO2Proxy Commands ===\n"
         user_command_count = 0
-        for command, cData in commandList.iteritems():
+        for command, cData in sorted(commandList.iteritems()):
             if cData[1] is not None:
                 if cData[2] is not None:
                     if not cData[2]:
@@ -131,7 +131,7 @@ class HelpCommand(Command):
                 else:
                     user_command_count += 1
                     string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
-        for command, cData in plugin_manager.commands.iteritems():
+        for command, cData in sorted(plugin_manager.commands.iteritems()):
             if cData[1] is not None:
                 if cData[2] is not None:
                     if not cData[2]:
@@ -153,13 +153,13 @@ class HelpCommandADM(Command):
     def call_from_client(self, client):
         string = "=== PSO2Proxy Commands ===\n"
         user_command_count = 0
-        for command, cData in commandList.iteritems():
+        for command, cData in sorted(commandList.iteritems()):
             if cData[1] is not None:
                 if cData[2] is not None:
                     if cData[2]:
                         user_command_count += 1
                         string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
-        for command, cData in plugin_manager.commands.iteritems():
+        for command, cData in sorted(plugin_manager.commands.iteritems()):
             if cData[1] is not None:
                 if cData[2] is not None:
                     if cData[2]:
