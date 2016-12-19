@@ -195,6 +195,7 @@ class ProxyServer(ShipProxy):
 
         self.reactor = reactor
         self.reactor.connectTCP(address, port if port < 13000 else port - 1000, client, 60)
+        self.transport.setTcpNoDelay(True)
 
 
 class ProxyFactory(protocol.Factory):
