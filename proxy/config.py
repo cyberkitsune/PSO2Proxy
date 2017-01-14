@@ -43,7 +43,7 @@ class YAMLConfig(object):
         self._load_config()
 
     def _validate_config(self):
-        for key, value in self.default_keys.iteritems():
+        for key, value in self.default_keys.items():
             if key not in self._config_values:
                 self._config_values[key] = value
                 print("[Config] Added new default %s for config %s" % (key, self.filename))
@@ -61,7 +61,7 @@ class YAMLConfig(object):
     def get_key(self, key):
         if key not in self._config_values:
             raise KeyError
-        if isinstance(self._config_values[key], unicode):
+        if str(type(self._config_values[key])) == "<type 'unicode'>":
             return self._config_values[key].encode('utf-8')
         else:
             return self._config_values[key]
