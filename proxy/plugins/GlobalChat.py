@@ -126,8 +126,8 @@ if ircMode:
                 return
             if channel == self.factory.channel:
                 if "`[Ship " in msg:
-                    self.nickbuf = user;
-                    self.nickmsgbuf = msg.replace("`","");
+                    self.nickbuf = user
+                    self.nickmsgbuf = msg.replace("`", "")
                     return
                 if self.ircOutput is True:
                     if self.nickbuf == user:
@@ -177,18 +177,13 @@ if ircMode:
         def send_global_message(self, ship, user, message, server=None):
             if not check_pso2_with_irc(message):
                 return
-            if discord:
-                fb = ("Ship %02i") % ship;
-            else:
-                fb = ("G-%02i") % ship
+            fb = ("G-%02i") % ship
             shipl = ShipLabel.get(fb, fb)
             if discord:
                 if server is None:
-                    self.say(self.factory.channel, "`[%s] %s`:" % (shipl, user), 250)
-                    self.msg(self.factory.channel, "%s" % replace_pso2_with_irc(message))
+                    self.say(self.factory.channel, "`[%s] %s`: %s" % (shipl, user, replace_pso2_with_irc(message)), 250)
                 else:
-                    self.msg(self.factory.channel, "(%s) `[%s] %s`:" % (server, shipl, user))
-                    self.msg(self.factory.channel, "%s" % replace_pso2_with_irc(message))
+                    self.msg(self.factory.channel, "'(%s) [%s] %s`: %s" % (server, shipl, user, replace_pso2_with_irc(message)))
             else:
                 if server is None:
                     self.msg(self.factory.channel, "[%s] <%s> %s" % (shipl, user, replace_pso2_with_irc(message)))
