@@ -247,11 +247,15 @@ def block_list_packet(context, data):
 @PacketHandler(0x11, 0x13)
 def block_reply_packet(context, data):
     data = bytearray(data)
+    o1, o2, o3, o4 = struct.unpack_from('BBBB', buffer(data), 0x14)
+    ip_string = "%i.%i.%i.%i" % (o1, o2, o3, o4)
     struct.pack_into('BBBB', data, 0x14, int(i0), int(i1), int(i2), int(i3))
     port = struct.unpack_from("H", buffer(data), 0x18)[0]
     if context.peer.transport.getHost().port > 12999:
         port += 1000
         struct.pack_into("H", data, (0x14 + 0x04), port)
+    if port not in blocks.blockList:
+        blocks.blockList[port] = (ip_string, "PVP Arena", port) #not really sure if it's proper way
     if port in blocks.blockList and port not in blocks.listeningPorts:
         from ShipProxy import ProxyFactory
         if bindIp == "0.0.0.0":
@@ -290,7 +294,8 @@ def player_name_packet(context, data):
 @PacketHandler(0x11, 0x21)
 def shared_ship_packet(context, data):
     data = bytearray(data)
+    o1, o2, o3, o4 = struct.unpack_from('BBBB', buffer(data), 0x8)
     struct.pack_into("BBBB", data, 0x8, int(i0), int(i1), int(i2), int(i3))
-    if context.peer.transport.getHost().port < 13000:  # If not already on challenge...
+    if o4 > 180: # Detect via IP instead port
         struct.pack_into("H", data, 0xC, 13000)  # Maybe incorrect?
     return str(data)

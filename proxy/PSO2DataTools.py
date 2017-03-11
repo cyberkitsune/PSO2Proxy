@@ -442,7 +442,7 @@ def replace_with_table(pIncoming, table, debug=0, check=0):
         for i in Bad_Unicode:
             outtext = outtext.replace(i, "")
     else:
-        outtext = lIncoming
+        outtext = lIncoming.rstrip('\x00')
 
     if debug > 0:
         print ("Outgoing replace: {}".format(repr(lIncoming)))
