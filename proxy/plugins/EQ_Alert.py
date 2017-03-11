@@ -53,18 +53,18 @@ except ImportError:
 eqalert_config = config.YAMLConfig("cfg/EQ_Alert.config.yml", {'enabled': True, 'timer': 80, 'debug': False, 'api': "http://pso2.acf.me.uk/api/eq.json", '0': True, '1': True, '2': True, '3': True, '4': True, '5': True, '6': True, '7': True, '8': True, '9': True, 'ircShip': 1}, True)
 
 # HTTP Headers
-ETag_Header     = ""
+ETag_Header = ""
 Modified_Header = ""
 # HTTP Modified in time
-Modified_time    = ""
+Modified_time = ""
 # HTTP Data
-HTTP_Data        = ""
+HTTP_Data = ""
 # Hour of EQ
-hour_eq          = ['', '', '', '', '', '', '', '', '', '']
+hour_eq = ['', '', '', '', '', '', '', '', '', '']
 # EQ Data
-data_eq          = ['', '', '', '', '', '', '', '', '', '']
+data_eq = ['', '', '', '', '', '', '', '', '', '']
 
-taskrun          = []
+taskrun = []
 
 eq_mode = eqalert_config.get_key('enabled')
 tasksec = eqalert_config.get_key('timer')
