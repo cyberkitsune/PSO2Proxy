@@ -1,0 +1,8 @@
+language: python
+dist: trusty
+
+install: true
+
+script:
+  - cd proxy
+  - ./checkstyle.sh
