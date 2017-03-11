@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: UTF-8 -*-
 try:
     from twisted.internet import epollreactor
     epollreactor.install()
@@ -46,7 +47,7 @@ class ServerConsole(basic.LineReceiver):
         self.delimiter = os.linesep
 
     def connectionMade(self):
-        self.transport.write('>>> ')
+        self.transport.write('>>> '.encode("utf-8"))
 
     def lineReceived(self, line):
         try:

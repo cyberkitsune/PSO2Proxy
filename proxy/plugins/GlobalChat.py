@@ -24,7 +24,7 @@ except ImportError:
     redisEnabled = False
 
 ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
-                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'svname': 'NickServ', 'svpass': '', 'channel': "", 'output': True, 'autoexec': []}, True)
+                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'svname': 'NickServ', 'svpass': '', 'channel': "", 'output': True, 'autoexec': [], 'discord': False}, True)
 
 ircBot = None
 ircMode = ircSettings.get_key('enabled')
@@ -34,6 +34,7 @@ ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
 ircChannel = ircSettings.get_key('channel')
 ircServicePass = ircSettings.get_key('svpass')
 ircServiceName = ircSettings.get_key('svname')
+discord = ircSettings.get_key('discord')
 
 gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePrefix': '', 'systemPrefix': '{whi}', 'prefix': ''}, True)
 
@@ -75,6 +76,8 @@ if ircMode:
     class GChatIRC(irc.IRCClient):
         currentPid = 0
         userIds = {}
+        nickmsgbuf = ""
+        nickbuf = ""
 
         def __init__(self):
             global ircNick
@@ -109,6 +112,9 @@ if ircMode:
                 log.msg(ne)
 
         def signedOn(self):
+            if discord:
+                self.msg("&bitlbee", "identify %s" % ircServicePass)
+                self.sendLine("OPER %s %s" % (self.nickname, ircServicePass))
             for command in ircSettings.get_key('autoexec'):
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
@@ -119,18 +125,32 @@ if ircMode:
             if not check_irc_with_pso2(msg):
                 return
             if channel == self.factory.channel:
+                if "`[Ship " in msg:
+                    self.nickbuf = user
+                    self.nickmsgbuf = msg.replace("`", "")
+                    return
                 if self.ircOutput is True:
-                    print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8', 'ignore')))
+                    if self.nickbuf == user:
+                        print("[GlobalChat] [IRC] <%s> %s" % (self.nickmsgbuf.split(":")[0], replace_irc_with_pso2(msg).decode('utf-8', 'ignore')))
+                    else:
+                        print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8', 'ignore')))
                 if redisEnabled:
                     PSO2PDConnector.db_conn.publish("plugin-message-gchat", json.dumps({'sender': 1, 'text': replace_irc_with_pso2(msg).decode('utf-8', 'ignore'), 'server': PSO2PDConnector.connector_conf['server_name'], 'playerName': user.split("!")[0], 'playerId': self.get_user_id(user.split("!")[0])}))
                 for client in data.clients.connectedClients.values():
+
+                    if discord and self.nickbuf == user:
+                        nickmsg = self.nickmsgbuf.split(":")[0]
+                    else:
+                        nickmsg = user.split("!")[0]
+                    pso2msg = replace_irc_with_pso2(msg).decode('utf-8', 'ignore')
                     if client.preferences.get_preference('globalChat') and client.get_handle() is not None:
                         if lookup_gchatmode(client.preferences) == 0:
-                            client.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]), "[GIRC] %s" % user.split("!")[0], "[GIRC] %s" % user.split("!")[0], "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(msg).decode('utf-8', 'ignore'))).build())
+                            client.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(self.get_user_id(nickmsg), "[GIRC] %s" % nickmsg, "[GIRC] %s" % nickmsg, "%s%s" % (client.preferences.get_preference('globalChatPrefix'), pso2msg)).build())
                         else:
-                            client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> %s" % (user.split("!")[0], "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(msg).decode('utf-8', 'ignore'))), 0x3).build())
+                            client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> %s" % (nickmsg, "%s%s" % (client.preferences.get_preference('globalChatPrefix'), pso2msg)), 0x3).build())
             else:
-                print("[IRC] <%s> %s" % (user, msg))
+                if not discord:
+                    print("[IRC] <%s> %s" % (user.encode('ascii', 'ignore'), msg.encode('ascii', 'ignore')))
 
         def noticed(self, user, channel, message):
             print("[IRC] [NOTICE] %s %s" % (user, message))
@@ -159,10 +179,16 @@ if ircMode:
                 return
             fb = ("G-%02i") % ship
             shipl = ShipLabel.get(fb, fb)
-            if server is None:
-                self.msg(self.factory.channel, "[%s] <%s> %s" % (shipl, user, replace_pso2_with_irc(message)))
+            if discord:
+                if server is None:
+                    self.say(self.factory.channel, "`[%s] %s`: %s" % (shipl, user, replace_pso2_with_irc(message)), 250)
+                else:
+                    self.msg(self.factory.channel, "'(%s) [%s] %s`: %s" % (server, shipl, user, replace_pso2_with_irc(message)))
             else:
-                self.msg(self.factory.channel, "(%s) [%s] <%s> %s" % (server, shipl, user, replace_pso2_with_irc(message)))
+                if server is None:
+                    self.msg(self.factory.channel, "[%s] <%s> %s" % (shipl, user, replace_pso2_with_irc(message)))
+                else:
+                    self.msg(self.factory.channel, "(%s) [%s] <%s> %s" % (server, shipl, user, replace_pso2_with_irc(message)))
 
         def send_channel_message(self, message):
             self.msg(self.factory.channel, message)
@@ -328,7 +354,7 @@ class MuteSomebody(commands.Command):
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Muted %s." % user_to_mute, 0x3).build())
             return
         else:
-            for player_id, player_data in data.players.playerList.iteritems():
+            for player_id, player_data in data.players.playerList.items():
                 if player_data[0].rstrip("\0") == user_to_mute:
                     if player_id in data.clients.connectedClients:
                         data.clients.connectedClients[player_id].preferences['chatMuted'] = True
@@ -347,7 +373,7 @@ class MuteSomebody(commands.Command):
         if user_to_mute.isdigit() and int(user_to_mute) in data.clients.connectedClients:
             data.clients.connectedClients[int(user_to_mute)].preferences['chatMuted'] = True
             return "Muted %s by Player #" % user_to_mute
-        for player_id, player_data in data.players.playerList.iteritems():
+        for player_id, player_data in data.players.playerList.items():
             if player_data[0].rstrip("\0") == user_to_mute:
                 if player_id in data.clients.connectedClients:
                     data.clients.connectedClients[player_id].preferences['chatMuted'] = True
@@ -373,7 +399,7 @@ class UnmuteSomebody(commands.Command):
         else:
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s either is not connected or is not part of the proxy." % user_to_mute, 0x3).build())
 
-        for player_id, player_data in data.players.playerList.iteritems():
+        for player_id, player_data in data.players.playerList.items():
             if player_data[0].rstrip("\0") == user_to_mute:
                 if player_id in data.clients.connectedClients:
                     data.clients.connectedClients[player_id].preferences['chatMuted'] = False
@@ -388,7 +414,7 @@ class UnmuteSomebody(commands.Command):
         if user_to_mute.isdigit() and int(user_to_mute) in data.clients.connectedClients:
             data.clients.connectedClients[int(user_to_mute)].preferences['chatMuted'] = False
             return "Unmuted %s by Player #" % user_to_mute
-        for player_id, player_data in data.players.playerList.iteritems():
+        for player_id, player_data in data.players.playerList.items():
             if player_data[0].rstrip("\0") == user_to_mute:
                 if player_id in data.clients.connectedClients:
                     data.clients.connectedClients[player_id].preferences['chatMuted'] = False
