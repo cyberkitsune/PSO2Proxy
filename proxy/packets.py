@@ -11,10 +11,10 @@ import data.players as players
 import io
 import packetFactory
 import plugins.plugins as plugin_manager
+from PSO2DataTools import replace_with_table
 from PSOCryptoUtils import PSO2RC4
 from PSOCryptoUtils import PSO2RSADecrypt
 from PSOCryptoUtils import PSO2RSAEncrypt
-from PSO2DataTools import replace_with_table
 import struct
 import traceback
 from twisted.internet import endpoints
@@ -255,7 +255,7 @@ def block_reply_packet(context, data):
         port += 1000
         struct.pack_into("H", data, (0x14 + 0x04), port)
     if port not in blocks.blockList:
-        blocks.blockList[port] = (ip_string, "PVP Arena", port) #not really sure if it's proper way
+        blocks.blockList[port] = (ip_string, "PVP Arena", port)  # not really sure if it's proper way
     if port in blocks.blockList and port not in blocks.listeningPorts:
         from ShipProxy import ProxyFactory
         if bindIp == "0.0.0.0":
@@ -296,6 +296,6 @@ def shared_ship_packet(context, data):
     data = bytearray(data)
     o1, o2, o3, o4 = struct.unpack_from('BBBB', buffer(data), 0x8)
     struct.pack_into("BBBB", data, 0x8, int(i0), int(i1), int(i2), int(i3))
-    if o4 > 180: # Detect via IP instead port
+    if o4 > 180:  # Detect via IP instead port
         struct.pack_into("H", data, 0xC, 13000)  # Maybe incorrect?
     return str(data)

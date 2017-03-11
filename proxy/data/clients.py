@@ -38,7 +38,7 @@ class ClientData(object):
         self.handle = handle
 
 
-class SQLitePreferenceManager():
+class SQLitePreferenceManager(object):
 
     user_preference_cache = {}
 
@@ -99,7 +99,7 @@ class SQLitePreferenceManager():
 dbManager = SQLitePreferenceManager()
 
 
-class ClientPreferences():
+class ClientPreferences(object):
     def __init__(self, segaid):
         self._config = dbManager.get_data_for_sega_id(segaid)
         self.segaid = segaid

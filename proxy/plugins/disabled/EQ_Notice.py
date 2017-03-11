@@ -54,25 +54,25 @@ except ImportError:
 eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True, 'timer': 60, 'debug': False, '1': "http://pso2.acf.me.uk/pso2eq.txt"}, True)
 
 # HTTP Headers
-ETag_Headers     = ['', '', '', '', '', '', '', '', '', '']
+ETag_Headers = ['', '', '', '', '', '', '', '', '', '']
 Modified_Headers = ['', '', '', '', '', '', '', '', '', '']
 # HTTP Modified in time
-Modified_time    = ['', '', '', '', '', '', '', '', '', '']
+Modified_time = ['', '', '', '', '', '', '', '', '', '']
 # HTTP Data
-HTTP_Data        = ['', '', '', '', '', '', '', '', '', '']
+HTTP_Data = ['', '', '', '', '', '', '', '', '', '']
 # was "【1時間前】" in the data?
-ishour_eq        = [False, False, False, False, False, False, False, False, False, False]
+ishour_eq = [False, False, False, False, False, False, False, False, False, False]
 # Hour of EQ
-hour_eq          = ['', '', '', '', '', '', '', '', '', '']
+hour_eq = ['', '', '', '', '', '', '', '', '', '']
 # Mins of EQ
-mins_eq          = ['', '', '', '', '', '', '', '', '', '']
+mins_eq = ['', '', '', '', '', '', '', '', '', '']
 # EQ Data
-data_eq          = ['', '', '', '', '', '', '', '', '', '']
+data_eq = ['', '', '', '', '', '', '', '', '', '']
 # EQ Data
-msg_eq           = ['', '', '', '', '', '', '', '', '', '']
+msg_eq = ['', '', '', '', '', '', '', '', '', '']
 
-eqJP             = []
-taskrun          = []
+eqJP = []
+taskrun = []
 
 eq_mode = eqnotice_config.get_key('enabled')
 tasksec = eqnotice_config.get_key('timer')

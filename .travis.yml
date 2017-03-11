@@ -1,0 +1,19 @@
+language: python
+dist: trusty
+sudo: false
+install: true
+
+addons:
+  apt:
+    packages:
+    - python-flake8
+    - flake
+
+virtualenv:
+  system_site_packages: true
+
+cache:
+  - apt
+
+script:
+  - cd proxy && ./checkstyle.sh
