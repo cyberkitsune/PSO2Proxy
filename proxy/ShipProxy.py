@@ -147,6 +147,7 @@ class ProxyClient(ShipProxy):
         self.connTimestamp = utctime
         self.peer.connTimestamp = utctime
         self.peer.transport.resumeProducing()
+        self.transport.setTcpNoDelay(True)
 
 
 class ProxyClientFactory(protocol.ClientFactory):
@@ -194,6 +195,7 @@ class ProxyServer(ShipProxy):
 
         self.reactor = reactor
         self.reactor.connectTCP(address, port if port < 13000 else port - 1000, client, 60)
+        self.transport.setTcpNoDelay(True)
 
 
 class ProxyFactory(protocol.Factory):
