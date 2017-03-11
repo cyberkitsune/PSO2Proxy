@@ -3,6 +3,10 @@ dist: trusty
 
 install: true
 
+addons:
+  apt:
+    packages:
+    - python-flake8
+
 script:
-  - cd proxy
-  - ./checkstyle.sh
+  - cd proxy && ./checkstyle.sh
