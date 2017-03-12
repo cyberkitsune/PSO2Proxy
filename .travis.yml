@@ -7,7 +7,6 @@ addons:
   apt:
     packages:
     - python-flake8
-    - flake
 
 virtualenv:
   system_site_packages: true

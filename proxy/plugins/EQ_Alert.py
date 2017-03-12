@@ -50,7 +50,7 @@ try:
 except ImportError:
     agent = RedirectAgent(Agent(reactor))
 
-eqalert_config = config.YAMLConfig("cfg/EQ_Alert.config.yml", {'enabled': True, 'timer': 80, 'debug': False, 'api': "http://pso2.acf.me.uk/api/eq.json", '0': True, '1': True, '2': True, '3': True, '4': True, '5': True, '6': True, '7': True, '8': True, '9': True, 'ircShip': 1}, True)
+eqalert_config = config.YAMLConfig("cfg/EQ_Alert.config.yml", {'enabled': True, 'timer': 80, 'debug': False, 'api': "http://pso2.acf.me.uk/api/eq.json", '0': True, '1': True, '2': True, '3': True, '4': True, '5': True, '6': True, '7': True, '8': True, '9': True, 'ircShip': 1, 'User-Agent': "PSO2Proxy"}, True)
 
 # HTTP Headers
 ETag_Header = ""
@@ -175,7 +175,10 @@ def EQResponse(response):
 
 
 def CheckupURL():
-    HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']})  # We need to send a User-Agent
+    if eqalert_config.key_exists('User-Agent'):  # We need to send a User-Agent
+        HTTPHeader0 = Headers({'User-Agent': [eqalert_config.get_key('User-Agent')]})
+    else:
+        HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']})
     if eqalert_config.key_exists('api'):
         eq_URL = eqalert_config.get_key('api')
     else:
