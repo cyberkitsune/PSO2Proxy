@@ -217,6 +217,8 @@ if ircMode:
 
 
 def lookup_gchatmode(client_preferences):
+    if redisEnabled:
+        return 1
     if client_preferences['gchatMode'] is not -1:
         return client_preferences['gchatMode']
     return gchatSettings['displayMode']
