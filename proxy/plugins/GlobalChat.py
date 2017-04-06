@@ -41,7 +41,10 @@ gchatSettings = YAMLConfig("cfg/gchat.config.yml", {'displayMode': 0, 'bubblePre
 
 def doRedisGchat(message):
     gchatMsg = json.loads(message['data'])
-    fb = ("G-%02i") % gchatMsg['ship']
+    if gchatMsg['ship'] == "GIRC":
+        fb = "GIRC"
+    else:
+        fb = ("G-%02i") % gchatMsg['ship']
     shipl = ShipLabel.get(fb, fb)
     strgchatmsg = str(gchatMsg['text'].encode('utf-8'))
     if not check_irc_with_pso2(strgchatmsg):
@@ -135,7 +138,7 @@ if ircMode:
                     else:
                         print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8', 'ignore')))
                 if redisEnabled:
-                    PSO2PDConnector.db_conn.publish("plugin-message-gchat", json.dumps({'sender': 1, 'text': replace_irc_with_pso2(msg).decode('utf-8', 'ignore'), 'server': PSO2PDConnector.connector_conf['server_name'], 'playerName': user.split("!")[0], 'playerId': self.get_user_id(user.split("!")[0])}))
+                    PSO2PDConnector.db_conn.publish("plugin-message-gchat", json.dumps({'sender': 1, 'text': replace_irc_with_pso2(msg).decode('utf-8', 'ignore'), 'server': PSO2PDConnector.connector_conf['server_name'], 'playerName': user.split("!")[0], 'playerId': self.get_user_id(user.split("!")[0]), 'ship': "GIRC"}))
                 for client in data.clients.connectedClients.values():
 
                     if discord and self.nickbuf == user:
