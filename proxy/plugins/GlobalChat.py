@@ -182,11 +182,13 @@ if ircMode:
                 return
             fb = ("G-%02i") % ship
             shipl = ShipLabel.get(fb, fb)
+            if server is None and redisEnabled:
+                server = PSO2PDConnector.connector_conf['server_name']
             if discord:
                 if server is None:
                     self.say(self.factory.channel, "`[%s] %s`: %s" % (shipl, user, replace_pso2_with_irc(message)), 250)
                 else:
-                    self.msg(self.factory.channel, "'(%s) [%s] %s`: %s" % (server, shipl, user, replace_pso2_with_irc(message)))
+                    self.msg(self.factory.channel, "`(%s) [%s] %s`: %s" % (server, shipl, user, replace_pso2_with_irc(message)))
             else:
                 if server is None:
                     self.msg(self.factory.channel, "[%s] <%s> %s" % (shipl, user, replace_pso2_with_irc(message)))
