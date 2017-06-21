@@ -80,6 +80,7 @@ def addServer():
     global thread
     thread.daemon = True
     thread.start()
+    sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': 0})
 
 
 @plugins.on_stop_hook
