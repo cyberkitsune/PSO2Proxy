@@ -239,7 +239,7 @@ def block_list_packet(context, data):
             if len(block_string) < 0x40:
                 struct.pack_into('%ix' % (0x40 - len(block_string)), data, pos + len(block_string))
         struct.pack_into('BBBB', data, pos + 0x40, int(i0), int(i1), int(i2), int(i3))
-        pos += 0xEC
+        pos += 0x68
 
     return str(data)
 
