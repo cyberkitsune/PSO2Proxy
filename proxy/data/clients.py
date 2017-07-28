@@ -127,7 +127,10 @@ class ClientPreferences(object):
         self.set_preference(key, value)
 
     def __del__(self):
-        dbManager.update_user_cache(self.segaid, self._config)  # Incase it doesn't stick I guess
+        try:
+            dbManager.update_user_cache(self.segaid, self._config)  # Incase it doesn't stick I guess
+        except Exception as e:
+            log.msg("saving data on player quit return an error: %s" % (e))
 
 
 def add_client(handle):
