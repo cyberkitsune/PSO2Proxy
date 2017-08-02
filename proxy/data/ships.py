@@ -183,6 +183,9 @@ def scrape_ship_packet(ship_ip, ship_port, destination_ip):
     # Hardcoded ship count, fix this!
     pos = 0x10
     for x in xrange(1, 10):
-        struct.pack_into('BBBB', data, pos + 0x20, int(o1), int(o2), int(o3), int(o4))
-        pos += 0x34
+        try:
+            struct.pack_into('BBBB', data, pos + 0x20, int(o1), int(o2), int(o3), int(o4))
+            pos += 0x34
+        except struct.error as e:
+            log.msg("[ShipQuery] ship status packet was so small for ship %i: %s ", x, e)
     return str(data)
