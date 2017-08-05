@@ -128,13 +128,13 @@ if ircMode:
             if not check_irc_with_pso2(msg):
                 return
             if channel == self.factory.channel:
-                if "`[Ship " in msg:
+                if "title: [Ship " in msg:
                     self.nickbuf = user
-                    self.nickmsgbuf = msg.replace("`", "")
+                    self.nickmsgbuf = msg.replace("title: [", "")
                     return
                 if self.ircOutput is True:
                     if self.nickbuf == user:
-                        print("[GlobalChat] [IRC] <%s> %s" % (self.nickmsgbuf.split(":")[0], replace_irc_with_pso2(msg).decode('utf-8', 'ignore')))
+                        print("[GlobalChat] [IRC] <%s> %s" % (self.nickmsgbuf.split("] ")[1], replace_irc_with_pso2(msg).decode('utf-8', 'ignore')))
                     else:
                         print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8', 'ignore')))
                 if redisEnabled:
