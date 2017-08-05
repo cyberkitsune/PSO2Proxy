@@ -134,6 +134,7 @@ if ircMode:
                     return
                 if self.ircOutput is True:
                     if self.nickbuf == user:
+                        msg = msg.replace("description: ", "")
                         print("[GlobalChat] [IRC] <%s> %s" % (self.nickmsgbuf.split("] ")[1], replace_irc_with_pso2(msg).decode('utf-8', 'ignore')))
                     else:
                         print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8', 'ignore')))
