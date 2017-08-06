@@ -130,16 +130,22 @@ if ircMode:
             if channel == self.factory.channel:
                 if "title: [Ship " in msg:
                     self.nickbuf = user
-                    self.nickmsgbuf = msg.replace("title: [", "")
+                    self.nickmsgbuf = msg.replace("title: ", "", 1)
                     return
+                elif "title: " in msg and "title: [Ship " not in msg:
+                    self.nickbuf = None
+                if self.nickbuf == user:
+                    msg = msg.replace("description: ", "", 1)
                 if self.ircOutput is True:
                     if self.nickbuf == user:
-                        msg = msg.replace("description: ", "", 1)
                         print("[GlobalChat] [IRC] <%s> %s" % (self.nickmsgbuf.split("] ")[1], replace_irc_with_pso2(msg).decode('utf-8', 'ignore')))
                     else:
                         print("[GlobalChat] [IRC] <%s> %s" % (user.split("!")[0], replace_irc_with_pso2(msg).decode('utf-8', 'ignore')))
                 if redisEnabled:
-                    PSO2PDConnector.db_conn.publish("plugin-message-gchat", json.dumps({'sender': 1, 'text': replace_irc_with_pso2(msg).decode('utf-8', 'ignore'), 'server': PSO2PDConnector.connector_conf['server_name'], 'playerName': user.split("!")[0], 'playerId': self.get_user_id(user.split("!")[0]), 'ship': "GIRC"}))
+                    if self.nickbuf == user:
+                        PSO2PDConnector.db_conn.publish("plugin-message-gchat", json.dumps({'sender': 1, 'text': replace_irc_with_pso2(msg).decode('utf-8', 'ignore'), 'server': PSO2PDConnector.connector_conf['server_name'], 'playerName': self.nickmsgbuf, 'playerId': self.get_user_id(self.nickmsgbuf), 'ship': "GIRC"}))
+                    else:
+                        PSO2PDConnector.db_conn.publish("plugin-message-gchat", json.dumps({'sender': 1, 'text': replace_irc_with_pso2(msg).decode('utf-8', 'ignore'), 'server': PSO2PDConnector.connector_conf['server_name'], 'playerName': user.split("!")[0], 'playerId': self.get_user_id(user.split("!")[0]), 'ship': "GIRC"}))
                 for client in data.clients.connectedClients.values():
 
                     if discord and self.nickbuf == user:
