@@ -4,7 +4,6 @@ import packetFactory
 import sqlite3
 from threading import Lock
 import twisted
-from twisted.python import log
 import yaml
 
 from ships import get_ship_from_port
