@@ -26,6 +26,7 @@
 ":[共用]のんびりプレイ推奨"          	:":[Shared] Casual Play",
 ":[共用]やりこみプレイ推奨"          	:":[Shared] Speedrun Play",
 ":[共用]バトルアリーナ"              	:":[Shared] Battle Arena",
+":[共用]バスタークエスト推奨"          	:":[Shared] Buster quest",
 ":ビギナー推奨"                      	:":Beginner",
 ":ノーマル推奨"                      	:":Normal",
 ":ハード推奨"                        	:":Hard",
@@ -44,5 +45,6 @@
 ":エクストリーム推奨"                	:":Extreme Quest",
 ":カジノ推奨"                        	:":Casino",
 ":撮影向け"                          	:":Video Recording",
-":プレミアムセット専用"              	:":Premium"
+":プレミアムセット専用"              	:":Premium",
+":バスタークエスト推奨"              	:":Buster quest"
 }
