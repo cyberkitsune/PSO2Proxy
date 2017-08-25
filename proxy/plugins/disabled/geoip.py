@@ -151,6 +151,6 @@ def whitelist_check(context, data):
 
     if badip:
         print("[Geoip] %s (IP: %s) is not in the GeoIP whitelist, disconnecting client." % place, ip)
-        context.send_crypto_packet(SystemMessagePacket("You are not on the Geoip whitelist for this proxy, please contact the owner of this proxy.", 0x1).build())
+        context.send_crypto_packet(SystemMessagePacket("You are not on the Geoip whitelist for this proxy, please contact the owner of this proxy.\nDetails:\nCountry Code: %s\nIPv4: %s".format(place, ip), 0x1).build())
         context.transport.loseConnection()
     return data
