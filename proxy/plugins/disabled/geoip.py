@@ -132,10 +132,13 @@ def whitelist_check(context, data):
     if not geoipmode:
         return data
     ip = context.transport.getPeer().host
+    badip = True
 
     try:
         respone = Countries.country(ip)
         place = respone.country.iso_code
+        if place in geoiplist:
+            badip = False
     except geoip2.AddressNotFoundError:
         print("[GeoIP] Could not find %s in GeoIP database)".format(ip))
         place = "NULL"
@@ -143,8 +146,11 @@ def whitelist_check(context, data):
         print("[GeoIP] Error: %s".format(e))
         place = "ERROR"
 
-    if place not in geoiplist:
-        print("[Geoip] %s is not in the GeoIP whitelist, disconnecting client." % place)
+    if ip in geoiplist:
+        badip = False
+
+    if badip:
+        print("[Geoip] %s (IP: %s) is not in the GeoIP whitelist, disconnecting client." % place, ip)
         context.send_crypto_packet(SystemMessagePacket("You are not on the Geoip whitelist for this proxy, please contact the owner of this proxy.", 0x1).build())
         context.transport.loseConnection()
     return data
