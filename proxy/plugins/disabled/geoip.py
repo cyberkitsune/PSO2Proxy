@@ -13,6 +13,8 @@ GeoSettings = YAMLConfig("cfg/pso2proxy.geoip.config.yml",
 
 geoipmode = GeoSettings.get_key('enabled')
 
+Countries = None
+
 
 @plugins.on_start_hook
 def load_geoiplist():
