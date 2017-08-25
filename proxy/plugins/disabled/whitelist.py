@@ -7,10 +7,10 @@ from packetFactory import SystemMessagePacket
 import plugins
 whitelist = []
 
-ircSettings = YAMLConfig("cfg/pso2proxy.whitelist.config.yml",
-                         {'enabled': True}, True)
+WLSettings = YAMLConfig("cfg/pso2proxy.whitelist.config.yml",
+                        {'enabled': True}, True)
 
-whitelistmode = ircSettings.get_key('enabled')
+whitelistmode = WLSettings.get_key('enabled')
 
 
 @plugins.on_start_hook
@@ -127,6 +127,6 @@ def whitelist_check(context, data):
     username = username.rstrip('\0')
     if username not in whitelist:
         print("[Whitelist] %s is not in the whitelist, disconnecting client." % username)
-        context.send_crypto_packet(SystemMessagePacket("You are not on the whitelist for this proxy, please contact the owner of this proxy.", 0x1).build())
+        context.send_crypto_packet(SystemMessagePacket("You are not on the SEGAID whitelist for this proxy, please contact the owner of this proxy.", 0x1).build())
         context.transport.loseConnection()
     return data
