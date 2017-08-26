@@ -171,7 +171,9 @@ def whitelist_check(context, data):
     elif geoip1c:
         try:
             place = geoip1c.country_code_by_addr(ip)
-            if place in geoiplist:
+            if place == "":
+                place = "NULL"
+            elif place in geoiplist:
                 badip = False
         except Exception as e:
             print("[GeoIP] Error: %s".format(e))
