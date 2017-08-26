@@ -72,7 +72,7 @@ def save_geoiplist():
 
 
 @plugins.CommandHook("geoipmode", "[Admin Only] Toggle geoip mode", True)
-class Whitelistmode(commands.Command):
+class geoipmode(commands.Command):
     def call_from_client(self, client):
         global geoipmode
         geoipmode = not geoipmode
@@ -93,7 +93,7 @@ class Whitelistmode(commands.Command):
 
 
 @plugins.CommandHook("geoip", "[Admin Only] Adds or removes places to the geoip whitelist.", True)
-class Whitelist(commands.Command):
+class geoip(commands.Command):
     def call_from_console(self):
         global geoiplist
         params = self.args.split(" ")
@@ -149,7 +149,7 @@ class Whitelist(commands.Command):
 
 
 @plugins.PacketHook(0x11, 0x0)
-def whitelist_check(context, data):
+def geoip_check(context, data):
     """
 
     :type context: ShipProxy.ShipProxy
