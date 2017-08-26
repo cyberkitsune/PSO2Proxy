@@ -52,7 +52,8 @@ def load_geoiplist():
 
     if geoip2c is None:
         try:
-            geoip1c = GeoIP.open("/var/lib/GeoIP/GeoLiteCountry.dat", GeoIP.GEOIP_MMAP_CACHE)
+            geoip1c = GeoIP.open()
+            geoip1c.set_charset(GeoIP.GEOIP_CHARSET_UTF8)
         except Exception as e:
             print("[GeoIP] GeoIP1 Error: %s".format(e))
 
