@@ -180,7 +180,7 @@ def geoip_check(context, data):
     elif geoip1c:
         try:
             place = geoip1c.country_code_by_addr(ip)
-            if place == "":
+            if place is None:
                 place = "NULL"
             elif place in geoiplist:
                 badip = False
