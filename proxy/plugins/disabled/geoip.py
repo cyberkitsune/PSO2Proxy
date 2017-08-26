@@ -7,7 +7,7 @@ from packetFactory import SystemMessagePacket
 import plugins
 
 try:
-    import geoip2.database
+    import geoip2
 except ImportError:
     print("[GeoIP] no GeoIP2 library installed")
 
@@ -45,17 +45,19 @@ def load_geoiplist():
 
     try:
         geoip2c = geoip2.database.Reader('/var/lib/GeoIP/GeoLite2-Country.mmdb')
-    except geoip2.FileNotFoundError as e:
-        print("[GeoIP] GeoIP2 database not found: %s".format(e))
+    except AttributeError:
+        None
     except Exception as e:
-        print("[GeoIP] Unknown error: %s".format(e))
+        print("[GeoIP] GeoIP2 error: {}".format(e))
 
-    if geoip2c is None:
+    if GeoIP.open:
         try:
-            geoip1c = GeoIP.open()
+            geoip1c = GeoIP.open("/usr/share/GeoIP/GeoIP.dat", GeoIP.GEOIP_MMAP_CACHE | GeoIP.GEOIP_CHECK_CACHE)
             geoip1c.set_charset(GeoIP.GEOIP_CHARSET_UTF8)
+        except AttributeError:
+            None
         except Exception as e:
-            print("[GeoIP] GeoIP1 Error: %s".format(e))
+            print("[GeoIP] GeoIP1 Error: {}".format(e))
 
 
 def save_geoiplist():
@@ -157,17 +159,19 @@ def whitelist_check(context, data):
     ip = context.transport.getPeer().host
     badip = True
 
-    if geoip2c:
+    if ip in geoiplist:
+        badip = False
+    elif geoip2c:
         try:
             respone = geoip2c.country(ip)
             place = respone.country.iso_code
             if place in geoiplist:
                 badip = False
         except geoip2.AddressNotFoundError:
-            print("[GeoIP] Could not find %s in GeoIP database)".format(ip))
+            print("[GeoIP] Could not find {} in GeoIP database)".format(ip))
             place = "NULL"
         except Exception as e:
-            print("[GeoIP] Error: %s".format(e))
+            print("[GeoIP] Error: {}".format(e))
             place = "ERROR"
     elif geoip1c:
         try:
@@ -177,16 +181,11 @@ def whitelist_check(context, data):
             elif place in geoiplist:
                 badip = False
         except Exception as e:
-            print("[GeoIP] Error: %s".format(e))
+            print("[GeoIP] Error: {}".format(e))
             place = "ERROR"
-    else:
-        return data
-
-    if ip in geoiplist:
-        badip = False
 
     if badip:
-        print("[GeoIP] %s (IP: %s) is not in the GeoIP whitelist, disconnecting client." % place, ip)
-        context.send_crypto_packet(SystemMessagePacket("You are not on the Geoip whitelist for this proxy, please contact the owner of this proxy.\nDetails:\nCountry Code: %s\nIPv4: %s".format(place, ip), 0x1).build())
+        print("[GeoIP] {} (IP: {}) is not in the GeoIP whitelist, disconnecting client.".format(place, ip))
+        context.send_crypto_packet(SystemMessagePacket("You are not on the Geoip whitelist for this proxy, please contact the owner of this proxy.\nDetails:\nCountry Code: {}\nIPv4: {}".format(place, ip), 0x1).build())
         context.transport.loseConnection()
     return data
