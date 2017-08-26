@@ -47,6 +47,8 @@ def load_geoiplist():
         geoip2c = geoip2.database.Reader('/var/lib/GeoIP/GeoLite2-Country.mmdb')
     except AttributeError:
         None
+    except NameError:
+        None
     except Exception as e:
         print("[GeoIP] GeoIP2 error: {}".format(e))
 
