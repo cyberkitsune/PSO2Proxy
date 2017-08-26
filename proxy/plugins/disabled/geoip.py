@@ -52,11 +52,13 @@ def load_geoiplist():
     except Exception as e:
         print("[GeoIP] GeoIP2 error: {}".format(e))
 
-    if GeoIP.open:
+    if geoip2c is not None:
         try:
             geoip1c = GeoIP.open("/usr/share/GeoIP/GeoIP.dat", GeoIP.GEOIP_MMAP_CACHE | GeoIP.GEOIP_CHECK_CACHE)
             geoip1c.set_charset(GeoIP.GEOIP_CHARSET_UTF8)
         except AttributeError:
+            None
+        except NameError:
             None
         except Exception as e:
             print("[GeoIP] GeoIP1 Error: {}".format(e))
@@ -157,7 +159,7 @@ def whitelist_check(context, data):
     global geoipmode
     if not geoipmode:
         return data
-    place = "NOPE"
+    place = "IPv4"
     ip = context.transport.getPeer().host
     badip = True
 
