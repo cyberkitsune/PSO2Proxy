@@ -9,13 +9,23 @@ import plugins
 try:
     import geoip2
 except ImportError:
-    print("[GeoIP] no GeoIP2 library installed")
+    print("[GeoIP] geoip2 library not installed")
 
 try:
     import GeoIP
 except ImportError:
-    print("[GeoIP] no GeoIP library installed")
+    print("[GeoIP] GeoIP library not installed")
 
+
+cidr = False
+try:
+    from netaddr import IPAddress
+    from netaddr import IPNetwork
+    cidr = True
+except ImportError:
+    print("[GeoIP] netaddr library not installed")
+
+cidrlist = []
 
 geoiplist = []
 
@@ -63,12 +73,32 @@ def load_geoiplist():
         except Exception as e:
             print("[GeoIP] GeoIP1 Error: {}".format(e))
 
+    if cidr:
+        cidrlist = []
+        for x in geoiplist:
+            try:
+                cidrlist.append(IPNetwork(x))
+            except ValueError:
+                None
+            except Exception as e:
+                print("[GeoIP] Error adding CIDR range {} during loading: {}".format(x, e))
+
 
 def save_geoiplist():
     f = open("cfg/pso2proxy.geoip.json", "w")
     f.write(json.dumps(geoiplist))
     f.close()
     print('[GeoIP] Saved whitelist')
+
+    if cidr:
+        cidrlist = []
+        for x in geoiplist:
+            try:
+                cidrlist.append(IPNetwork(x))
+            except ValueError:
+                None
+            except Exception as e:
+                print("[GeoIP] Error adding CIDR range {} during saving: {}".format(x, e))
 
 
 @plugins.CommandHook("geoipmode", "[Admin Only] Toggle geoip mode", True)
@@ -162,6 +192,12 @@ def geoip_check(context, data):
     place = "IPv4"
     ip = context.transport.getPeer().host
     badip = True
+
+    if cidr:
+        ipa = IPAddress(ip)
+        for x in cidrlist:
+            if ipa == x:
+                badip = False
 
     if ip in geoiplist:
         badip = False
