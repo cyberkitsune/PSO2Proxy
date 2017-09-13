@@ -66,7 +66,7 @@ def load_geoiplist():
     except Exception as e:
         print("[GeoIP] GeoIP2 error: {}".format(e))
 
-    if geoip2c is not None:
+    if geoip2c is None:
         try:
             geoip1c = GeoIP.open(geoip2db, GeoIP.GEOIP_CHECK_CACHE)
             geoip1c.set_charset(GeoIP.GEOIP_CHARSET_UTF8)
