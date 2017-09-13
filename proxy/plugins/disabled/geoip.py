@@ -31,9 +31,11 @@ cidrlist = []
 geoiplist = []
 
 GeoSettings = YAMLConfig("cfg/pso2proxy.geoip.config.yml",
-                         {'enabled': True}, True)
+                         {'enabled': True, 'geoip1': "/usr/share/GeoIP/GeoIP.dat", 'geoip2': "/var/lib/GeoIP/GeoLite2-Country.mmdb"}, True)
 
 geoipmode = GeoSettings.get_key('enabled')
+geoip1db = GeoSettings.get_key('geoip1')
+geoip2db = GeoSettings.get_key('geoip2')
 
 geoip2c = None
 geoip1c = None
@@ -55,7 +57,7 @@ def load_geoiplist():
         print("[GeoIP] Loaded %i geoip entries." % len(geoiplist))
 
     try:
-        geoip2c = geoip2.database.Reader('/var/lib/GeoIP/GeoLite2-Country.mmdb')
+        geoip2c = geoip2.database.Reader(geoip1db)
     except AttributeError:
         None
     except NameError:
@@ -65,7 +67,7 @@ def load_geoiplist():
 
     if geoip2c is not None:
         try:
-            geoip1c = GeoIP.open("/usr/share/GeoIP/GeoIP.dat", GeoIP.GEOIP_MMAP_CACHE | GeoIP.GEOIP_CHECK_CACHE)
+            geoip1c = GeoIP.open(geoip2db, GeoIP.GEOIP_MMAP_CACHE | GeoIP.GEOIP_CHECK_CACHE)
             geoip1c.set_charset(GeoIP.GEOIP_CHARSET_UTF8)
         except AttributeError:
             None
