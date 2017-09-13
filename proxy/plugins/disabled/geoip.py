@@ -68,7 +68,7 @@ def load_geoiplist():
 
     if geoip2c is not None:
         try:
-            geoip1c = GeoIP.open(geoip2db, GeoIP.GEOIP_MMAP_CACHE | GeoIP.GEOIP_CHECK_CACHE)
+            geoip1c = GeoIP.open(geoip2db, GeoIP.GEOIP_CHECK_CACHE)
             geoip1c.set_charset(GeoIP.GEOIP_CHARSET_UTF8)
         except AttributeError:
             None
