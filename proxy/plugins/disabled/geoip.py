@@ -20,6 +20,7 @@ except ImportError:
 
 cidr = False
 try:
+    from netaddr import AddrFormatError
     from netaddr import IPAddress
     from netaddr import IPNetwork
     cidr = True
@@ -82,6 +83,8 @@ def load_geoiplist():
             try:
                 cidrlist.append(IPNetwork(x))
             except ValueError:
+                None
+            except AddrFormatError:
                 None
             except Exception as e:
                 print("[GeoIP] Error adding CIDR range {} during loading: {}".format(x, e))
