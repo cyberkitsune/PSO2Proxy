@@ -58,7 +58,7 @@ def load_geoiplist():
         print("[GeoIP] Loaded %i geoip entries." % len(geoiplist))
 
     try:
-        geoip2c = geoip2.database.Reader(geoip1db)
+        geoip2c = geoip2.database.Reader(geoip2db)
     except AttributeError:
         None
     except NameError:
@@ -68,7 +68,7 @@ def load_geoiplist():
 
     if geoip2c is None:
         try:
-            geoip1c = GeoIP.open(geoip2db, GeoIP.GEOIP_CHECK_CACHE)
+            geoip1c = GeoIP.open(geoip1db, GeoIP.GEOIP_CHECK_CACHE)
             geoip1c.set_charset(GeoIP.GEOIP_CHARSET_UTF8)
         except AttributeError:
             None
