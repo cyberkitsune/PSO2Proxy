@@ -235,7 +235,7 @@ def geoip_check(context, data):
         print("Please check your GeoIP settings, IPv4 address {} return as {}".format(ip, place))
     else:
         print("[GeoIP] Connection from {}|{}".format(loc, ip))
-        if badip:
+        if badip and geoipmode:
             print("[GeoIP] {} (IP: {}) is not in the GeoIP whitelist, disconnecting client.".format(loc, ip))
             context.send_crypto_packet(SystemMessagePacket("You are not on the Geoip whitelist for this proxy, please contact the owner of this proxy.\nDetails:\nCountry Code: {}\nIPv4: {}".format(loc, ip), 0x1).build())
             context.transport.loseConnection()
