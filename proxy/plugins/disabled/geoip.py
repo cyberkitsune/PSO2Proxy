@@ -193,19 +193,11 @@ def geoip_check(context, data):
     global geoip2c, geoip1c
     global geoiplist
     global geoipmode
-    place = "IPv4"
+    place = "NONE"
     ip = context.transport.getPeer().host
     badip = True
 
-    if cidr:
-        ipa = IPAddress(ip)
-        for x in cidrlist:
-            if ipa == x:
-                badip = False
-
-    if ip in geoiplist:
-        badip = False
-    elif geoip2c:
+    if geoip2c:
         try:
             respone = geoip2c.country(ip)
             place = respone.country.iso_code
@@ -228,10 +220,24 @@ def geoip_check(context, data):
             print("[GeoIP] Error: {}".format(e))
             place = "ERROR"
 
-    if not geoip:
-        print("[GeoIP] Connection from {}|{}".format(place, ip))
-    elif badip:
-        print("[GeoIP] {} (IP: {}) is not in the GeoIP whitelist, disconnecting client.".format(place, ip))
-        context.send_crypto_packet(SystemMessagePacket("You are not on the Geoip whitelist for this proxy, please contact the owner of this proxy.\nDetails:\nCountry Code: {}\nIPv4: {}".format(place, ip), 0x1).build())
-        context.transport.loseConnection()
+    loc = place
+    if ip in geoiplist:
+        badip = False
+        place = "IPV4"
+    if cidr:
+        ipa = IPAddress(ip)
+        for x in cidrlist:
+            if ipa == x:
+                badip = False
+                place = "CIDR"
+
+    if place == "NONE" or place == "NULL" or place == "ERROR":
+        print("Please check your GeoIP settings, IPv4 address {} return as {}".format(ip, place))
+    else:
+        print("[GeoIP] Connection from {}|{}".format(loc, ip))
+        if badip:
+            print("[GeoIP] {} (IP: {}) is not in the GeoIP whitelist, disconnecting client.".format(loc, ip))
+            context.send_crypto_packet(SystemMessagePacket("You are not on the Geoip whitelist for this proxy, please contact the owner of this proxy.\nDetails:\nCountry Code: {}\nIPv4: {}".format(loc, ip), 0x1).build())
+            context.transport.loseConnection()
+
     return data
