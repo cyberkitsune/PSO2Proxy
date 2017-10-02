@@ -34,7 +34,7 @@ geoiplist = []
 GeoSettings = YAMLConfig("cfg/pso2proxy.geoip.config.yml",
                          {'enabled': True, 'geoip1': "/usr/share/GeoIP/GeoIP.dat", 'geoip2': "/var/lib/GeoIP/GeoLite2-Country.mmdb"}, True)
 
-geoipmode = GeoSettings.get_key('enabled')
+geoipenabled = GeoSettings.get_key('enabled')
 geoip1db = GeoSettings.get_key('geoip1')
 geoip2db = GeoSettings.get_key('geoip2')
 
@@ -110,9 +110,9 @@ def save_geoiplist():
 @plugins.CommandHook("geoipmode", "[Admin Only] Toggle geoip mode", True)
 class geoipmode(commands.Command):
     def call_from_client(self, client):
-        global geoipmode
-        geoipmode = not geoipmode
-        if geoipmode:
+        global geoipenabled
+        geoipenabled = not geoipenabled
+        if geoipenabled:
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[GeoIP] Whitelist turn on.", 0x3).build())
             return
         else:
@@ -120,9 +120,9 @@ class geoipmode(commands.Command):
             return
 
     def call_from_console(self):
-        global geoipmode
-        geoipmode = not geoipmode
-        if geoipmode:
+        global geoipenabled
+        geoipenabled = not geoipenabled
+        if geoipenabled:
             return "[GeoIP] Whitelist turn on."
         else:
             return "[GeoIP] Whitelist turn off."
@@ -192,7 +192,7 @@ def geoip_check(context, data):
     """
     global geoip2c, geoip1c
     global geoiplist
-    global geoipmode
+    global geoipenabled
     place = "NONE"
     ip = context.transport.getPeer().host
     badip = True
@@ -235,13 +235,13 @@ def geoip_check(context, data):
         print("Please check your GeoIP settings, IPv4 address {} return as {}".format(ip, place))
     else:
         print("[GeoIP] Connection from {}|{}".format(loc, ip))
-        if badip and geoipmode:
+        if badip and geoipenabled:
             print("[GeoIP] {} (IP: {}) is not in the GeoIP whitelist, disconnecting client.".format(loc, ip))
             context.send_crypto_packet(SystemMessagePacket("You are not on the Geoip whitelist for this proxy, please contact the owner of this proxy.\nDetails:\nCountry Code: {}\nIPv4: {}".format(loc, ip), 0x1).build())
             context.transport.loseConnection()
         elif badip:
             print("[GeoIP] Not rejecting bad connection")
-        elif not geoipmode:
+        elif not geoipenabled:
             print("[GeoIP] Allowing good connection")
 
     return data
