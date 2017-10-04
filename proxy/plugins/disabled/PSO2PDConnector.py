@@ -94,8 +94,8 @@ def adduser(client):
     sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': len(data.clients.connectedClients)})
 
 
-@plugins.on_client_remove_hook
-def removeuser(client):
+@plugins.on_connection_lost_hook
+def on_loss(client):
     sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': len(data.clients.connectedClients) - 1})
 
 
