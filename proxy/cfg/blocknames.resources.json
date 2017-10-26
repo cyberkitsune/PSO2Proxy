@@ -27,7 +27,7 @@
 ":[共用]やりこみプレイ推奨"          	:":[Shared] Speedrun Play",
 ":[共用]バトルアリーナ"              	:":[Shared] Battle Arena",
 ":[共用]バスタークエスト推奨"        	:":[Shared] Buster Quest",
-"[共用]トリガークエスト推奨"         	:":[Shared] Trigger Quests",
+":[共用]トリガークエスト推奨"        	:":[Shared] Trigger Quests",
 ":ビギナー推奨"                      	:":Beginner",
 ":ノーマル推奨"                      	:":Normal",
 ":ハード推奨"                        	:":Hard",
@@ -48,5 +48,5 @@
 ":撮影向け"                          	:":Video Recording",
 ":プレミアムセット専用"              	:":Premium",
 ":バスタークエスト推奨"              	:":Buster Quest",
-"[共用]トリガークエスト推奨"         	:":Trigger Quests"
+":トリガークエスト推奨"              	:":Trigger Quests"
 }
