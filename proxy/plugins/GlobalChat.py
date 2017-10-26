@@ -224,6 +224,7 @@ if ircMode:
 
 
 def lookup_gchatmode(client_preferences):
+    return 1
     if redisEnabled:
         return 1
     if client_preferences['gchatMode'] is not -1:
