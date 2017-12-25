@@ -70,6 +70,7 @@ class RedisListenThread(threading.Thread):
 def sendCommand(command_dict):
     db_conn.publish("proxy-server-%s" % connector_conf['server_name'], json.dumps(command_dict))
 
+
 thread = RedisListenThread(db_conn)
 
 

@@ -503,6 +503,7 @@ def ci_switchs(cmd):  # decode /ci[1-9] {[1-5]} {t[1-5]} {nw} {s[0-99]}
         count += 1
     return count
 
+
 PSO2_Commands = [
     # Text Bubble Emotes
     ("toge", 0),

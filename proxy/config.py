@@ -119,6 +119,7 @@ def load_block_names():
     else:
         return "[ShipProxy] BlockName file does not exists"
 
+
 load_block_names()
 
 
@@ -140,6 +141,7 @@ def load_ship_names():
             return ("[GlobalChat] Failed to load ship  labels!")
     else:
         return "[GlobalChat] shipslabel file does not exists"
+
 
 load_ship_names()
 

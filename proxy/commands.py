@@ -498,6 +498,7 @@ class ReloadPlugins(Command):
         output += "[ShipProxy] Plugin reloaded!\n"
         return output
 
+
 if useFaulthandler:
     @CommandHandler("dumptraceback", "[Admin Only] Dump stacktrack of Proxy", True)
     class Fault(Command):

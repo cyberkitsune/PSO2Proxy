@@ -96,6 +96,7 @@ class SQLitePreferenceManager(object):
     def __del__(self):
         self.close_db()
 
+
 dbManager = SQLitePreferenceManager()
 
 
