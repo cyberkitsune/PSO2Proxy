@@ -35,6 +35,12 @@ def Maint_check(context, data):
     global maintmode
     if not maintmode:
         return data
-    context.send_crypto_packet(SystemMessagePacket("The PSO2 or PSO2Proxy server is currently undergoing maintenance. Please try again later.", 0x1).build())
+    context.send_crypto_packet
+    (
+        SystemMessagePacket
+        (
+            "The PSO2 or PSO2Proxy server is currently undergoing maintenance. Please try again later.", 0x1
+        ).build()
+    )
     context.transport.loseConnection()
     return data

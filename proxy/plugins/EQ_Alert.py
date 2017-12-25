@@ -50,7 +50,20 @@ try:
 except ImportError:
     agent = RedirectAgent(Agent(reactor))
 
-eqalert_config = config.YAMLConfig("cfg/EQ_Alert.config.yml", {'enabled': True, 'timer': 80, 'debug': False, 'api': "http://pso2.acf.me.uk/api/eq.json", '0': True, '1': True, '2': True, '3': True, '4': True, '5': True, '6': True, '7': True, '8': True, '9': True, 'ircShip': 1, 'User-Agent': "PSO2Proxy"}, True)
+eqalert_config = config.YAMLConfig
+(
+    "cfg/EQ_Alert.config.yml",
+    {
+        'enabled': True,
+        'timer': 80,
+        'debug': False,
+        'api': "http://pso2.acf.me.uk/api/eq.json",
+        '0': True, '1': True, '2': True, '3': True, '4': True,
+        '5': True, '6': True, '7': True, '8': True, '9': True,
+        'ircShip': 1, 'User-Agent': "PSO2Proxy"
+    },
+    True
+)
 
 # HTTP Headers
 ETag_Header = ""
@@ -142,7 +155,11 @@ def EQBody(body):  # 0 is ship1
                 for client in clients.connectedClients.values():
                     try:
                         chandle = client.get_handle()
-                        if chandle is not None and client.preferences.get_preference('eqalert') and ship == (client.preferences.get_preference('eqalert_ship') - 1):
+                        if (
+                            chandle is not None and
+                            client.preferences.get_preference('eqalert') and
+                            ship == (client.preferences.get_preference('eqalert_ship') - 1)
+                        ):
                             chandle.send_crypto_packet(SMPacket)
                     except AttributeError:
                         logdebug("Ship %d: Found a dead client, skipping" % (ship + 1))
