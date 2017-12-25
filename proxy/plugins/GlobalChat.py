@@ -180,7 +180,23 @@ if ircMode:
                 for client in data.clients.connectedClients.values():
                     if client.preferences.get_preference('globalChat') and client.get_handle() is not None:
                         if lookup_gchatmode(client.preferences) == 0:
-                            client.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(self.get_user_id(user.split("!")[0]), "[GIRC] %s" % user.split("!")[0], "[GIRC] %s" % user.split("!")[0], "* %s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(msg).decode('utf-8', 'ignore'))).build())
+                            client.get_handle().send_crypto_packet
+                            (
+                                packetFactory.TeamChatPacket
+                                (
+                                    self.get_user_id
+                                    (
+                                        user.split("!")[0]
+                                    ),
+                                    "[GIRC] %s" % user.split("!")[0],
+                                    "[GIRC] %s" % user.split("!")[0],
+                                    "* %s%s" %
+                                    (
+                                        client.preferences.get_preference('globalChatPrefix'),
+                                        replace_irc_with_pso2(msg).decode('utf-8', 'ignore')
+                                    )
+                                ).build()
+                            )
                         else:
                             client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> * %s" % (user.split("!")[0], "%s%s" % (client.preferences.get_preference('globalChatPrefix'), replace_irc_with_pso2(msg).decode('utf-8', 'ignore'))), 0x3).build())
 
@@ -452,7 +468,19 @@ class GChat(commands.Command):
             return
         print("[GlobalChat] <%s> %s" % (data.players.playerList[client.playerId][0], self.args[3:]))
         if redisEnabled:
-                    PSO2PDConnector.db_conn.publish("plugin-message-gchat", json.dumps({'sender': 0, 'text': self.args[3:], 'server': PSO2PDConnector.connector_conf['server_name'], 'playerName': data.players.playerList[client.playerId][0], 'playerId': client.playerId, 'ship': data.clients.connectedClients[client.playerId].ship}))
+                    PSO2PDConnector.db_conn.publish
+                    (
+                        "plugin-message-gchat", json.dumps
+                        (
+                            {
+                                'sender': 0, 'text': self.args[3:],
+                                'server': PSO2PDConnector.connector_conf['server_name'],
+                                'playerName': data.players.playerList[client.playerId][0],
+                                'playerId': client.playerId,
+                                'ship': data.clients.connectedClients[client.playerId].ship
+                            }
+                        )
+                    )
         if ircMode:
             global ircBot
             if ircBot is not None:
