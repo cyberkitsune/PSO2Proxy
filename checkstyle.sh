@@ -1,1 +1,1 @@
-/usr/bin/python2 /usr/bin/flake8 proxy
+/usr/bin/python2 /usr/bin/flake8 --max-line-length=396 proxy
