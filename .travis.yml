@@ -15,4 +15,4 @@ cache:
   - apt
 
 script:
-  - cd proxy && ./checkstyle.sh
+  - ./checkstyle.sh
