@@ -56,7 +56,11 @@ class ToggleTranslateOut(commands.Command):
             if user_prefs.get_preference('translate_out'):
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Enabled outgoing chat translation.", 0x3).build())
             else:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled outgoing chat translation.", 0x3).build())
+                client.send_crypto_packet
+                (
+                    packetFactory.SystemMessagePacket("[Translate] Disabled outgoing chat translation.", 0x3
+                        ).build()
+                )
 
 
 @p.PacketHook(0x7, 0x0)
@@ -65,7 +69,10 @@ def get_chat_packet(context, packet):
     :type context: ShipProxy.ShipProxy
     """
     try:
-        if context.psoClient and context.playerId and data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out'):
+        if(
+            context.psoClient and context.playerId and
+            data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out')
+        ):
             player_id = struct.unpack_from("<I", packet, 0x8)[0]
             if player_id != 0:  # ???
                 return None
@@ -121,7 +128,10 @@ def get_team_chat_packet(context, packet):
     :type context: ShipProxy.ShipProxy
     """
     try:
-        if context.psoClient and context.playerId and data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out'):
+        if(
+                context.psoClient and context.playerId and
+                data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out')
+        ):
             player_id = struct.unpack_from("<I", packet, 0x8)[0]
             if player_id != 0:  # ???
                 return None

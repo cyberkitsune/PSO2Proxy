@@ -46,12 +46,32 @@ def servercom_handler(message):
         sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': len(data.clients.connectedClients)})
 
 
-connector_conf = config.YAMLConfig("cfg/distributed.cfg.yml", {'db_host': 'localhost', 'db_port': 6379, 'db_id': 0, 'db_pass': '', 'server_name': 'changeme'}, True)
+connector_conf = config.YAMLConfig
+(
+    "cfg/distributed.cfg.yml",
+    {
+        'db_host': 'localhost',
+        'db_port': 6379,
+        'db_id': 0,
+        'db_pass': '',
+        'server_name': 'changeme'
+    },
+    True
+)
 
 if connector_conf['db_pass'] is not '':
-    db_conn = redis.StrictRedis(host=connector_conf['db_host'], port=connector_conf['db_port'], db=connector_conf['db_id'], password=connector_conf['db_pass'])
+    db_conn = redis.StrictRedis(
+        host=connector_conf['db_host'],
+        port=connector_conf['db_port'],
+        db=connector_conf['db_id'],
+        password=connector_conf['db_pass']
+    )
 else:
-    db_conn = redis.StrictRedis(host=connector_conf['db_host'], port=connector_conf['db_port'], db=connector_conf['db_id'])
+    db_conn = redis.StrictRedis(
+        host=connector_conf['db_host'],
+        port=connector_conf['db_port'],
+        db=connector_conf['db_id']
+    )
 
 
 class RedisListenThread(threading.Thread):
@@ -103,4 +123,13 @@ def on_loss(client):
 @plugins.CommandHook("server", "Shows the server you're currently connected to.")
 class ServerCommand(commands.Command):
     def call_from_client(self, client):
-        client.send_crypto_packet(SystemMessagePacket("You are currently connected to %s, on the IP address %s." % (connector_conf['server_name'], config.myIpAddress), 0x3).build())
+        client.send_crypto_packet
+        (
+            SystemMessagePacket
+            (
+                "You are currently connected to %s, on the IP address %s." %
+                (
+                    connector_conf['server_name'], config.myIpAddress
+                ), 0x3
+            ).build()
+        )

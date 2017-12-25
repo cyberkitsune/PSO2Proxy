@@ -51,7 +51,16 @@ try:
 except ImportError:
     agent = RedirectAgent(Agent(reactor))
 
-eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True, 'timer': 60, 'debug': False, '1': "http://pso2.acf.me.uk/pso2eq.txt"}, True)
+eqnotice_config = config.YAMLConfig(
+    "cfg/EQ_Notice.config.yml",
+    {
+        'enabled': True,
+        'timer': 60,
+        'debug': False,
+        '1': "http://pso2.acf.me.uk/pso2eq.txt"
+    },
+    True
+)
 
 # HTTP Headers
 ETag_Headers = ['', '', '', '', '', '', '', '', '', '']
@@ -206,7 +215,11 @@ def EQBody(body, ship):  # 0 is ship1
     for client in clients.connectedClients.values():
         try:
             chandle = client.get_handle()
-            if chandle is not None and client.preferences.get_preference('eqnotice') and ship == (client.preferences.get_preference('eqnotice_ship') - 1):
+            if (
+               chandle is not None and
+               client.preferences.get_preference('eqnotice') and
+               ship == (client.preferences.get_preference('eqnotice_ship') - 1)
+               ):
                 chandle.send_crypto_packet(SMPacket)
         except AttributeError:
             logdebug("Ship %d: Got a dead client, skipping" % (ship + 1))

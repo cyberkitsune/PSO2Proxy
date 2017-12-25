@@ -31,8 +31,16 @@ cidrlist = []
 
 geoiplist = []
 
-GeoSettings = YAMLConfig("cfg/pso2proxy.geoip.config.yml",
-                         {'enabled': True, 'geoip1': "/usr/share/GeoIP/GeoIP.dat", 'geoip2': "/var/lib/GeoIP/GeoLite2-Country.mmdb"}, True)
+GeoSettings = YAMLConfig
+(
+    "cfg/pso2proxy.geoip.config.yml",
+    {
+        'enabled': True,
+        'geoip1': "/usr/share/GeoIP/GeoIP.dat",
+        'geoip2': "/var/lib/GeoIP/GeoLite2-Country.mmdb"
+    },
+    True
+)
 
 geoipenabled = GeoSettings.get_key('enabled')
 geoip1db = GeoSettings.get_key('geoip1')
@@ -40,6 +48,9 @@ geoip2db = GeoSettings.get_key('geoip2')
 
 geoip2c = None
 geoip1c = None
+
+notallowed = "You are not on the Geoip whitelist for this proxy, please " \
+    "contact the owner of this proxy.\nDetails:\nCountry Code: {}\nIPv4: {}"
 
 
 @plugins.on_start_hook
@@ -159,28 +170,65 @@ class geoip(commands.Command):
         global geoiplist
         params = self.args.split(" ")
         if len(params) < 3:
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. (Usage: geoip <add/del> <SegaID>)", 0x3).build())
+            client.send_crypto_packet
+            (
+                packetFactory.SystemMessagePacket
+                (
+                    "[Command] {red}Invalid usage. (Usage: geoip <add/del> <SegaID>)", 0x3
+                ).build()
+            )
             return
         if params[1] == "add" or params[1] == "ADD":
             if params[2] not in geoiplist:
                 geoiplist.append(params[2])
                 save_geoiplist()
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Added %s to the whitelist." % params[2], 0x3).build())
+                client.send_crypto_packet
+                (
+                    packetFactory.SystemMessagePacket
+                    (
+                        "[Command] {gre}Added %s to the whitelist." % params[2], 0x3
+                    ).build()
+                )
                 return
             else:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s is already in the whitelist." % params[2], 0x3).build())
+                client.send_crypto_packet
+                (
+                    packetFactory.SystemMessagePacket
+                    (
+                        "[Command] {red}%s is already in the whitelist." % params[2], 0x3
+                    ).build()
+                )
                 return
         elif params[1] == "del" or params[1] == "DEL":
             if params[2] in geoiplist:
                 geoiplist.remove(params[2])
                 save_geoiplist()
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Removed %s from whitelist." % params[2], 0x3).build())
+                client.send_crypto_packet
+                (
+                    packetFactory.SystemMessagePacket
+                    (
+                        "[Command] {gre}Removed %s from whitelist." % params[2], 0x3
+                    ).build()
+                )
                 return
             else:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s is not in the whitelist, can not delete!" % params[2], 0x3).build())
+                client.send_crypto_packet
+                (
+                    packetFactory.SystemMessagePacket
+                    (
+                        "[Command] {red}%s is not in the whitelist, can not delete!" % params[2], 0x3
+                    ).build()
+                )
                 return
         else:
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. (Usage: whitelist <add/del> <SegaID>)", 0x3).build())
+            client.send_crypto_packet
+            (
+                packetFactory.SystemMessagePacket
+                (
+                    "[Command] {red}Invalid usage. (Usage: whitelist <add/del> <SegaID>)",
+                    0x3
+                ).build()
+            )
             return
 
 
@@ -237,7 +285,14 @@ def geoip_check(context, data):
         print("[GeoIP] Connection from {}|{}".format(loc, ip))
         if badip and geoipenabled:
             print("[GeoIP] {} (IP: {}) is not in the GeoIP whitelist, disconnecting client.".format(loc, ip))
-            context.send_crypto_packet(SystemMessagePacket("You are not on the Geoip whitelist for this proxy, please contact the owner of this proxy.\nDetails:\nCountry Code: {}\nIPv4: {}".format(loc, ip), 0x1).build())
+            context.send_crypto_packet
+            (
+                SystemMessagePacket
+                (
+                    notallowed.format(loc, ip),
+                    0x1
+                ).build()
+            )
             context.transport.loseConnection()
         elif badip:
             print("[GeoIP] Not rejecting bad connection")
