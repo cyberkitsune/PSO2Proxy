@@ -197,7 +197,11 @@ def scrape_ship_packet(ship_ip, ship_port, destination_ip):
         return packetFactory.SystemMessagePacket("PSO2Proxy: PSO2 server dropped the connection midway.", 0x1).build()
     except Exception as e:
         log.msg("[ShipQuery] Scraping %s:%i wrtie return an error: %s" % (ship_ip, ship_port, sys.exc_info()[0]))
-        return packetFactory.SystemMessagePacket("PSO2Proxy: PSO2 server dropped the connection midway due to an error.", 0x1).build()
+        return packetFactory.SystemMessagePacket
+        (
+            "PSO2Proxy: PSO2 server dropped the connection midway due to an error.",
+            0x1
+        ).build()
     s.close()
     data.flush()
     data = bytearray(data.getvalue())

@@ -74,7 +74,14 @@ class SQLitePreferenceManager(object):
             raise KeyError("User data isn't even cached, can't update data!")
         self._db_lock.acquire(True)
         local_cursor = self._db_connection.cursor()
-        local_cursor.execute("UPDATE users SET data = ? WHERE sega_id = ?", (yaml.dump(self.user_preference_cache[sega_id]), str(sega_id)))
+        local_cursor.execute
+        (
+            "UPDATE users SET data = ? WHERE sega_id = ?",
+            (
+                yaml.dump(self.user_preference_cache[sega_id]),
+                str(sega_id)
+            )
+        )
         self._db_connection.commit()
         self._db_lock.release()
 
@@ -150,7 +157,14 @@ def add_client(handle):
     print('[Clients] Registered client %s (ID:%i) in online clients' % (l_my_username, handle.playerId))
     if config.is_player_id_banned(handle.playerId):
         print('[Bans] Player %s (ID:%i) is banned!' % (l_my_username, handle.playerId))
-        handle.send_crypto_packet(packetFactory.SystemMessagePacket("You are banned from connecting to this PSO2Proxy.", 0x1).build())
+        handle.send_crypto_packet
+        (
+            packetFactory.SystemMessagePacket
+            (
+                "You are banned from connecting to this PSO2Proxy.",
+                0x1
+            ).build()
+        )
         handle.transport.loseConnection()
 
 

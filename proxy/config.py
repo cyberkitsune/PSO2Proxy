@@ -85,9 +85,20 @@ class YAMLConfig(object):
 
 banList = []
 
-globalConfig = YAMLConfig("cfg/pso2proxy.config.yml",
-                          {'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 1,
-                           'noisy': False, 'admins': [], 'enabledShips': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'commandPrefix': '!'}, True)
+globalConfig = YAMLConfig
+(
+    "cfg/pso2proxy.config.yml",
+    {
+        'myIpAddr': "0.0.0.0",
+        'bindIp': "0.0.0.0",
+        'blockNameMode': 1,
+        'noisy': False,
+        'admins': [],
+        'enabledShips': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        'commandPrefix': '!'
+    },
+    True
+)
 
 blockNames = {}
 ShipLabel = {}

@@ -88,7 +88,14 @@ class RedisListenThread(threading.Thread):
 
 
 def sendCommand(command_dict):
-    db_conn.publish("proxy-server-%s" % connector_conf['server_name'], json.dumps(command_dict))
+    db_conn.publish
+    (
+        "proxy-server-{}".format
+        (
+            connector_conf['server_name']
+        ),
+        json.dumps(command_dict)
+    )
 
 
 thread = RedisListenThread(db_conn)
@@ -96,31 +103,68 @@ thread = RedisListenThread(db_conn)
 
 @plugins.on_start_hook
 def addServer():
-    sendCommand({'command': "newserver", 'ip': config.myIpAddress, 'name': connector_conf['server_name']})
+    sendCommand
+    (
+        {
+            'command': "newserver",
+            'ip': config.myIpAddress,
+            'name': connector_conf['server_name']
+        }
+    )
     print("[PSO2PD] Registered with redis!")
     global thread
     thread.daemon = True
     thread.start()
-    sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': 0})
+    sendCommand
+    (
+        {
+            'command': "ping",
+            'name': connector_conf['server_name'],
+            'usercount': 0
+        }
+    )
 
 
 @plugins.on_stop_hook
 def removeServer():
-    sendCommand({'command': "delserver", 'name': connector_conf['server_name']})
+    sendCommand
+    (
+        {
+            'command': "delserver",
+            'name': connector_conf['server_name']
+        }
+    )
     print("[PSO2PD] Redis stopped!")
 
 
 @plugins.on_initial_connect_hook
 def adduser(client):
-    sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': len(data.clients.connectedClients)})
+    sendCommand
+    (
+        {
+            'command': "ping",
+            'name': connector_conf['server_name'],
+            'usercount': len(data.clients.connectedClients)
+        }
+    )
 
 
 @plugins.on_connection_lost_hook
 def on_loss(client):
-    sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': len(data.clients.connectedClients) - 1})
+    sendCommand
+    (
+        {
+            'command': "ping",
+            'name': connector_conf['server_name'],
+            'usercount': len(data.clients.connectedClients) - 1
+        }
+    )
 
 
-@plugins.CommandHook("server", "Shows the server you're currently connected to.")
+@plugins.CommandHook(
+    "server",
+    "Shows the server you're currently connected to."
+)
 class ServerCommand(commands.Command):
     def call_from_client(self, client):
         client.send_crypto_packet

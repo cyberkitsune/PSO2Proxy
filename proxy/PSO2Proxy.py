@@ -105,12 +105,14 @@ def main():
         sys.exit(0)
 
     for shipNum in range(0, 10):
-        # PSO2 Checks all ships round robin, so sadly for max compatibility we have to open these no matter what ships are enabled...
+        # PSO2 Checks all ships round robin,
+        # so sadly for max compatibility we have to open these no matter what ships are enabled...
         ship_endpoint = endpoints.TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=interface_ip)
         ship_endpoint.listen(ShipAdvertiserFactoryPC())
 
     for shipNum in range(0, 10):
-        # PSO2 Checks all ships round robin, so sadly for max compatibility we have to open these no matter what ships are enabled...
+        # PSO2 Checks all ships round robin,
+        #  so sadly for max compatibility we have to open these no matter what ships are enabled...
         ship_endpoint = endpoints.TCP4ServerEndpoint(reactor, 12094 + (100 * shipNum), interface=interface_ip)
         ship_endpoint.listen(ShipAdvertiserFactoryVita())
 
