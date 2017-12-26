@@ -140,7 +140,13 @@ def add_client(handle):
     except AttributeError:
         l_my_username = handle.myUsername
 
-    connectedClients[handle.playerId] = ClientData(handle.transport.getPeer().host, l_my_username, get_ship_from_port(handle.transport.getHost().port), handle)
+    connectedClients[handle.playerId] = ClientData
+    (
+        handle.transport.getPeer().host,
+        l_my_username,
+        get_ship_from_port(handle.transport.getHost().port),
+        handle
+    )
     print('[Clients] Registered client %s (ID:%i) in online clients' % (l_my_username, handle.playerId))
     if config.is_player_id_banned(handle.playerId):
         print('[Bans] Player %s (ID:%i) is banned!' % (l_my_username, handle.playerId))

@@ -23,8 +23,23 @@ try:
 except ImportError:
     redisEnabled = False
 
-ircSettings = YAMLConfig("cfg/gchat-irc.config.yml",
-                         {'enabled': False, 'nick': "PSO2IRCBot", 'server': '', 'port': 6667, 'svname': 'NickServ', 'svpass': '', 'channel': "", 'output': True, 'autoexec': [], 'discord': False}, True)
+ircSettings = YAMLConfig
+(
+    "cfg/gchat-irc.config.yml",
+    {
+        'enabled': False,
+        'nick': "PSO2IRCBot",
+        'server': '',
+        'port': 6667,
+        'svname': 'NickServ',
+        'svpass': '',
+        'channel': "",
+        'output': True,
+        'autoexec': [],
+        'discord': False
+    },
+    True
+)
 
 ircBot = None
 ircMode = ircSettings.get_key('enabled')
@@ -259,7 +274,19 @@ if ircMode:
                         else:
                             client.get_handle().send_crypto_packet
                             (
-                                packetFactory.SystemMessagePacket("[GIRC] <%s> %s" % (nickmsg, "%s%s" % (client.preferences.get_preference('globalChatPrefix'), pso2msg)), 0x3).build()
+                                packetFactory.SystemMessagePacket
+                                (
+                                    "[GIRC] <{}> {}".format
+                                    (
+                                        nickmsg,
+                                        "{}{}".format
+                                        (
+                                            client.preferences.get_preference('globalChatPrefix'),
+                                            pso2msg
+                                        )
+                                    ),
+                                    0x3
+                                ).build()
                             )
             else:
                 if not discord:
@@ -386,10 +413,9 @@ def check_config(user):
         if client_preferences.get_preference('globalChat'):
             user.send_crypto_packet(
                 packetFactory.SystemMessagePacket(
-                    "[Proxy] {yel}Global chat is enabled. Use %sg <Message> to chat, %sgoff to disable it, and %sgmode to toggle team/system chat mode." %
+                    "[Proxy] {0}Global chat is enabled. Use {1}g <Message> to chat, {1}goff to disable it, and {1}gmode to toggle team/system chat mode.".format
                     (
-                        config.globalConfig.get_key('commandPrefix'),
-                        config.globalConfig.get_key('commandPrefix'),
+                        "{yel}",
                         config.globalConfig.get_key('commandPrefix')
                     ),
                     0x3
@@ -419,13 +445,34 @@ class GChatModeCommand(commands.Command):
                 client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Global chat will now come through team chat.", 0x3).build())
             elif client_preferences['gchatMode'] == 0:
                 client_preferences['gchatMode'] = 1
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Global chat will now come through system chat.", 0x3).build())
+                client.send_crypto_packet
+                (
+                    packetFactory.SystemMessagePacket
+                    (
+                        "[Command] {gre}Global chat will now come through system chat.",
+                        0x3
+                    ).build()
+                )
             elif client_preferences['gchatMode'] == 1:
                 client_preferences['gchatMode'] = -1
                 if gchatSettings['displayMode'] == 0:
-                    client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Global chat will now come through team chat. (Default)", 0x3).build())
+                    client.send_crypto_packet
+                    (
+                        packetFactory.SystemMessagePacket
+                        (
+                            "[Command] {gre}Global chat will now come through team chat. (Default)",
+                            0x3
+                        ).build()
+                    )
                 else:
-                    client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Global chat will now come through system chat. (Default)", 0x3).build())
+                    client.send_crypto_packet
+                    (
+                        packetFactory.SystemMessagePacket
+                        (
+                            "[Command] {gre}Global chat will now come through system chat. (Default)",
+                            0x3
+                        ).build()
+                    )
 
 
 @plugins.CommandHook("gprefix", "Changes your Global Chat prefix / color.")
@@ -434,7 +481,14 @@ class GPrefixCommand(commands.Command):
         if client.playerId is not None:
             client_prefs = data.clients.connectedClients[client.playerId].preferences
             if len(self.args.split(" ", 1)) < 2:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. Usage: gprefix <Prefix or PSO2 Color Code>", 0x3).build())
+                client.send_crypto_packet
+                (
+                    packetFactory.SystemMessagePacket
+                    (
+                        "[Command] {red}Invalid usage. Usage: gprefix <Prefix or PSO2 Color Code>",
+                        0x3
+                    ).build()
+                )
                 return
             prefix = self.args.split(" ", 1)[1]
             client_prefs['globalChatPrefix'] = prefix
@@ -518,13 +572,46 @@ class MuteSomebody(commands.Command):
                 if player_data[0].rstrip("\0") == user_to_mute:
                     if player_id in data.clients.connectedClients:
                         data.clients.connectedClients[player_id].preferences['chatMuted'] = True
-                        client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Muted %s." % player_data[0].rstrip("\0"), 0x3).build())
+                        client.send_crypto_packet
+                        (
+                            packetFactory.SystemMessagePacket
+                            (
+                                "[Command] {}Muted {}.".format
+                                (
+                                    "{gre}",
+                                    player_data[0].rstrip("\0")
+                                ),
+                                0x3
+                            ).build()
+                        )
                         return
                     else:
-                        client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0"), 0x3).build())
+                        client.send_crypto_packet
+                        (
+                            packetFactory.SystemMessagePacket
+                            (
+                                "[Command] {}{} either is not connected or is not part of the proxy.".format
+                                (
+                                    "{red}",
+                                    player_data[0].rstrip("\0")
+                                ),
+                                0x3
+                            ).build()
+                        )
                         return
 
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s either is not connected or is not part of the proxy." % user_to_mute, 0x3).build())
+        client.send_crypto_packet
+        (
+            packetFactory.SystemMessagePacket
+            (
+                "[Command] {}{} either is not connected or is not part of the proxy.".format
+                (
+                    "{red}",
+                    user_to_mute
+                ),
+                0x3
+            ).build()
+        )
 
     def call_from_console(self):
         if len(self.args.split(" ", 1)) < 2:
@@ -557,7 +644,18 @@ class UnmuteSomebody(commands.Command):
             data.clients.connectedClients[int(user_to_mute)].preferences['chatMuted'] = False
             client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Unmuted %s." % user_to_mute, 0x3).build())
         else:
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s either is not connected or is not part of the proxy." % user_to_mute, 0x3).build())
+            client.send_crypto_packet
+            (
+                packetFactory.SystemMessagePacket
+                (
+                    "[Command] {}{} either is not connected or is not part of the proxy.".format
+                    (
+                        "{red}",
+                        user_to_mute
+                    ),
+                    0x3
+                ).build()
+            )
 
         for player_id, player_data in data.players.playerList.items():
             if player_data[0].rstrip("\0") == user_to_mute:
@@ -565,7 +663,18 @@ class UnmuteSomebody(commands.Command):
                     data.clients.connectedClients[player_id].preferences['chatMuted'] = False
                     client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Unmuted %s." % player_data[0].rstrip("\0"), 0x3).build())
                 else:
-                    client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s either is not connected or is not part of the proxy." % player_data[0].rstrip("\0"), 0x3).build())
+                    client.send_crypto_packet
+                    (
+                        packetFactory.SystemMessagePacket
+                        (
+                            "[Command] {}{} either is not connected or is not part of the proxy.".format
+                            (
+                                "{red}",
+                                player_data[0].rstrip("\0")
+                            ),
+                            0x3
+                        ).build()
+                    )
 
     def call_from_console(self):
         if len(self.args.split(" ", 1)) < 2:
@@ -592,8 +701,18 @@ class GChat(commands.Command):
             client.send_crypto_packet(packetFactory.SystemMessagePacket(
                 "[GlobalChat] You do not have global chat enabled, and can not send a global message.", 0x3).build())
             return
-        if data.clients.connectedClients[client.playerId].preferences.has_preference("chatMuted") and data.clients.connectedClients[client.playerId].preferences['chatMuted']:
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[GChat] {red}You have been muted from GChat and can not talk in it. :(", 0x3).build())
+        if (
+            data.clients.connectedClients[client.playerId].preferences.has_preference("chatMuted") and
+            data.clients.connectedClients[client.playerId].preferences['chatMuted']
+        ):
+            client.send_crypto_packet
+            (
+                packetFactory.SystemMessagePacket
+                (
+                    "[GChat] {red}You have been muted from GChat and can not talk in it. :(",
+                    0x3
+                ).build()
+            )
             return
         print("[GlobalChat] <%s> %s" % (data.players.playerList[client.playerId][0], self.args[3:]))
         if redisEnabled:
@@ -613,7 +732,12 @@ class GChat(commands.Command):
         if ircMode:
             global ircBot
             if ircBot is not None:
-                ircBot.send_global_message(data.clients.connectedClients[client.playerId].ship, data.players.playerList[client.playerId][0].encode('utf-8'), self.args[3:].encode('utf-8'))
+                ircBot.send_global_message
+                (
+                    data.clients.connectedClients[client.playerId].ship,
+                    data.players.playerList[client.playerId][0].encode('utf-8'),
+                    self.args[3:].encode('utf-8')
+                )
         fb = ("G-%02i") % data.clients.connectedClients[client.playerId].ship
         shipl = ShipLabel.get(fb, fb)
         for client_data in data.clients.connectedClients.values():
@@ -641,7 +765,16 @@ class GChat(commands.Command):
                     (
                         packetFactory.SystemMessagePacket
                         (
-                            "[%s] <%s> %s" % (shipl, data.players.playerList[client.playerId][0], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), self.args[3:])), 0x3
+                            "[{}] <{}> {}".format
+                            (
+                                shipl, data.players.playerList[client.playerId][0],
+                                "{}{}".format
+                                (
+                                    client_data.preferences.get_preference('globalChatPrefix'),
+                                    self.args[3:]
+                                )
+                            ),
+                            0x3
                         ).build()
                     )
 

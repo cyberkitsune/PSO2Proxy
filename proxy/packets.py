@@ -179,7 +179,15 @@ def chat_packet(context, data):
     if player_id == 0:  # Probably the wrong way to check, but check if a PSO2 client sent this packet
         message = message.rstrip('\0')
         if len(message) > 2 and message.startswith(config.globalConfig.get_key('commandPrefix')):
-            command = (message.split(' ')[0])[len(config.globalConfig.get_key('commandPrefix')):]  # Get the first word (the command) and strip the prefix'
+            command = (
+                message.split(' ')[0]
+            )[
+                len
+                (
+                    config.globalConfig.get_key('commandPrefix')
+                ):
+            ]
+            # Get the first word (the command) and strip the prefix'
             if command in commands.commandList:
                 try:
                     if commands.commandList[command][2] and not config.is_admin(context.myUsername):
@@ -189,7 +197,14 @@ def chat_packet(context, data):
                     cmd_class = commands.commandList[command][0]
                     cmd_class(message).call_from_client(context)  # Lazy...
                 except Exception as e:
-                    context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}An error occured when trying to run this command.", 0x3).build())
+                    context.send_crypto_packet
+                    (
+                        packetFactory.SystemMessagePacket
+                        (
+                            "[Proxy] {red}An error occured when trying to run this command.",
+                            0x3
+                        ).build()
+                    )
                     e = traceback.format_exc()
                     context.send_crypto_packet(packetFactory.SystemMessagePacket("[{red}ERROR{def}] %s" % e, 0x3).build())
             elif command in plugin_manager.commands:
@@ -201,7 +216,14 @@ def chat_packet(context, data):
                     cmd_class = plugin_manager.commands[command][0]
                     cmd_class(message).call_from_client(context)
                 except Exception as e:
-                    context.send_crypto_packet(packetFactory.SystemMessagePacket("[Proxy] {red}An error occured when trying to run this command.", 0x3).build())
+                    context.send_crypto_packet
+                    (
+                        packetFactory.SystemMessagePacket
+                        (
+                            "[Proxy] {red}An error occured when trying to run this command.",
+                            0x3
+                        ).build()
+                    )
                     e = traceback.format_exc()
                     context.send_crypto_packet(packetFactory.SystemMessagePacket("[{red}ERROR{def}] %s" % e, 0x3).build())
             else:
