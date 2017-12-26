@@ -242,9 +242,25 @@ if ircMode:
                     pso2msg = replace_irc_with_pso2(msg).decode('utf-8', 'ignore')
                     if client.preferences.get_preference('globalChat') and client.get_handle() is not None:
                         if lookup_gchatmode(client.preferences) == 0:
-                            client.get_handle().send_crypto_packet(packetFactory.TeamChatPacket(self.get_user_id(nickmsg), "[GIRC] %s" % nickmsg, "[GIRC] %s" % nickmsg, "%s%s" % (client.preferences.get_preference('globalChatPrefix'), pso2msg)).build())
+                            client.get_handle().send_crypto_packet
+                            (
+                                packetFactory.TeamChatPacket
+                                (
+                                    self.get_user_id(nickmsg),
+                                    "[GIRC] %s" % nickmsg,
+                                    "[GIRC] %s" % nickmsg,
+                                    "%s%s" %
+                                    (
+                                        client.preferences.get_preference('globalChatPrefix'),
+                                        pso2msg
+                                    )
+                                ).build()
+                            )
                         else:
-                            client.get_handle().send_crypto_packet(packetFactory.SystemMessagePacket("[GIRC] <%s> %s" % (nickmsg, "%s%s" % (client.preferences.get_preference('globalChatPrefix'), pso2msg)), 0x3).build())
+                            client.get_handle().send_crypto_packet
+                            (
+                                packetFactory.SystemMessagePacket("[GIRC] <%s> %s" % (nickmsg, "%s%s" % (client.preferences.get_preference('globalChatPrefix'), pso2msg)), 0x3).build()
+                            )
             else:
                 if not discord:
                     print("[IRC] <%s> %s" % (user.encode('ascii', 'ignore'), msg.encode('ascii', 'ignore')))
@@ -607,7 +623,17 @@ class GChat(commands.Command):
                     (
                         packetFactory.TeamChatPacket
                         (
-                            client.playerId, "[%s] %s" % (shipl, data.players.playerList[client.playerId][0]), data.players.playerList[client.playerId][0], "%s%s" % (client_data.preferences.get_preference('globalChatPrefix'), self.args[3:])
+                            client.playerId,
+                            "[%s] %s" %
+                            (
+                                shipl, data.players.playerList[client.playerId][0]
+                            ),
+                            data.players.playerList[client.playerId][0],
+                            "%s%s" %
+                            (
+                                client_data.preferences.get_preference('globalChatPrefix'),
+                                self.args[3:]
+                            )
                         ).build()
                     )
                 else:

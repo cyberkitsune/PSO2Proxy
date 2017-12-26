@@ -140,7 +140,11 @@ class HelpCommand(Command):
                 else:
                     user_command_count += 1
                     string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
-        string += "%ssuhelp - [Admin Only] Display proxy administrator command list.\n\n" % config.globalConfig.get_key('commandPrefix')  # i add this manually because don't know how to get specific command.
+        string += "%ssuhelp - [Admin Only] Display proxy administrator command list.\n\n".format
+        (
+            config.globalConfig.get_key('commandPrefix')
+        )
+        # i add this manually because don't know how to get specific command.
         string += "=== %i commands in total ===" % user_command_count
         client.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
 
