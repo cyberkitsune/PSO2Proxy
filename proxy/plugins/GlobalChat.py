@@ -42,14 +42,14 @@ ircSettings = YAMLConfig
 )
 
 ircBot = None
-ircMode = ircSettings.get_key('enabled')
-ircOutput = ircSettings.get_key('output')
-ircNick = ircSettings.get_key('nick')
-ircServer = (ircSettings.get_key('server'), ircSettings.get_key('port'))
-ircChannel = ircSettings.get_key('channel')
-ircServicePass = ircSettings.get_key('svpass')
-ircServiceName = ircSettings.get_key('svname')
-discord = ircSettings.get_key('discord')
+ircMode = ircSettings['enabled']
+ircOutput = ircSettings['output']
+ircNick = ircSettings['nick']
+ircServer = (ircSettings['server'], ircSettings['port'])
+ircChannel = ircSettings['channel']
+ircServicePass = ircSettings['svpass']
+ircServiceName = ircSettings['svname']
+discord = ircSettings['discord']
 
 gchatSettings = YAMLConfig
 (
@@ -215,7 +215,7 @@ if ircMode:
             if discord:
                 self.msg("&bitlbee", "identify %s" % ircServicePass)
                 self.sendLine("OPER %s %s" % (self.nickname, ircServicePass))
-            for command in ircSettings.get_key('autoexec'):
+            for command in ircSettings['autoexec']:
                 self.sendLine(command)
                 print("[IRC-AUTO] >>> %s" % command)
             task.deferLater(reactor, 15, self.joinChan)
@@ -451,7 +451,7 @@ def check_config(user):
                     "team/system chat mode.".format
                     (
                         "{yel}",
-                        config.globalConfig.get_key('commandPrefix')
+                        config.globalConfig['commandPrefix']
                     ),
                     0x3
                 ).build()
@@ -463,7 +463,7 @@ def check_config(user):
                 "chat mode.".format
                 (
                     "{yel}",
-                    config.globalConfig.get_key('commandPrefix')
+                    config.globalConfig['commandPrefix']
                 ),
                 0x3
             ).build())

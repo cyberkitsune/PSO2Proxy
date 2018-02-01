@@ -25,17 +25,14 @@ def login_message(sender):
         server_name = PSO2PDConnector.connector_conf['server_name']
     except ImportError:
         pass
-    message = login_config.get_key
-    (
-        'message'
-    ).format(
+    message = login_config['message'].format(
         client_name=sender.myUsername,
         client_count=len(data.clients.connectedClients),
         proxy_ver=config.proxy_ver,
-        command_prefix=config.globalConfig.get_key('commandPrefix'),
+        command_prefix=config.globalConfig['commandPrefix'],
         server_name=server_name
     )
-    sender.send_crypto_packet(packetFactory.SystemMessagePacket(message, login_config.get_key('messageType')).build())
+    sender.send_crypto_packet(packetFactory.SystemMessagePacket(message, login_config['messageType']).build())
 
 
 @plugins.CommandHook("reloadloginmessage")

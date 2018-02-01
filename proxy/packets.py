@@ -181,13 +181,13 @@ def chat_packet(context, data):
         'utf-16')  # This is technically improper. Should use the xor byte to check string length (See packetReader)
     if player_id == 0:  # Probably the wrong way to check, but check if a PSO2 client sent this packet
         message = message.rstrip('\0')
-        if len(message) > 2 and message.startswith(config.globalConfig.get_key('commandPrefix')):
+        if len(message) > 2 and message.startswith(config.globalConfig['commandPrefix']):
             command = (
                 message.split(' ')[0]
             )[
                 len
                 (
-                    config.globalConfig.get_key('commandPrefix')
+                    config.globalConfig['commandPrefix']
                 ):
             ]
             # Get the first word (the command) and strip the prefix'

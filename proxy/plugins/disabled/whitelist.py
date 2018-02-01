@@ -10,7 +10,7 @@ whitelist = []
 WLSettings = YAMLConfig("cfg/pso2proxy.whitelist.config.yml",
                         {'enabled': True}, True)
 
-whitelistmode = WLSettings.get_key('enabled')
+whitelistmode = WLSettings['enabled']
 
 
 @plugins.on_start_hook

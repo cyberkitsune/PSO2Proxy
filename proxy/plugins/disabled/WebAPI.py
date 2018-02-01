@@ -39,7 +39,7 @@ class WEBRcon(resource.Resource):
 
     def render_GET(self, request):
         request.setHeader('content-type', "application/json")
-        if 'key' not in request.args or request.args['key'][0] != web_api_config.get_key('webRconKey'):
+        if 'key' not in request.args or request.args['key'][0] != web_api_config['webRconKey']:
             return json.dumps({'success': False, 'reason': "Your RCON key is invalid!"})
         else:
             if 'command' not in request.args:
@@ -84,8 +84,8 @@ class JSONConfig(resource.Resource):
         request.setHeader("content-type", "application/json")
         config_json = {
             'version': 1,
-            "name": web_api_config.get_key('ServerName'),
-            "publickeyurl": "http://%s:%i/publickey.blob" % (hostName, web_api_config.get_key('port')),
+            "name": web_api_config['ServerName'],
+            "publickeyurl": "http://%s:%i/publickey.blob" % (hostName, web_api_config['port']),
             "host": hostName
         }
         return json.dumps(config_json)
@@ -165,13 +165,13 @@ def setup_web_api():
         print("[WebAPI] As a result, webapi will be disabled !!")
         print("[WebAPI] Please fix this and restart the proxy.")
         return
-    web_endpoint = endpoints.TCP4ServerEndpoint(reactor, web_api_config.get_key('port'), interface=interfaceIp)
+    web_endpoint = endpoints.TCP4ServerEndpoint(reactor, web_api_config['port'], interface=interfaceIp)
     web_resource = WebAPI()
     web_resource.putChild("config.json", JSONConfig())
     web_resource.putChild("publickey.blob", PublicKey())
     web_resource.putChild("latest_profile", LatestProfile())
     web_resource.putChild("stacktrace", LatestStackTrace())
-    if web_api_config.get_key('webRconEnabled'):
+    if web_api_config['webRconEnabled']:
         web_resource.putChild("rcon", WEBRcon())
     web_endpoint.listen(server.Site(web_resource))
 

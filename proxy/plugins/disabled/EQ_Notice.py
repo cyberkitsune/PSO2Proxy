@@ -83,9 +83,9 @@ msg_eq = ['', '', '', '', '', '', '', '', '', '']
 eqJP = []
 taskrun = []
 
-eq_mode = eqnotice_config.get_key('enabled')
-tasksec = eqnotice_config.get_key('timer')
-debug = eqnotice_config.get_key('debug')
+eq_mode = eqnotice_config['enabled']
+tasksec = eqnotice_config['timer']
+debug = eqnotice_config['debug']
 
 
 def logdebug(message):
@@ -114,7 +114,7 @@ def load_eqJP_names():
         f.close()
     if not eqJP:
         return
-    for ship in config.globalConfig.get_key('enabledShips'):
+    for ship in config.globalConfig['enabledShips']:
         eqJPd = eqJP.get(data_eq[ship])
         if eqJPd:  # Is there a mapping?
             msg_eq[ship] = "%s (JP: %s@%s:%s JST)" % (eqJPd, data_eq[ship], hour_eq[ship], mins_eq[ship])
@@ -252,9 +252,9 @@ def EQResponse(response, ship=-1):  # 0 is ship1
 def CheckupURL():
     HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']})
     load_eqJP_names()  # Reload file
-    for shipNum in config.globalConfig.get_key('enabledShips'):
+    for shipNum in config.globalConfig['enabledShips']:
         if eqnotice_config.key_exists(str(shipNum)):
-            eq_URL = eqnotice_config.get_key(str(shipNum))
+            eq_URL = eqnotice_config.get_key[str(shipNum)]
         else:
             eq_URL = None
         if eq_URL:

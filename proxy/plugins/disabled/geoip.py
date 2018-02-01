@@ -42,9 +42,9 @@ GeoSettings = YAMLConfig
     True
 )
 
-geoipenabled = GeoSettings.get_key('enabled')
-geoip1db = GeoSettings.get_key('geoip1')
-geoip2db = GeoSettings.get_key('geoip2')
+geoipenabled = GeoSettings['enabled']
+geoip1db = GeoSettings['geoip1']
+geoip2db = GeoSettings['geoip2']
 
 geoip2c = None
 geoip1c = None

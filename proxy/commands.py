@@ -67,7 +67,7 @@ class OpCommand(Command):
                 packetFactory.SystemMessagePacket
                 (
                     "[Proxy] {red}Invalid usage.\n(Usage: %sop <SegaID>)".format(
-                        config.globalConfig.get_key('commandPrefix')
+                        config.globalConfig['commandPrefix']
                     ),
                     0x3
                 ).build()
@@ -75,7 +75,7 @@ class OpCommand(Command):
             return
         player = self.args.split(" ")[1]
         if not config.is_admin(player):
-            current_admins = config.globalConfig.get_key('admins')
+            current_admins = config.globalConfig['admins']
             current_admins.append(player)
             config.globalConfig.set_key('admins', current_admins)
             client.send_crypto_packet(
@@ -90,7 +90,7 @@ class OpCommand(Command):
             return "[ShipProxy] Invalid usage. (Usage: op <SegaID>)"
         player = self.args.split(" ")[1]
         if not config.is_admin(player):
-            current_admins = config.globalConfig.get_key('admins')
+            current_admins = config.globalConfig['admins']
             current_admins.append(player)
             config.globalConfig.set_key('admins', current_admins)
             return "[ShipProxy] %s is now an admin." % player
@@ -108,7 +108,7 @@ class DeopCommand(Command):
                 (
                     "[Proxy] {}Invalid usage.\n(Usage: {}deop <SegaID>)".format(
                         "{red}",
-                        config.globalConfig.get_key('commandPrefix')
+                        config.globalConfig['commandPrefix']
                     ),
                     0x3
                 ).build()
@@ -116,7 +116,7 @@ class DeopCommand(Command):
             return
         player = self.args.split(" ")[1]
         if config.is_admin(player):
-            current_admins = config.globalConfig.get_key('admins')
+            current_admins = config.globalConfig['admins']
             current_admins.remove(player)
             config.globalConfig.set_key('admins', current_admins)
             client.send_crypto_packet(
@@ -131,7 +131,7 @@ class DeopCommand(Command):
             return "[ShipProxy] Invalid usage. (Usage: deop <SegaID>"
         player = self.args.split(" ")[1]
         if not config.is_admin(player):
-            current_admins = config.globalConfig.get_key('admins')
+            current_admins = config.globalConfig['admins']
             current_admins.remove(player)
             config.globalConfig.set_key('admins', current_admins)
             return "[ShipProxy] %s is no longer an admin." % player
@@ -149,22 +149,22 @@ class HelpCommand(Command):
                 if cData[2] is not None:
                     if not cData[2]:
                         user_command_count += 1
-                        string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
+                        string += "%s%s - %s\n\n" % (config.globalConfig['commandPrefix'], command, cData[1])
                 else:
                     user_command_count += 1
-                    string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
+                    string += "%s%s - %s\n\n" % (config.globalConfig['commandPrefix'], command, cData[1])
         for command, cData in sorted(plugin_manager.commands.iteritems()):
             if cData[1] is not None:
                 if cData[2] is not None:
                     if not cData[2]:
                         user_command_count += 1
-                        string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
+                        string += "%s%s - %s\n\n" % (config.globalConfig['commandPrefix'], command, cData[1])
                 else:
                     user_command_count += 1
-                    string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
+                    string += "%s%s - %s\n\n" % (config.globalConfig['commandPrefix'], command, cData[1])
         string += "{}suhelp - [Admin Only] Display proxy administrator command list.\n\n".format
         (
-            config.globalConfig.get_key('commandPrefix')
+            config.globalConfig['commandPrefix']
         )
         # i add this manually because don't know how to get specific command.
         string += "=== %i commands in total ===" % user_command_count
@@ -188,13 +188,13 @@ class HelpCommandADM(Command):
                 if cData[2] is not None:
                     if cData[2]:
                         user_command_count += 1
-                        string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
+                        string += "%s%s - %s\n\n" % (config.globalConfig['commandPrefix'], command, cData[1])
         for command, cData in sorted(plugin_manager.commands.iteritems()):
             if cData[1] is not None:
                 if cData[2] is not None:
                     if cData[2]:
                         user_command_count += 1
-                        string += "%s%s - %s\n\n" % (config.globalConfig.get_key('commandPrefix'), command, cData[1])
+                        string += "%s%s - %s\n\n" % (config.globalConfig['commandPrefix'], command, cData[1])
         string += "=== %i commands in total ===" % user_command_count
         client.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
 
@@ -246,7 +246,7 @@ class Ban(Command):
                 (
                     "[Command] {}Invalid usage.\n(Usage: {}ban <SegaID/PlayerID> <value>)".format(
                         "{red}",
-                        config.globalConfig.get_key('commandPrefix')
+                        config.globalConfig['commandPrefix']
                     ),
                     0x3
                 ).build()
@@ -304,7 +304,7 @@ class Unban(Command):
                 (
                     "[Command] {}Invalid usage.\n(Usage: {}unban <SegaID/PlayerID> <value>)".format(
                         "{red",
-                        config.globalConfig.get_key('commandPrefix')
+                        config.globalConfig['commandPrefix']
                     ),
                     0x3
                 ).build()
@@ -335,7 +335,7 @@ class Unban(Command):
                 (
                     "[Command] {red}Invalid usage. \n(Usage: %sunban <SegaID/PlayerID> <value>)".foramt
                     (
-                        config.globalConfig.get_key('commandPrefix')
+                        config.globalConfig['commandPrefix']
                     ),
                     0x3
                 ).build()
@@ -371,7 +371,7 @@ class Kick(Command):
                     "[Command] {}Invalid usage.\n(Usage: {}kick <PlayerID>)".format
                     (
                         "{red}",
-                        config.globalConfig.get_key('commandPrefix')
+                        config.globalConfig['commandPrefix']
                     ),
                     0x3
                 ).build()
@@ -486,7 +486,7 @@ class GlobalMessage(Command):
                     "[Command] {}Invalid usage.\n(Usage: {}globalmsg  <message>)".format
                     (
                         "{red}",
-                        config.globalConfig.get_key('commandPrefix')
+                        config.globalConfig['commandPrefix']
                     ),
                     0x3
                 ).build()

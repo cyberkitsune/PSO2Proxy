@@ -116,7 +116,7 @@ def main():
         ship_endpoint = endpoints.TCP4ServerEndpoint(reactor, 12094 + (100 * shipNum), interface=interface_ip)
         ship_endpoint.listen(ShipAdvertiserFactoryVita())
 
-    for shipNum in config.globalConfig.get_key('enabledShips'):
+    for shipNum in config.globalConfig['enabledShips']:
         query_endpoint = endpoints.TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=interface_ip)
         query_endpoint.listen(BlockScraperFactory())
         print("[ShipProxy] Bound port %i for ship %i query server!" % ((12000 + (100 * shipNum)), shipNum))

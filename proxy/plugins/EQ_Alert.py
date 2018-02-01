@@ -79,9 +79,9 @@ data_eq = ['', '', '', '', '', '', '', '', '', '']
 
 taskrun = []
 
-eq_mode = eqalert_config.get_key('enabled')
-tasksec = eqalert_config.get_key('timer')
-debug = eqalert_config.get_key('debug')
+eq_mode = eqalert_config['enabled']
+tasksec = eqalert_config['timer']
+debug = eqalert_config['debug']
 
 
 def logdebug(message):
@@ -110,7 +110,7 @@ def EQBody(body):  # 0 is ship1
     logdebug("New data from API.")
     HTTP_Data = APIResponse
 
-    for ship in config.globalConfig.get_key('enabledShips'):
+    for ship in config.globalConfig['enabledShips']:
         if eqalert_config.key_exists(str(ship)):
 
             try:
@@ -148,7 +148,7 @@ def EQBody(body):  # 0 is ship1
                 SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report: %s" % (data_eq[ship]), 0x0).build()
                 if useGlobalChat:
                     if eqalert_config.key_exists('ircShip'):
-                        ircShip = eqalert_config.get_key('ircShip')  # Get the Ship to send notices for on IRC
+                        ircShip = eqalert_config['ircShip']  # Get the Ship to send notices for on IRC
                         if GlobalChat.ircMode and GlobalChat.ircBot is not None and ship == ircShip:
                             msg = "[EQ Alert Ship %02d] Incoming EQ Report: %s" % (ship + 1, data_eq[ship])
                             GlobalChat.ircBot.send_channel_message(msg.encode('utf-8'))
@@ -193,11 +193,11 @@ def EQResponse(response):
 
 def CheckupURL():
     if eqalert_config.key_exists('User-Agent'):  # We need to send a User-Agent
-        HTTPHeader0 = Headers({'User-Agent': [eqalert_config.get_key('User-Agent')]})
+        HTTPHeader0 = Headers({'User-Agent': [eqalert_config['User-Agent']]})
     else:
         HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']})
     if eqalert_config.key_exists('api'):
-        eq_URL = eqalert_config.get_key('api')
+        eq_URL = eqalert_config['api']
     else:
         eq_URL = None
     if eq_URL:
