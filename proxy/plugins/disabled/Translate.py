@@ -49,18 +49,14 @@ class ToggleTranslateIn(commands.Command):
             user_prefs = data.clients.connectedClients[client.playerId].preferences
             user_prefs.set_preference('translate_chat', not user_prefs.get_preference('translate_chat'))
             if user_prefs.get_preference('translate_chat'):
-                client.send_crypto_packet
-                (
-                    packetFactory.SystemMessagePacket
-                    (
+                client.send_crypto_packet(
+                    packetFactory.SystemMessagePacket(
                         "[Translate] Enabled incoming chat translation.", 0x3
                     ).build()
                 )
             else:
-                client.send_crypto_packet
-                (
-                    packetFactory.SystemMessagePacket
-                    (
+                client.send_crypto_packet(
+                    packetFactory.SystemMessagePacket(
                         "[Translate] Disabled incoming chat translation.", 0x3
                     ).build()
                 )
@@ -73,18 +69,14 @@ class ToggleTranslateOut(commands.Command):
             user_prefs = data.clients.connectedClients[client.playerId].preferences
             user_prefs.set_preference('translate_out', not user_prefs.get_preference('translate_out'))
             if user_prefs.get_preference('translate_out'):
-                client.send_crypto_packet
-                (
-                    packetFactory.SystemMessagePacket
-                    (
+                client.send_crypto_packet(
+                    packetFactory.SystemMessagePacket(
                         "[Translate] Enabled outgoing chat translation.", 0x3
                     ).build()
                 )
             else:
-                client.send_crypto_packet
-                (
-                    packetFactory.SystemMessagePacket
-                    (
+                client.send_crypto_packet(
+                    packetFactory.SystemMessagePacket(
                         "[Translate] Disabled outgoing chat translation.", 0x3
                     ).build()
                 )

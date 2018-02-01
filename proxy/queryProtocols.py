@@ -13,8 +13,7 @@ class BlockScraper(protocol.Protocol):
     def connectionMade(self):
         port = self.transport.getHost().port
         print(
-            "[BlockQuery] {}:{} wants to load-balance on port {}!".format
-            (
+            "[BlockQuery] {}:{} wants to load-balance on port {}!".format(
                 self.transport.getPeer().host,
                 self.transport.getPeer().port,
                 port

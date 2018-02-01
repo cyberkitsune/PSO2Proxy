@@ -45,10 +45,8 @@ class Command(object):
         """
         :param client: ShipProxy.ShipProxy
         """
-        client.send_crypto_packet
-        (
-            packetFactory.SystemMessagePacket
-            (
+        client.send_crypto_packet(
+            packetFactory.SystemMessagePacket(
                 "[Command] {red}That command cannot be run in-game.",
                 0x3
             ).build()
@@ -62,10 +60,8 @@ class Command(object):
 class OpCommand(Command):
     def call_from_client(self, client):
         if len(self.args.split(" ")) < 2:
-            client.send_crypto_packet
-            (
-                packetFactory.SystemMessagePacket
-                (
+            client.send_crypto_packet(
+                packetFactory.SystemMessagePacket(
                     "[Proxy] {red}Invalid usage.\n(Usage: %sop <SegaID>)".format(
                         config.globalConfig['commandPrefix']
                     ),
@@ -102,10 +98,8 @@ class OpCommand(Command):
 class DeopCommand(Command):
     def call_from_client(self, client):
         if len(self.args.split(" ")) < 2:
-            client.send_crypto_packet
-            (
-                packetFactory.SystemMessagePacket
-                (
+            client.send_crypto_packet(
+                packetFactory.SystemMessagePacket(
                     "[Proxy] {}Invalid usage.\n(Usage: {}deop <SegaID>)".format(
                         "{red}",
                         config.globalConfig['commandPrefix']
@@ -162,8 +156,7 @@ class HelpCommand(Command):
                 else:
                     user_command_count += 1
                     string += "%s%s - %s\n\n" % (config.globalConfig['commandPrefix'], command, cData[1])
-        string += "{}suhelp - [Admin Only] Display proxy administrator command list.\n\n".format
-        (
+        string += "{}suhelp - [Admin Only] Display proxy administrator command list.\n\n".format(
             config.globalConfig['commandPrefix']
         )
         # i add this manually because don't know how to get specific command.
@@ -171,8 +164,7 @@ class HelpCommand(Command):
         client.send_crypto_packet(packetFactory.SystemMessagePacket(string, 0x2).build())
 
     def call_from_console(self):
-        return "=== PSO2Proxy Commands ===\n -- {}\n -- {}\n=== PSO2Proxy Commands ===".format
-        (
+        return "=== PSO2Proxy Commands ===\n -- {}\n -- {}\n=== PSO2Proxy Commands ===".format(
             '\n -- '.join(commandList.keys()),
             '\n -- '.join(plugin_manager.commands.keys())
         )
@@ -240,10 +232,8 @@ class Ban(Command):
     def call_from_client(self, client):
         args = self.args.split(' ')
         if len(args) < 3:
-            client.send_crypto_packet
-            (
-                packetFactory.SystemMessagePacket
-                (
+            client.send_crypto_packet(
+                packetFactory.SystemMessagePacket(
                     "[Command] {}Invalid usage.\n(Usage: {}ban <SegaID/PlayerID> <value>)".format(
                         "{red}",
                         config.globalConfig['commandPrefix']
@@ -298,10 +288,8 @@ class Unban(Command):
     def call_from_client(self, client):
         args = self.args.split(' ')
         if len(args) < 3:
-            client.send_crypto_packet
-            (
-                packetFactory.SystemMessagePacket
-                (
+            client.send_crypto_packet(
+                packetFactory.SystemMessagePacket(
                     "[Command] {}Invalid usage.\n(Usage: {}unban <SegaID/PlayerID> <value>)".format(
                         "{red",
                         config.globalConfig['commandPrefix']
@@ -329,12 +317,9 @@ class Unban(Command):
                 packetFactory.SystemMessagePacket("[Command] {gre}%s has been unbanned." % args[2], 0x3).build())
             config.save_bans()
         else:
-            client.send_crypto_packet
-            (
-                packetFactory.SystemMessagePacket
-                (
-                    "[Command] {red}Invalid usage. \n(Usage: %sunban <SegaID/PlayerID> <value>)".foramt
-                    (
+            client.send_crypto_packet(
+                packetFactory.SystemMessagePacket(
+                    "[Command] {red}Invalid usage. \n(Usage: %sunban <SegaID/PlayerID> <value>)".foramt(
                         config.globalConfig['commandPrefix']
                     ),
                     0x3
@@ -366,10 +351,8 @@ class Kick(Command):
         args = self.args.split(' ')
         if len(args) < 2:
             client.send_crypto_packet(
-                packetFactory.SystemMessagePacket
-                (
-                    "[Command] {}Invalid usage.\n(Usage: {}kick <PlayerID>)".format
-                    (
+                packetFactory.SystemMessagePacket(
+                    "[Command] {}Invalid usage.\n(Usage: {}kick <PlayerID>)".format(
                         "{red}",
                         config.globalConfig['commandPrefix']
                     ),
@@ -401,10 +384,8 @@ class Kick(Command):
             return "[Command] {red}%s is not a number." % args[1]
         if int(args[1]) in data.clients.connectedClients:
             if data.clients.connectedClients[int(args[1])].get_handle() is not None:
-                data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet
-                (
-                    packetFactory.SystemMessagePacket
-                    (
+                data.clients.connectedClients[int(args[1])].get_handle().send_crypto_packet(
+                    packetFactory.SystemMessagePacket(
                         "[Proxy] You have been disconnected from the proxy by an admin.",
                         0x1
                     ).build()
@@ -479,12 +460,9 @@ class GlobalMessage(Command):
         message = None
         print(self.args)
         if len(self.args.split(' ', 1)) < 2:
-            client.send_crypto_packet
-            (
-                packetFactory.SystemMessagePacket
-                (
-                    "[Command] {}Invalid usage.\n(Usage: {}globalmsg  <message>)".format
-                    (
+            client.send_crypto_packet(
+                packetFactory.SystemMessagePacket(
+                    "[Command] {}Invalid usage.\n(Usage: {}globalmsg  <message>)".format(
                         "{red}",
                         config.globalConfig['commandPrefix']
                     ),
@@ -546,8 +524,7 @@ class Profiler(Command):
         if profile is None:
             profile = cProfile.Profile()
             profile.enable()
-            SMPacket = packetFactory.SystemMessagePacket
-            (
+            SMPacket = packetFactory.SystemMessagePacket(
                 "[Proxy Notice] Profiling mode has been enabled, expect lag while this runs.",
                 0x0
             ).build()
@@ -564,8 +541,7 @@ class Profiler(Command):
             shutil.copy(out.name, "latest_profile.txt")
             out.close()
             profile = None
-            SMPacket = packetFactory.SystemMessagePacket
-            (
+            SMPacket = packetFactory.SystemMessagePacket(
                 "[Proxy Notice] Profiling mode has been disabled, any lag caused by this should subside.",
                 0x0
             ).build()

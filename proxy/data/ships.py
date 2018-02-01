@@ -60,10 +60,8 @@ def get_first_block(ship_port, destination_ip):
     if ship_port not in cachedBlocks:
         cachedBlocks[ship_port] = {
             'time_scraped': time.time(),
-            'data': scrape_block_packet
-            (
-                blockShipList[ship_port],
-                (ship_port if (ship_port != 13000) else 12000),
+            'data': scrape_block_packet(
+                blockShipList[ship_port],(ship_port if (ship_port != 13000) else 12000),
                 destination_ip
             )
         }
@@ -75,10 +73,8 @@ def get_first_block(ship_port, destination_ip):
     if current_time > last_time + (60 * 3):
         cachedBlocks[ship_port] = {
             'time_scraped': time.time(),
-            'data': scrape_block_packet
-            (
-                blockShipList[ship_port],
-                (ship_port if (ship_port != 13000) else 12000),
+            'data': scrape_block_packet(
+                blockShipList[ship_port],(ship_port if (ship_port != 13000) else 12000),
                 destination_ip
             )
         }
@@ -96,8 +92,7 @@ def get_ship_query(my_ip_address, client_ip_address):
     if client_ip_address in brokenlist:
         brokenlist.remove(client_ip_address)
         print("[ShipQuery] Rejecting broken client %s" % client_ip_address)
-        return packetFactory.SystemMessagePacket
-        (
+        return packetFactory.SystemMessagePacket(
             "PSO2Proxy: Double check that you're using the correct public key file and have PSO2Proxy.dll enabled.",
             0x1
         ).build()
@@ -197,8 +192,7 @@ def scrape_ship_packet(ship_ip, ship_port, destination_ip):
         return packetFactory.SystemMessagePacket("PSO2Proxy: PSO2 server dropped the connection midway.", 0x1).build()
     except Exception as e:
         log.msg("[ShipQuery] Scraping %s:%i wrtie return an error: %s" % (ship_ip, ship_port, sys.exc_info()[0]))
-        return packetFactory.SystemMessagePacket
-        (
+        return packetFactory.SystemMessagePacket(
             "PSO2Proxy: PSO2 server dropped the connection midway due to an error.",
             0x1
         ).build()

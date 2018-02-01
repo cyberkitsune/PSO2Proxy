@@ -87,10 +87,8 @@ class RedisListenThread(threading.Thread):
 
 
 def sendCommand(command_dict):
-    db_conn.publish
-    (
-        "proxy-server-{}".format
-        (
+    db_conn.publish(
+        "proxy-server-{}".format(
             connector_conf['server_name']
         ),
         json.dumps(command_dict)
@@ -102,8 +100,7 @@ thread = RedisListenThread(db_conn)
 
 @plugins.on_start_hook
 def addServer():
-    sendCommand
-    (
+    sendCommand(
         {
             'command': "newserver",
             'ip': config.myIpAddress,
@@ -114,8 +111,7 @@ def addServer():
     global thread
     thread.daemon = True
     thread.start()
-    sendCommand
-    (
+    sendCommand(
         {
             'command': "ping",
             'name': connector_conf['server_name'],
@@ -126,8 +122,7 @@ def addServer():
 
 @plugins.on_stop_hook
 def removeServer():
-    sendCommand
-    (
+    sendCommand(
         {
             'command': "delserver",
             'name': connector_conf['server_name']
@@ -138,8 +133,7 @@ def removeServer():
 
 @plugins.on_initial_connect_hook
 def adduser(client):
-    sendCommand
-    (
+    sendCommand(
         {
             'command': "ping",
             'name': connector_conf['server_name'],
@@ -150,8 +144,7 @@ def adduser(client):
 
 @plugins.on_connection_lost_hook
 def on_loss(client):
-    sendCommand
-    (
+    sendCommand(
         {
             'command': "ping",
             'name': connector_conf['server_name'],
@@ -166,12 +159,9 @@ def on_loss(client):
 )
 class ServerCommand(commands.Command):
     def call_from_client(self, client):
-        client.send_crypto_packet
-        (
-            SystemMessagePacket
-            (
-                "You are currently connected to %s, on the IP address %s." %
-                (
+        client.send_crypto_packet(
+            SystemMessagePacket(
+                "You are currently connected to %s, on the IP address %s." %(
                     connector_conf['server_name'], config.myIpAddress
                 ), 0x3
             ).build()

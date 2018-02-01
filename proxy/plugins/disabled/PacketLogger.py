@@ -37,19 +37,15 @@ def notify_and_config(client):
     if 'logPackets' not in client_config:
         client_config['logPackets'] = False
     if client_config['logPackets']:
-        client.send_crypto_packet
-        (
-            packetFactory.SystemMessagePacket
-            (
+        client.send_crypto_packet(
+            packetFactory.SystemMessagePacket(
                 msgin,
                 0x3
             ).build()
         )
     else:
-        client.send_crypto_packet
-        (
-            packetFactory.SystemMessagePacket
-            (
+        client.send_crypto_packet(
+            packetFactory.SystemMessagePacket(
                 msgout,
                 0x3
             ).build()
@@ -64,10 +60,8 @@ class OptIn(commands.Command):
             "http://pso2proxy.cyberkitsune.net/redpill/"
         client_config = dbManager.get_data_for_sega_id(client.myUsername)
         client_config['logPackets'] = True
-        client.send_crypto_packet
-        (
-            packetFactory.SystemMessagePacket
-            (
+        client.send_crypto_packet(
+            packetFactory.SystemMessagePacket(
                 msg,
                 0x3
             ).build()
@@ -80,10 +74,8 @@ class OptOut(commands.Command):
         archive_packets(client)
         client_config = dbManager.get_data_for_sega_id(client.myUsername)
         client_config['logPackets'] = True
-        client.send_crypto_packet
-        (
-            packetFactory.SystemMessagePacket
-            (
+        client.send_crypto_packet(
+            packetFactory.SystemMessagePacket(
                 "[PacketLogging] {red}You have disabled packet logging! :( If you change your mind, please use !optin to rejoin!",
                 0x3
             ).build()

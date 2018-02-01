@@ -185,8 +185,7 @@ def chat_packet(context, data):
             command = (
                 message.split(' ')[0]
             )[
-                len
-                (
+                len(
                     config.globalConfig['commandPrefix']
                 ):
             ]
@@ -200,10 +199,8 @@ def chat_packet(context, data):
                     cmd_class = commands.commandList[command][0]
                     cmd_class(message).call_from_client(context)  # Lazy...
                 except Exception as e:
-                    context.send_crypto_packet
-                    (
-                        packetFactory.SystemMessagePacket
-                        (
+                    context.send_crypto_packet(
+                        packetFactory.SystemMessagePacket(
                             "[Proxy] {red}An error occured when trying to run this command.",
                             0x3
                         ).build()
@@ -219,10 +216,8 @@ def chat_packet(context, data):
                     cmd_class = plugin_manager.commands[command][0]
                     cmd_class(message).call_from_client(context)
                 except Exception as e:
-                    context.send_crypto_packet
-                    (
-                        packetFactory.SystemMessagePacket
-                        (
+                    context.send_crypto_packet(
+                        packetFactory.SystemMessagePacket(
                             "[Proxy] {red}An error occured when trying to run this command.",
                             0x3
                         ).build()
