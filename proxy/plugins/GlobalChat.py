@@ -421,7 +421,7 @@ def check_config(user):
         else:
             user.send_crypto_packet(packetFactory.SystemMessagePacket(
                 "[Proxy] {0}Global chat is disabled. Use {1}gon to enable it,"
-                " {1}g <Message> to chat, and {}gmode to toggle team/system "
+                " {1}g <Message> to chat, and {1}gmode to toggle team/system "
                 "chat mode.".format(
                     "{yel}",
                     config.globalConfig['commandPrefix']
