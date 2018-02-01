@@ -1,8 +1,8 @@
 import calendar
 import commands
+import config
 from config import bindIp as interfaceIp
 from config import myIpAddress as hostName
-from config import YAMLConfig as ConfigModel
 
 import data.blocks
 import data.clients
@@ -18,8 +18,7 @@ from twisted.internet import endpoints
 from twisted.internet import reactor
 from twisted.web import resource
 
-web_api_config = ConfigModel
-(
+web_api_config = config.YAMLConfig(
     "cfg/webapi.config.yml",
     {
         "port": 8080,

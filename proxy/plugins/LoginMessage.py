@@ -4,8 +4,7 @@ import data.clients
 import packetFactory
 import plugins
 
-login_config = config.YAMLConfig
-(
+login_config = config.YAMLConfig(
     "cfg/loginmessage.config.yml",
     {
         'message': "{{yel}}Welcome to PSO2Proxy build {proxy_ver} "

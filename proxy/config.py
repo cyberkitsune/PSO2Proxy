@@ -85,8 +85,7 @@ class YAMLConfig(object):
 
 banList = []
 
-globalConfig = YAMLConfig
-(
+globalConfig = YAMLConfig(
     "cfg/pso2proxy.config.yml",
     {
         'myIpAddr': "0.0.0.0",

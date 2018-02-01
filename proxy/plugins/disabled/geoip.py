@@ -1,5 +1,5 @@
 import commands
-from config import YAMLConfig
+import config
 import json
 import os
 import packetFactory
@@ -31,8 +31,7 @@ cidrlist = []
 
 geoiplist = []
 
-GeoSettings = YAMLConfig
-(
+GeoSettings = config.YAMLConfig(
     "cfg/pso2proxy.geoip.config.yml",
     {
         'enabled': True,

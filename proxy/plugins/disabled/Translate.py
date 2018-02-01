@@ -1,5 +1,5 @@
 import commands
-from config import YAMLConfig
+import config
 import data.clients
 import packetFactory
 from PSO2DataTools import check_pso2_with_irc
@@ -11,7 +11,14 @@ from unicodescript import script
 
 import plugins as p
 
-plugin_config = YAMLConfig("cfg/translator.config.yml", {"translationService": 0, "msTranslateID": '', "msTranslateSecret": ''})
+plugin_config = config.YAMLConfig(
+    "cfg/translator.config.yml",
+    {
+        "translationService": 0,
+        "msTranslateID": '',
+        "msTranslateSecret": ''
+    }
+)
 if plugin_config['translationService'] == 1 and plugin_config['msTranslateID'] != '' and plugin_config['msTranslateSecret'] != '':
     import microsofttranslator
     provider = "Bing"

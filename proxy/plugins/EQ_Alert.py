@@ -50,8 +50,7 @@ try:
 except ImportError:
     agent = RedirectAgent(Agent(reactor))
 
-eqalert_config = config.YAMLConfig
-(
+eqalert_config = config.YAMLConfig(
     "cfg/EQ_Alert.config.yml",
     {
         'enabled': True,

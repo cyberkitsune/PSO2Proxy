@@ -1,5 +1,5 @@
 import commands
-from config import YAMLConfig
+import config
 import json
 import os
 import packetFactory
@@ -7,8 +7,10 @@ from packetFactory import SystemMessagePacket
 import plugins
 whitelist = []
 
-WLSettings = YAMLConfig("cfg/pso2proxy.whitelist.config.yml",
-                        {'enabled': True}, True)
+WLSettings = config.YAMLConfig(
+    "cfg/pso2proxy.whitelist.config.yml",
+    {'enabled': True}, True
+)
 
 whitelistmode = WLSettings['enabled']
 

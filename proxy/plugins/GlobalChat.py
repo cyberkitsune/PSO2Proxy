@@ -1,7 +1,6 @@
 import commands
 import config
 from config import ShipLabel
-from config import YAMLConfig
 import data.clients
 import data.players
 import json
@@ -23,8 +22,7 @@ try:
 except ImportError:
     redisEnabled = False
 
-ircSettings = YAMLConfig
-(
+ircSettings = config.YAMLConfig(
     "cfg/gchat-irc.config.yml",
     {
         'enabled': False,
@@ -51,8 +49,7 @@ ircServicePass = ircSettings['svpass']
 ircServiceName = ircSettings['svname']
 discord = ircSettings['discord']
 
-gchatSettings = YAMLConfig
-(
+gchatSettings = config.YAMLConfig(
     "cfg/gchat.config.yml",
     {
         'displayMode': 0,

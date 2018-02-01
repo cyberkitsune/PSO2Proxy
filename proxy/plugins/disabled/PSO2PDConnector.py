@@ -46,8 +46,7 @@ def servercom_handler(message):
         sendCommand({'command': "ping", 'name': connector_conf['server_name'], 'usercount': len(data.clients.connectedClients)})
 
 
-connector_conf = config.YAMLConfig
-(
+connector_conf = config.YAMLConfig(
     "cfg/distributed.cfg.yml",
     {
         'db_host': 'localhost',
