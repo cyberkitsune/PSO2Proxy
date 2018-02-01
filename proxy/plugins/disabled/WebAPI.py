@@ -48,7 +48,7 @@ class WEBRcon(resource.Resource):
                     if request.args['command'][0] in commands.commandList:
                         cmd_class = commands.commandList[request.args['command'][0]][0]
                         result = cmd_class(
-                            "%s %s" %(
+                            "%s %s" % (
                                 request.args['command'][0],
                                 request.args['params'][0] if 'params' in request.args else None
                             )
@@ -57,7 +57,7 @@ class WEBRcon(resource.Resource):
                     elif request.args['command'][0] in pluginCommands:
                         cmd_class = pluginCommands[request.args['command'][0]][0]
                         result = cmd_class(
-                            "%s %s" %(
+                            "%s %s" % (
                                 request.args['command'][0],
                                 request.args['params'][0] if 'params' in request.args else None
                             )

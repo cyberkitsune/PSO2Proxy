@@ -75,7 +75,8 @@ class SQLitePreferenceManager(object):
         self._db_lock.acquire(True)
         local_cursor = self._db_connection.cursor()
         local_cursor.execute(
-            "UPDATE users SET data = ? WHERE sega_id = ?",(
+            "UPDATE users SET data = ? WHERE sega_id = ?",
+            (
                 yaml.dump(self.user_preference_cache[sega_id]),
                 str(sega_id)
             )
