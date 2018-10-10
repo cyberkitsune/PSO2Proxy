@@ -51,32 +51,41 @@ try:
 except ImportError:
     agent = RedirectAgent(Agent(reactor))
 
-eqnotice_config = config.YAMLConfig("cfg/EQ_Notice.config.yml", {'enabled': True, 'timer': 60, 'debug': False, '1': "http://pso2.acf.me.uk/pso2eq.txt"}, True)
+eqnotice_config = config.YAMLConfig(
+    "cfg/EQ_Notice.config.yml",
+    {
+        'enabled': True,
+        'timer': 60,
+        'debug': False,
+        '1': "http://pso2.acf.me.uk/pso2eq.txt"
+    },
+    True
+)
 
 # HTTP Headers
-ETag_Headers     = ['', '', '', '', '', '', '', '', '', '']
+ETag_Headers = ['', '', '', '', '', '', '', '', '', '']
 Modified_Headers = ['', '', '', '', '', '', '', '', '', '']
 # HTTP Modified in time
-Modified_time    = ['', '', '', '', '', '', '', '', '', '']
+Modified_time = ['', '', '', '', '', '', '', '', '', '']
 # HTTP Data
-HTTP_Data        = ['', '', '', '', '', '', '', '', '', '']
+HTTP_Data = ['', '', '', '', '', '', '', '', '', '']
 # was "【1時間前】" in the data?
-ishour_eq        = [False, False, False, False, False, False, False, False, False, False]
+ishour_eq = [False, False, False, False, False, False, False, False, False, False]
 # Hour of EQ
-hour_eq          = ['', '', '', '', '', '', '', '', '', '']
+hour_eq = ['', '', '', '', '', '', '', '', '', '']
 # Mins of EQ
-mins_eq          = ['', '', '', '', '', '', '', '', '', '']
+mins_eq = ['', '', '', '', '', '', '', '', '', '']
 # EQ Data
-data_eq          = ['', '', '', '', '', '', '', '', '', '']
+data_eq = ['', '', '', '', '', '', '', '', '', '']
 # EQ Data
-msg_eq           = ['', '', '', '', '', '', '', '', '', '']
+msg_eq = ['', '', '', '', '', '', '', '', '', '']
 
-eqJP             = []
-taskrun          = []
+eqJP = []
+taskrun = []
 
-eq_mode = eqnotice_config.get_key('enabled')
-tasksec = eqnotice_config.get_key('timer')
-debug = eqnotice_config.get_key('debug')
+eq_mode = eqnotice_config['enabled']
+tasksec = eqnotice_config['timer']
+debug = eqnotice_config['debug']
 
 
 def logdebug(message):
@@ -105,7 +114,7 @@ def load_eqJP_names():
         f.close()
     if not eqJP:
         return
-    for ship in config.globalConfig.get_key('enabledShips'):
+    for ship in config.globalConfig['enabledShips']:
         eqJPd = eqJP.get(data_eq[ship])
         if eqJPd:  # Is there a mapping?
             msg_eq[ship] = "%s (JP: %s@%s:%s JST)" % (eqJPd, data_eq[ship], hour_eq[ship], mins_eq[ship])
@@ -206,7 +215,11 @@ def EQBody(body, ship):  # 0 is ship1
     for client in clients.connectedClients.values():
         try:
             chandle = client.get_handle()
-            if chandle is not None and client.preferences.get_preference('eqnotice') and ship == (client.preferences.get_preference('eqnotice_ship') - 1):
+            if (
+               chandle is not None and
+               client.preferences.get_preference('eqnotice') and
+               ship == (client.preferences.get_preference('eqnotice_ship') - 1)
+               ):
                 chandle.send_crypto_packet(SMPacket)
         except AttributeError:
             logdebug("Ship %d: Got a dead client, skipping" % (ship + 1))
@@ -239,9 +252,9 @@ def EQResponse(response, ship=-1):  # 0 is ship1
 def CheckupURL():
     HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']})
     load_eqJP_names()  # Reload file
-    for shipNum in config.globalConfig.get_key('enabledShips'):
+    for shipNum in config.globalConfig['enabledShips']:
         if eqnotice_config.key_exists(str(shipNum)):
-            eq_URL = eqnotice_config.get_key(str(shipNum))
+            eq_URL = eqnotice_config.get_key[str(shipNum)]
         else:
             eq_URL = None
         if eq_URL:

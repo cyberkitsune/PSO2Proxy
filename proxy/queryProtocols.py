@@ -12,7 +12,13 @@ class BlockScraper(protocol.Protocol):
 
     def connectionMade(self):
         port = self.transport.getHost().port
-        print('[BlockQuery] %s:%i wants to load-balance on port %i!' % (self.transport.getPeer().host, self.transport.getPeer().port, port))
+        print(
+            "[BlockQuery] {}:{} wants to load-balance on port {}!".format(
+                self.transport.getPeer().host,
+                self.transport.getPeer().port,
+                port
+            )
+        )
         d = threads.deferToThread(ships.get_first_block, port, myIpAddress)
         d.addCallback(self.send_block_scrape)
         ships.get_first_block(port, myIpAddress)

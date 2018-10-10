@@ -1,0 +1,18 @@
+language: python
+dist: trusty
+sudo: false
+install: true
+
+addons:
+  apt:
+    packages:
+    - python-flake8
+
+virtualenv:
+  system_site_packages: true
+
+cache:
+  - apt
+
+script:
+  - ./checkstyle.sh

@@ -1,5 +1,5 @@
 import commands
-from config import YAMLConfig
+import config
 import data.clients
 import packetFactory
 from PSO2DataTools import check_pso2_with_irc
@@ -11,7 +11,14 @@ from unicodescript import script
 
 import plugins as p
 
-plugin_config = YAMLConfig("cfg/translator.config.yml", {"translationService": 0, "msTranslateID": '', "msTranslateSecret": ''})
+plugin_config = config.YAMLConfig(
+    "cfg/translator.config.yml",
+    {
+        "translationService": 0,
+        "msTranslateID": '',
+        "msTranslateSecret": ''
+    }
+)
 if plugin_config['translationService'] == 1 and plugin_config['msTranslateID'] != '' and plugin_config['msTranslateSecret'] != '':
     import microsofttranslator
     provider = "Bing"
@@ -42,9 +49,17 @@ class ToggleTranslateIn(commands.Command):
             user_prefs = data.clients.connectedClients[client.playerId].preferences
             user_prefs.set_preference('translate_chat', not user_prefs.get_preference('translate_chat'))
             if user_prefs.get_preference('translate_chat'):
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Enabled incoming chat translation.", 0x3).build())
+                client.send_crypto_packet(
+                    packetFactory.SystemMessagePacket(
+                        "[Translate] Enabled incoming chat translation.", 0x3
+                    ).build()
+                )
             else:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled incoming chat translation.", 0x3).build())
+                client.send_crypto_packet(
+                    packetFactory.SystemMessagePacket(
+                        "[Translate] Disabled incoming chat translation.", 0x3
+                    ).build()
+                )
 
 
 @p.CommandHook("jpout", "Toggles outbound chat translation to japanese. (Powered by %s Translate, Outgoing only.)" % provider)
@@ -54,9 +69,17 @@ class ToggleTranslateOut(commands.Command):
             user_prefs = data.clients.connectedClients[client.playerId].preferences
             user_prefs.set_preference('translate_out', not user_prefs.get_preference('translate_out'))
             if user_prefs.get_preference('translate_out'):
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Enabled outgoing chat translation.", 0x3).build())
+                client.send_crypto_packet(
+                    packetFactory.SystemMessagePacket(
+                        "[Translate] Enabled outgoing chat translation.", 0x3
+                    ).build()
+                )
             else:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Translate] Disabled outgoing chat translation.", 0x3).build())
+                client.send_crypto_packet(
+                    packetFactory.SystemMessagePacket(
+                        "[Translate] Disabled outgoing chat translation.", 0x3
+                    ).build()
+                )
 
 
 @p.PacketHook(0x7, 0x0)
@@ -65,7 +88,10 @@ def get_chat_packet(context, packet):
     :type context: ShipProxy.ShipProxy
     """
     try:
-        if context.psoClient and context.playerId and data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out'):
+        if(
+            context.psoClient and context.playerId and
+            data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out')
+        ):
             player_id = struct.unpack_from("<I", packet, 0x8)[0]
             if player_id != 0:  # ???
                 return None
@@ -121,7 +147,10 @@ def get_team_chat_packet(context, packet):
     :type context: ShipProxy.ShipProxy
     """
     try:
-        if context.psoClient and context.playerId and data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out'):
+        if(
+                context.psoClient and context.playerId and
+                data.clients.connectedClients[context.playerId].preferences.get_preference('translate_out')
+        ):
             player_id = struct.unpack_from("<I", packet, 0x8)[0]
             if player_id != 0:  # ???
                 return None

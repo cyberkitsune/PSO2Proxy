@@ -1,8 +1,8 @@
 import calendar
 import commands
+import config
 from config import bindIp as interfaceIp
 from config import myIpAddress as hostName
-from config import YAMLConfig as ConfigModel
 
 import data.blocks
 import data.clients
@@ -18,7 +18,16 @@ from twisted.internet import endpoints
 from twisted.internet import reactor
 from twisted.web import resource
 
-web_api_config = ConfigModel("cfg/webapi.config.yml", {"port": 8080, "ServerName": "Unnamed Server", 'webRconEnabled': False, 'webRconKey': ''}, True)
+web_api_config = config.YAMLConfig(
+    "cfg/webapi.config.yml",
+    {
+        "port": 8080,
+        "ServerName": "Unnamed Server",
+        'webRconEnabled': False,
+        'webRconKey': ''
+    },
+    True
+)
 
 upStart = calendar.timegm(datetime.datetime.utcnow().utctimetuple())
 peakPlayers = 0
@@ -29,7 +38,7 @@ class WEBRcon(resource.Resource):
 
     def render_GET(self, request):
         request.setHeader('content-type', "application/json")
-        if 'key' not in request.args or request.args['key'][0] != web_api_config.get_key('webRconKey'):
+        if 'key' not in request.args or request.args['key'][0] != web_api_config['webRconKey']:
             return json.dumps({'success': False, 'reason': "Your RCON key is invalid!"})
         else:
             if 'command' not in request.args:
@@ -38,11 +47,21 @@ class WEBRcon(resource.Resource):
                 try:
                     if request.args['command'][0] in commands.commandList:
                         cmd_class = commands.commandList[request.args['command'][0]][0]
-                        result = cmd_class("%s %s" % (request.args['command'][0], request.args['params'][0] if 'params' in request.args else None)).call_from_console()
+                        result = cmd_class(
+                            "%s %s" % (
+                                request.args['command'][0],
+                                request.args['params'][0] if 'params' in request.args else None
+                            )
+                        ).call_from_console()
                         return json.dumps({'success': True, 'output': result})
                     elif request.args['command'][0] in pluginCommands:
                         cmd_class = pluginCommands[request.args['command'][0]][0]
-                        result = cmd_class("%s %s" % (request.args['command'][0], request.args['params'][0] if 'params' in request.args else None)).call_from_console()
+                        result = cmd_class(
+                            "%s %s" % (
+                                request.args['command'][0],
+                                request.args['params'][0] if 'params' in request.args else None
+                            )
+                        ).call_from_console()
                         return json.dumps({'success': True, 'output': result})
                     else:
                         return json.dumps({'success': False, 'reason': "Command not found."})
@@ -58,7 +77,12 @@ class JSONConfig(resource.Resource):
     @staticmethod
     def render_GET(request):
         request.setHeader("content-type", "application/json")
-        config_json = {'version': 1, "name": web_api_config.get_key('ServerName'), "publickeyurl": "http://%s:%i/publickey.blob" % (hostName, web_api_config.get_key('port')), "host": hostName}
+        config_json = {
+            'version': 1,
+            "name": web_api_config['ServerName'],
+            "publickeyurl": "http://%s:%i/publickey.blob" % (hostName, web_api_config['port']),
+            "host": hostName
+        }
         return json.dumps(config_json)
 
 
@@ -111,7 +135,13 @@ class WebAPI(resource.Resource):
     # noinspection PyPep8Naming
     @staticmethod
     def render_GET(request):
-        current_data = {'playerCount': len(data.clients.connectedClients), 'blocksCached': len(data.blocks.blockList), 'uniquePlayers': data.clients.dbManager.get_db_size(), 'upSince': upStart, 'peakPlayers': peakPlayers}
+        current_data = {
+            'playerCount': len(data.clients.connectedClients),
+            'blocksCached': len(data.blocks.blockList),
+            'uniquePlayers': data.clients.dbManager.get_db_size(),
+            'upSince': upStart,
+            'peakPlayers': peakPlayers
+        }
         request.setHeader("content-type", "application/json")
         return json.dumps(current_data)
 
@@ -130,13 +160,13 @@ def setup_web_api():
         print("[WebAPI] As a result, webapi will be disabled !!")
         print("[WebAPI] Please fix this and restart the proxy.")
         return
-    web_endpoint = endpoints.TCP4ServerEndpoint(reactor, web_api_config.get_key('port'), interface=interfaceIp)
+    web_endpoint = endpoints.TCP4ServerEndpoint(reactor, web_api_config['port'], interface=interfaceIp)
     web_resource = WebAPI()
     web_resource.putChild("config.json", JSONConfig())
     web_resource.putChild("publickey.blob", PublicKey())
     web_resource.putChild("latest_profile", LatestProfile())
     web_resource.putChild("stacktrace", LatestStackTrace())
-    if web_api_config.get_key('webRconEnabled'):
+    if web_api_config['webRconEnabled']:
         web_resource.putChild("rcon", WEBRcon())
     web_endpoint.listen(server.Site(web_resource))
 

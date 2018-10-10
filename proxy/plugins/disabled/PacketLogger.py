@@ -29,20 +29,43 @@ def notify_and_config(client):
     :type client: ShipProxy.ShipProxy
     """
     client_config = dbManager.get_data_for_sega_id(client.myUsername)
+    msgin = "[PacketLogging] {gre}You have opted-in to packet logging, " \
+        "Thank you! View your contributions on " \
+        "http://pso2proxy.cyberkitsune.net/redpill/ or use !optout to opt out"
+    msgout = "[PacketLogging] {red}You have not opted-in to packet logging, " \
+        "and it has been disabled. Use !optin to opt in."
     if 'logPackets' not in client_config:
         client_config['logPackets'] = False
     if client_config['logPackets']:
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have opted-in to packet logging, Thank you! View your contributions on http://pso2proxy.cyberkitsune.net/redpill/ or use !optout to opt out", 0x3).build())
+        client.send_crypto_packet(
+            packetFactory.SystemMessagePacket(
+                msgin,
+                0x3
+            ).build()
+        )
     else:
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have not opted-in to packet logging, and it has been disabled. Use !optin to opt in.", 0x3).build())
+        client.send_crypto_packet(
+            packetFactory.SystemMessagePacket(
+                msgout,
+                0x3
+            ).build()
+        )
 
 
 @plugins.CommandHook("optin", "Opts you into packet logging for the redpill project.")
 class OptIn(commands.Command):
     def call_from_client(self, client):
+        msg = "[PacketLogging] {gre}You have enabled packet logging!" \
+            " Thank you! Track your data at " \
+            "http://pso2proxy.cyberkitsune.net/redpill/"
         client_config = dbManager.get_data_for_sega_id(client.myUsername)
         client_config['logPackets'] = True
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {gre}You have enabled packet logging! Thank you! Track your data at http://pso2proxy.cyberkitsune.net/redpill/", 0x3).build())
+        client.send_crypto_packet(
+            packetFactory.SystemMessagePacket(
+                msg,
+                0x3
+            ).build()
+        )
 
 
 @plugins.CommandHook("optout", "Opts you out of the packet logging for the redpill project.")
@@ -51,7 +74,12 @@ class OptOut(commands.Command):
         archive_packets(client)
         client_config = dbManager.get_data_for_sega_id(client.myUsername)
         client_config['logPackets'] = True
-        client.send_crypto_packet(packetFactory.SystemMessagePacket("[PacketLogging] {red}You have disabled packet logging! :( If you change your mind, please use !optin to rejoin!", 0x3).build())
+        client.send_crypto_packet(
+            packetFactory.SystemMessagePacket(
+                "[PacketLogging] {red}You have disabled packet logging! :( If you change your mind, please use !optin to rejoin!",
+                0x3
+            ).build()
+        )
 
 
 @plugins.raw_packet_hook
@@ -121,5 +149,9 @@ def archive_packets(client):
     if user_config['logPackets']:
         metadata = {'sega_id': client.myUsername, 'player_id': client.playerId, 'timestamp': client.connTimestamp}
         json_string = json.dumps(metadata)
-        reactor.callInThread(write_file, "packets/%s/%s/metadata.json" % (client.myUsername, client.connTimestamp), json_string, 'w')
+        reactor.callInThread(
+            write_file,
+            "packets/%s/%s/metadata.json" % (client.myUsername, client.connTimestamp),
+            json_string,
+            'w')
         print("[PacketLogger] Wrote meta for %s, %i." % (client.myUsername, client.connTimestamp))

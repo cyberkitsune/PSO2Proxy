@@ -11,6 +11,7 @@ def main():
     if len(sys.argv) > 1:
         f = open(sys.argv[1])
 
+
 for line in f:
     replace_pso2_with_irc(line, 1)
 

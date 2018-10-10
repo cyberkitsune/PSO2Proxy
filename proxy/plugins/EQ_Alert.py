@@ -4,10 +4,8 @@ import config
 import data.clients as clients
 from datetime import datetime
 import json
-import os.path
 import packetFactory
 import plugins
-import json
 from pprint import pformat
 from twisted.internet import defer
 from twisted.internet import protocol
@@ -52,25 +50,37 @@ try:
 except ImportError:
     agent = RedirectAgent(Agent(reactor))
 
-eqalert_config = config.YAMLConfig("cfg/EQ_Alert.config.yml", {'enabled': True, 'timer': 80, 'debug': False, 'api': "http://pso2.acf.me.uk/api/eq.json", '0': True, '1': True, '2': True, '3': True, '4': True, '5': True, '6': True, '7': True, '8': True, '9': True, 'ircShip': 1}, True)
+eqalert_config = config.YAMLConfig(
+    "cfg/EQ_Alert.config.yml",
+    {
+        'enabled': True,
+        'timer': 80,
+        'debug': False,
+        'api': "http://pso2.acf.me.uk/api/eq.json",
+        '0': True, '1': True, '2': True, '3': True, '4': True,
+        '5': True, '6': True, '7': True, '8': True, '9': True,
+        'ircShip': 1, 'User-Agent': "PSO2Proxy"
+    },
+    True
+)
 
 # HTTP Headers
-ETag_Header     = ""
+ETag_Header = ""
 Modified_Header = ""
 # HTTP Modified in time
-Modified_time    = ""
+Modified_time = ""
 # HTTP Data
-HTTP_Data        = ""
+HTTP_Data = ""
 # Hour of EQ
-hour_eq          = ['', '', '', '', '', '', '', '', '', '']
+hour_eq = ['', '', '', '', '', '', '', '', '', '']
 # EQ Data
-data_eq          = ['', '', '', '', '', '', '', '', '', '']
+data_eq = ['', '', '', '', '', '', '', '', '', '']
 
-taskrun          = []
+taskrun = []
 
-eq_mode = eqalert_config.get_key('enabled')
-tasksec = eqalert_config.get_key('timer')
-debug = eqalert_config.get_key('debug')
+eq_mode = eqalert_config['enabled']
+tasksec = eqalert_config['timer']
+debug = eqalert_config['debug']
 
 
 def logdebug(message):
@@ -81,7 +91,7 @@ def logdebug(message):
 def EQBody(body):  # 0 is ship1
     try:
         APIData = json.loads(str(body.decode("utf-8")))
-    except Exception as e: #If we can't load a JSON then something went wrong with the API
+    except Exception as e:  # If we can't load a JSON then something went wrong with the API
         print("[EQ Alert] Bad API response, %s" % e)
         return
 
@@ -90,16 +100,16 @@ def EQBody(body):  # 0 is ship1
     except Exception as e:
         logdebug("Falling back")
         APIResponse = APIData
-    
+
     global HTTP_Data
 
     if HTTP_Data == APIResponse:
         logdebug("API data has not changed.")
-        return #Don't do anything if the data hasn't changed
+        return  # Don't do anything if the data hasn't changed
     logdebug("New data from API.")
     HTTP_Data = APIResponse
 
-    for ship in config.globalConfig.get_key('enabledShips'):
+    for ship in config.globalConfig['enabledShips']:
         if eqalert_config.key_exists(str(ship)):
 
             try:
@@ -108,18 +118,18 @@ def EQBody(body):  # 0 is ship1
                 print("[EQ Alert] Unable to get data, %s" % e)
                 return
 
-            try: #We need to check these in the proper order
-                if not APIResponse['Ship' + str(ship + 1)] == "": #Check the Ship first
+            try:  # We need to check these in the proper order
+                if not APIResponse['Ship' + str(ship + 1)] == "":  # Check the Ship first
                     data_eq[ship] = APIResponse['Ship' + str(ship + 1)] + " at " + hour_eq[ship] + " JST."
-                elif not APIResponse['HalfHour'] == "": #Check what's coming at :30 next
+                elif not APIResponse['HalfHour'] == "":  # Check what's coming at :30 next
                     data_eq[ship] = APIResponse['HalfHour'] + " at half past."
-                elif not APIResponse['OneLater'] == "": #Check responses for all ships
+                elif not APIResponse['OneLater'] == "":  # Check responses for all ships
                     data_eq[ship] = APIResponse['OneLater'] + " at " + hour_eq[ship] + " JST."
-                elif not APIResponse['TwoLater'] == "": #Check what's coming in 2 hours
+                elif not APIResponse['TwoLater'] == "":  # Check what's coming in 2 hours
                     data_eq[ship] = APIResponse['TwoLater'] + " in two hours."
-                elif not APIResponse['ThreeLater'] == "": #Finally check what's coming in 3 hours
+                elif not APIResponse['ThreeLater'] == "":  # Finally check what's coming in 3 hours
                     data_eq[ship] = APIResponse['ThreeLater'] + " in three hours."
-                else: #If all of the above are blank then there's no EQ for this Ship
+                else:  # If all of the above are blank then there's no EQ for this Ship
                     data_eq[ship] = ""
             except KeyError as e:
                 print("[EQ Alert] Could not find key, %s" % e)
@@ -128,7 +138,7 @@ def EQBody(body):  # 0 is ship1
                 print("[EQ Alert] Unable to get data, %s" % e)
                 return
 
-            if not data_eq[ship] == "" and not "no Emergency Quests" in data_eq[ship]:
+            if not data_eq[ship] == "" and "no Emergency Quests" not in data_eq[ship]:
                 logdebug("Ship %d: %s" % (ship + 1, data_eq[ship]))
 
                 logdebug("Time  : %s" % (datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')))
@@ -137,20 +147,26 @@ def EQBody(body):  # 0 is ship1
                 SMPacket = packetFactory.SystemMessagePacket("[Proxy] Incoming EQ Report: %s" % (data_eq[ship]), 0x0).build()
                 if useGlobalChat:
                     if eqalert_config.key_exists('ircShip'):
-                        ircShip = eqalert_config.get_key('ircShip') #Get the Ship to send notices for on IRC
+                        ircShip = eqalert_config['ircShip']  # Get the Ship to send notices for on IRC
                         if GlobalChat.ircMode and GlobalChat.ircBot is not None and ship == ircShip:
                             msg = "[EQ Alert Ship %02d] Incoming EQ Report: %s" % (ship + 1, data_eq[ship])
                             GlobalChat.ircBot.send_channel_message(msg.encode('utf-8'))
                 for client in clients.connectedClients.values():
                     try:
                         chandle = client.get_handle()
-                        if chandle is not None and client.preferences.get_preference('eqalert') and ship == (client.preferences.get_preference('eqalert_ship') - 1):
+                        if (
+                            chandle is not None and
+                            client.preferences.get_preference('eqalert') and
+                            ship == (client.preferences.get_preference('eqalert_ship') - 1)
+                        ):
                             chandle.send_crypto_packet(SMPacket)
                     except AttributeError:
                         logdebug("Ship %d: Found a dead client, skipping" % (ship + 1))
 
 
 def EQResponse(response):
+    global ETag_Header
+    global Modified_time
     if response.code == 304:
         return
     logdebug("HTTP Status: " + str(response.code))
@@ -175,9 +191,12 @@ def EQResponse(response):
 
 
 def CheckupURL():
-    HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']}) #We need to send a User-Agent
+    if eqalert_config.key_exists('User-Agent'):  # We need to send a User-Agent
+        HTTPHeader0 = Headers({'User-Agent': [eqalert_config['User-Agent']]})
+    else:
+        HTTPHeader0 = Headers({'User-Agent': ['PSO2Proxy']})
     if eqalert_config.key_exists('api'):
-        eq_URL = eqalert_config.get_key('api')
+        eq_URL = eqalert_config['api']
     else:
         eq_URL = None
     if eq_URL:

@@ -43,7 +43,7 @@ class YAMLConfig(object):
         self._load_config()
 
     def _validate_config(self):
-        for key, value in self.default_keys.iteritems():
+        for key, value in self.default_keys.items():
             if key not in self._config_values:
                 self._config_values[key] = value
                 print("[Config] Added new default %s for config %s" % (key, self.filename))
@@ -58,10 +58,10 @@ class YAMLConfig(object):
                         print("[Config] Resetting invalid key type for %s in config %s." % (key, self.filename))
         self._save_config()
 
-    def get_key(self, key):
+    def _get_key(self, key):
         if key not in self._config_values:
             raise KeyError
-        if isinstance(self._config_values[key], unicode):
+        if str(type(self._config_values[key])) == "<type 'unicode'>":
             return self._config_values[key].encode('utf-8')
         else:
             return self._config_values[key]
@@ -77,7 +77,7 @@ class YAMLConfig(object):
             return False
 
     def __getitem__(self, item):
-        return self.get_key(item)
+        return self._get_key(item)
 
     def __setitem__(self, key, value):
         self.set_key(key, value)
@@ -85,9 +85,19 @@ class YAMLConfig(object):
 
 banList = []
 
-globalConfig = YAMLConfig("cfg/pso2proxy.config.yml",
-                          {'myIpAddr': "0.0.0.0", 'bindIp': "0.0.0.0", 'blockNameMode': 1,
-                           'noisy': False, 'admins': [], 'enabledShips': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], 'commandPrefix': '!'}, True)
+globalConfig = YAMLConfig(
+    "cfg/pso2proxy.config.yml",
+    {
+        'myIpAddr': "0.0.0.0",
+        'bindIp': "0.0.0.0",
+        'blockNameMode': 1,
+        'noisy': False,
+        'admins': [],
+        'enabledShips': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+        'commandPrefix': '!'
+    },
+    True
+)
 
 blockNames = {}
 ShipLabel = {}
@@ -96,7 +106,7 @@ proxy_ver = subprocess.Popen(["git", "describe", "--always"], stdout=subprocess.
 
 
 def is_admin(sega_id):
-    if sega_id in globalConfig.get_key('admins'):
+    if sega_id in globalConfig['admins']:
         return True
     else:
         return False
@@ -104,7 +114,7 @@ def is_admin(sega_id):
 
 def load_block_names():
     global blockNames
-    if globalConfig.get_key('blockNameMode') == 0:
+    if globalConfig['blockNameMode'] == 0:
         return "[ShipProxy] Blocks are not renamed"
     if os.path.exists("cfg/blocknames.resources.json"):
         f = open("cfg/blocknames.resources.json", 'r')
@@ -118,6 +128,7 @@ def load_block_names():
 
     else:
         return "[ShipProxy] BlockName file does not exists"
+
 
 load_block_names()
 
@@ -140,6 +151,7 @@ def load_ship_names():
             return ("[GlobalChat] Failed to load ship  labels!")
     else:
         return "[GlobalChat] shipslabel file does not exists"
+
 
 load_ship_names()
 
@@ -185,8 +197,8 @@ def is_player_id_banned(player_id):
 
 load_bans()
 
-myIpAddress = globalConfig.get_key('myIpAddr')
-bindIp = globalConfig.get_key('bindIp')
-blockNameMode = globalConfig.get_key('blockNameMode')
-noisy = globalConfig.get_key('noisy')
-admins = globalConfig.get_key('admins')
+myIpAddress = globalConfig['myIpAddr']
+bindIp = globalConfig['bindIp']
+blockNameMode = globalConfig['blockNameMode']
+noisy = globalConfig['noisy']
+admins = globalConfig['admins']

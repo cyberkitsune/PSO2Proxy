@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: UTF-8 -*-
 try:
     from twisted.internet import epollreactor
     epollreactor.install()
@@ -46,7 +47,7 @@ class ServerConsole(basic.LineReceiver):
         self.delimiter = os.linesep
 
     def connectionMade(self):
-        self.transport.write('>>> ')
+        self.transport.write('>>> '.encode("utf-8"))
 
     def lineReceived(self, line):
         try:
@@ -103,15 +104,19 @@ def main():
         print("After you fix this, please restart PSO2Proxy.")
         sys.exit(0)
 
-    for shipNum in range(0, 10):  # PSO2 Checks all ships round robin, so sadly for max compatibility we have to open these no matter what ships are enabled...
+    for shipNum in range(0, 10):
+        # PSO2 Checks all ships round robin,
+        # so sadly for max compatibility we have to open these no matter what ships are enabled...
         ship_endpoint = endpoints.TCP4ServerEndpoint(reactor, 12099 + (100 * shipNum), interface=interface_ip)
         ship_endpoint.listen(ShipAdvertiserFactoryPC())
 
-    for shipNum in range(0, 10):  # PSO2 Checks all ships round robin, so sadly for max compatibility we have to open these no matter what ships are enabled...
+    for shipNum in range(0, 10):
+        # PSO2 Checks all ships round robin,
+        #  so sadly for max compatibility we have to open these no matter what ships are enabled...
         ship_endpoint = endpoints.TCP4ServerEndpoint(reactor, 12094 + (100 * shipNum), interface=interface_ip)
         ship_endpoint.listen(ShipAdvertiserFactoryVita())
 
-    for shipNum in config.globalConfig.get_key('enabledShips'):
+    for shipNum in config.globalConfig['enabledShips']:
         query_endpoint = endpoints.TCP4ServerEndpoint(reactor, 12000 + (100 * shipNum), interface=interface_ip)
         query_endpoint.listen(BlockScraperFactory())
         print("[ShipProxy] Bound port %i for ship %i query server!" % ((12000 + (100 * shipNum)), shipNum))

@@ -1,5 +1,5 @@
 import commands
-from config import YAMLConfig
+import config
 import json
 import os
 import packetFactory
@@ -7,10 +7,12 @@ from packetFactory import SystemMessagePacket
 import plugins
 whitelist = []
 
-ircSettings = YAMLConfig("cfg/pso2proxy.whitelist.config.yml",
-                         {'enabled': True}, True)
+WLSettings = config.YAMLConfig(
+    "cfg/pso2proxy.whitelist.config.yml",
+    {'enabled': True}, True
+)
 
-whitelistmode = ircSettings.get_key('enabled')
+whitelistmode = WLSettings['enabled']
 
 
 @plugins.on_start_hook
@@ -86,29 +88,56 @@ class Whitelist(commands.Command):
         """
         global whitelist
         params = self.args.split(" ")
+        msghelp = "[Command] {red}Invalid usage. (Usage: whitelist <add/del> <SegaID>)"
         if len(params) < 3:
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. (Usage: whitelist <add/del> <SegaID>)", 0x3).build())
+            client.send_crypto_packet(
+                packetFactory.SystemMessagePacket(
+                    msghelp,
+                    0x3
+                ).build()
+            )
             return
         if params[1] == "add" or params[1] == "ADD":
             if params[2] not in whitelist:
                 whitelist.append(params[2])
                 save_whitelist()
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Added %s to the whitelist." % params[2], 0x3).build())
+                client.send_crypto_packet(
+                    packetFactory.SystemMessagePacket(
+                        "[Command] {gre}Added %s to the whitelist." % params[2], 0x3
+                    ).build()
+                )
                 return
             else:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s is already in the whitelist." % params[2], 0x3).build())
+                client.send_crypto_packet(
+                    packetFactory.SystemMessagePacket(
+                        "[Command] {red}%s is already in the whitelist." % params[2], 0x3
+                    ).build()
+                )
                 return
         elif params[1] == "del" or params[1] == "DEL":
             if params[2] in whitelist:
                 whitelist.remove(params[2])
                 save_whitelist()
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {gre}Removed %s from whitelist." % params[2], 0x3).build())
+                client.send_crypto_packet(
+                    packetFactory.SystemMessagePacket(
+                        "[Command] {gre}Removed %s from whitelist." % params[2], 0x3
+                    ).build()
+                )
                 return
             else:
-                client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}%s is not in the whitelist, can not delete!" % params[2], 0x3).build())
+                client.send_crypto_packet(
+                    packetFactory.SystemMessagePacket(
+                        "[Command] {red}%s is not in the whitelist, can not delete!" % params[2], 0x3
+                    ).build()
+                )
                 return
         else:
-            client.send_crypto_packet(packetFactory.SystemMessagePacket("[Command] {red}Invalid usage. (Usage: whitelist <add/del> <SegaID>)", 0x3).build())
+            client.send_crypto_packet(
+                packetFactory.SystemMessagePacket(
+                    "[Command] {red}Invalid usage. (Usage: whitelist <add/del> <SegaID>)",
+                    0x3
+                ).build()
+            )
             return
 
 
@@ -126,7 +155,14 @@ def whitelist_check(context, data):
     username = data[start:start + 0x40].decode('utf-8')
     username = username.rstrip('\0')
     if username not in whitelist:
-        print("[Whitelist] %s is not in the whitelist, disconnecting client." % username)
-        context.send_crypto_packet(SystemMessagePacket("You are not on the whitelist for this proxy, please contact the owner of this proxy.", 0x1).build())
+        print(
+            "[Whitelist] %s is not in the whitelist, disconnecting client." % username
+        )
+        context.send_crypto_packet(
+            SystemMessagePacket(
+                "You are not on the SEGAID whitelist for this proxy, please contact the owner of this proxy.",
+                0x1
+            ).build()
+        )
         context.transport.loseConnection()
     return data

@@ -49,6 +49,7 @@ def get_ship_from_port(port):
         ship_num = 10
     return ship_num
 
+
 cachedBlocks = {}
 
 
@@ -57,14 +58,28 @@ def get_first_block(ship_port, destination_ip):
         return None
 
     if ship_port not in cachedBlocks:
-        cachedBlocks[ship_port] = {'time_scraped': time.time(), 'data': scrape_block_packet(blockShipList[ship_port], (ship_port if (ship_port != 13000) else 12000), destination_ip)}
+        cachedBlocks[ship_port] = {
+            'time_scraped': time.time(),
+            'data': scrape_block_packet(
+                blockShipList[ship_port],
+                (ship_port if (ship_port != 13000) else 12000),
+                destination_ip
+            )
+        }
         print("[BlockCache] Cached new block for ship %i, Holding onto it for 5 minutes..." % ship_port)
         return cachedBlocks[ship_port]['data']
 
     last_time = cachedBlocks[ship_port]['time_scraped']
     current_time = time.time()
     if current_time > last_time + (60 * 3):
-        cachedBlocks[ship_port] = {'time_scraped': time.time(), 'data': scrape_block_packet(blockShipList[ship_port], (ship_port if (ship_port != 13000) else 12000), destination_ip)}
+        cachedBlocks[ship_port] = {
+            'time_scraped': time.time(),
+            'data': scrape_block_packet(
+                blockShipList[ship_port],
+                (ship_port if (ship_port != 13000) else 12000),
+                destination_ip
+            )
+        }
         print("[BlockCache] Cached new block for ship %i, Holding onto it for 5 minutes..." % ship_port)
     return cachedBlocks[ship_port]['data']
 
@@ -79,7 +94,10 @@ def get_ship_query(my_ip_address, client_ip_address):
     if client_ip_address in brokenlist:
         brokenlist.remove(client_ip_address)
         print("[ShipQuery] Rejecting broken client %s" % client_ip_address)
-        return packetFactory.SystemMessagePacket("PSO2Proxy: Double check that you're using the correct public key file and have PSO2Proxy.dll enabled.", 0x1).build()
+        return packetFactory.SystemMessagePacket(
+            "PSO2Proxy: Double check that you're using the correct public key file and have PSO2Proxy.dll enabled.",
+            0x1
+        ).build()
     data = scrape_ship_packet(ship_address, ship_port, my_ip_address)
     curShipIndex += 1
     if curShipIndex >= len(queryShipArr):
@@ -167,7 +185,7 @@ def scrape_ship_packet(ship_ip, ship_port, destination_ip):
         return packetFactory.SystemMessagePacket("PSO2Proxy: PSO2 server dropped the connection.", 0x1).build()
     except Exception as e:
         log.msg("[ShipQuery] Scraping %s:%i recv return an error: %s" % (ship_ip, ship_port, sys.exc_info()[0]))
-        return packetFactory.SystemMessagePacket("PSO2Proxy: PSO2 server dropped the connection due to an error.", 0x1).build()
+        return packetFactory.SystemMessagePacket("PSO2Proxy: PSO2 server dropped the connection % ( to an error.", 0x1).build()
     actual_size = struct.unpack_from('i', data.getvalue(), 0x0)[0]
     try:
         data.write(s.recv(actual_size - 4))
@@ -176,13 +194,11 @@ def scrape_ship_packet(ship_ip, ship_port, destination_ip):
         return packetFactory.SystemMessagePacket("PSO2Proxy: PSO2 server dropped the connection midway.", 0x1).build()
     except Exception as e:
         log.msg("[ShipQuery] Scraping %s:%i wrtie return an error: %s" % (ship_ip, ship_port, sys.exc_info()[0]))
-        return packetFactory.SystemMessagePacket("PSO2Proxy: PSO2 server dropped the connection midway due to an error.", 0x1).build()
+        return packetFactory.SystemMessagePacket(
+            "PSO2Proxy: PSO2 server dropped the connection midway % ( to an error.",
+            0x1
+        ).build()
     s.close()
     data.flush()
     data = bytearray(data.getvalue())
-    # Hardcoded ship count, fix this!
-    pos = 0x10
-    for x in xrange(1, 10):
-        struct.pack_into('BBBB', data, pos + 0x20, int(o1), int(o2), int(o3), int(o4))
-        pos += 0x34
     return str(data)
