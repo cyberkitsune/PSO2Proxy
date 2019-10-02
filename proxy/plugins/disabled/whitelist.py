@@ -151,9 +151,9 @@ def whitelist_check(context, data):
     global whitelistmode
     if not whitelistmode:
         return data
-    start = len(data) - 0x88  # Skip password
+    start = len(data) - 0x90  # Skip password
     username = data[start:start + 0x40].decode('utf-8')
-    username = username.rstrip('\0')
+    username = username.strip("\x00").strip().split("\x00")[0].lower()
     if username not in whitelist:
         print(
             "[Whitelist] %s is not in the whitelist, disconnecting client." % username
