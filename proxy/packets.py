@@ -39,7 +39,7 @@ class PacketHandler(object):
 
 @PacketHandler(0x11, 0x0)
 def login_packet(context, data):
-    start = len(data) - 0x90  # Skip password
+    start = len(data) - 0xB0  # Skip password
     username = data[start:start + 0x40].decode('utf-8')
     username = username.strip("\x00").strip().split("\x00")[0].lower()
     print("[LoginPacket] Logging player %s in..." % username)
