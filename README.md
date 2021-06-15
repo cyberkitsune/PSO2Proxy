@@ -5,7 +5,6 @@ PSO2Proxy is a open source protocol proxy for the Japanese MMORPG, Phantasy Star
 This program allows you to host your own PSO2Proxy on a server you have access to. 
 **If you just want to play the game via the proxy, a public PSO2Proxy server is available for users who can't connect to PSO2 and users who want to contribute data for packet analysis. This server can be found at [pso2proxy.cyberkitsune.net](http://pso2proxy.cyberkitsune.net/). Below are the instructions for installing and setting up your own PSO2Proxy server.**
 
-If you require assistance, feel free to contact us on [IRC](irc://irc.badnik.zone/pso2proxypublic): irc.badnik.zone, #pso2proxypublic
 ## Installing
 PSO2Proxy uses the [Twisted Framework](https://twistedmatrix.com/trac/) and [PyCrypto](https://www.dlitz.net/software/pycrypto/). Please install these from their respective websites or use the commands below depending on your distribution.
 

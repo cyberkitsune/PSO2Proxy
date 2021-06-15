@@ -1,4 +1,4 @@
-import blocks
+from . import blocks
 import config
 import packetFactory
 import sqlite3
