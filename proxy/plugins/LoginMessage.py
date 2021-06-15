@@ -2,7 +2,7 @@ import commands
 import config
 import data.clients
 import packetFactory
-import plugins
+import plugins.proxyplugins as plugins
 
 login_config = config.YAMLConfig(
     "cfg/loginmessage.config.yml",

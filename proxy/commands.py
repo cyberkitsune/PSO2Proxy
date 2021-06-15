@@ -19,7 +19,7 @@ except ImportError:
 
 import config
 import packetFactory
-import plugins.plugins as plugin_manager
+import plugins.proxyplugins as plugin_manager
 from ShipProxy import ShipProxy
 
 

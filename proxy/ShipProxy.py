@@ -4,7 +4,7 @@ from data import blocks
 from data import clients
 import datetime
 import packets
-import plugins.plugins as plugin_manager
+import plugins.proxyplugins as plugin_manager
 import struct
 from twisted.internet import protocol
 from twisted.internet import reactor
