@@ -25,8 +25,6 @@ from queryProtocols import ShipAdvertiserFactoryVita
 
 import sys
 
-sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout, 'replace')
-
 import time
 import traceback
 from twisted.internet import endpoints
