@@ -102,7 +102,7 @@ globalConfig = YAMLConfig(
 blockNames = {}
 ShipLabel = {}
 
-proxy_ver = subprocess.Popen(["git", "describe", "--always"], stdout=subprocess.PIPE).communicate()[0].rstrip("\n")
+proxy_ver = str(str(subprocess.Popen(["git", "describe", "--always"], stdout=subprocess.PIPE).communicate()[0]).rstrip("\n"))
 
 
 def is_admin(sega_id):
@@ -117,9 +117,9 @@ def load_block_names():
     if globalConfig['blockNameMode'] == 0:
         return "[ShipProxy] Blocks are not renamed"
     if os.path.exists("cfg/blocknames.resources.json"):
-        f = open("cfg/blocknames.resources.json", 'r')
+        f = open("cfg/blocknames.resources.json", 'r', encoding='utf-8')
         try:
-            blockNames = json.load(f, encoding='utf-8')
+            blockNames = json.load(f)
             f.close()
             return ("[ShipProxy] %s Block names loaded!" % len(blockNames))
         except ValueError:

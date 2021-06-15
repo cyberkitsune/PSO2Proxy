@@ -6,7 +6,7 @@ from threading import Lock
 import twisted
 import yaml
 
-from ships import get_ship_from_port
+from .ships import get_ship_from_port
 
 connectedClients = {}
 """
