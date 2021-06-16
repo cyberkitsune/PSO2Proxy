@@ -1,7 +1,7 @@
 import commands
 import packetFactory
 from packetFactory import SystemMessagePacket
-import plugins
+import plugins.proxyplugins as plugins
 maintmode = False
 
 

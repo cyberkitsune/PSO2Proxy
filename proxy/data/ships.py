@@ -1,4 +1,4 @@
-import blocks
+from . import blocks
 from config import bindIp
 from config import brokenlist
 from config import myIpAddress as myIp

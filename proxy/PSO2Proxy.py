@@ -17,15 +17,13 @@ import data
 import locale
 import os
 
-import plugins.plugins as plugin_manager
+import plugins.proxyplugins as plugin_manager
 
 from queryProtocols import BlockScraperFactory
 from queryProtocols import ShipAdvertiserFactoryPC
 from queryProtocols import ShipAdvertiserFactoryVita
 
 import sys
-
-sys.stdout = codecs.getwriter(locale.getpreferredencoding())(sys.stdout, 'replace')
 
 import time
 import traceback
@@ -47,7 +45,7 @@ class ServerConsole(basic.LineReceiver):
         self.delimiter = os.linesep
 
     def connectionMade(self):
-        self.transport.write('>>> '.encode("utf-8"))
+        self.transport.write(b'>>> ')
 
     def lineReceived(self, line):
         try:
@@ -68,7 +66,7 @@ class ServerConsole(basic.LineReceiver):
         except Exception as e:
             e = traceback.format_exc()
             print("[ShipProxy] Error Occurred: %s" % e)
-        self.transport.write('>>> ')
+        self.transport.write(b'>>> ')
 
 
 def main():

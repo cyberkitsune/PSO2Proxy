@@ -5,7 +5,7 @@ import data.clients as clients
 from datetime import datetime
 import json
 import packetFactory
-import plugins
+import plugins.proxyplugins as plugins
 from pprint import pformat
 from twisted.internet import defer
 from twisted.internet import protocol
@@ -205,7 +205,7 @@ def CheckupURL():
             HTTPHeaderX.addRawHeader('If-None-Match', ETag_Header)
         if Modified_Header:
             HTTPHeaderX.addRawHeader('If-Modified-Since', Modified_Header)
-        EQ0 = agent.request('GET', eq_URL, HTTPHeaderX)
+        EQ0 = agent.request(bytes('GET', encoding='utf8'), bytes(eq_URL, encoding='utf8'), HTTPHeaderX)
         EQ0.addCallback(EQResponse)
         EQ0.addErrback(log.err)
 

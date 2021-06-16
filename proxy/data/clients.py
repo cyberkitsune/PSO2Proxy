@@ -1,4 +1,4 @@
-import blocks
+from . import blocks
 import config
 import packetFactory
 import sqlite3
@@ -6,7 +6,7 @@ from threading import Lock
 import twisted
 import yaml
 
-from ships import get_ship_from_port
+from .ships import get_ship_from_port
 
 connectedClients = {}
 """

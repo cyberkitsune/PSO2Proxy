@@ -1,7 +1,7 @@
 from config import myIpAddress
 from config import noisy as verbose
 import data.ships as ships
-import plugins.plugins
+import plugins.proxyplugins
 from twisted.internet import protocol
 from twisted.internet import threads
 
@@ -24,7 +24,7 @@ class BlockScraper(protocol.Protocol):
         ships.get_first_block(port, myIpAddress)
 
     def send_block_scrape(self, data):
-        self.transport.write(data)
+        self.transport.write(bytes(data))
         self.transport.loseConnection()
 
 

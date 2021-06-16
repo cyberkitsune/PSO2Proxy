@@ -5,7 +5,7 @@ import data.clients
 import data.players
 import json
 import packetFactory
-import plugins
+import plugins.proxyplugins as plugins
 from PSO2DataTools import check_irc_with_pso2
 from PSO2DataTools import check_pso2_with_irc
 from PSO2DataTools import replace_irc_with_pso2

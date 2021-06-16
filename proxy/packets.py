@@ -10,7 +10,7 @@ import data.clients as clients
 import data.players as players
 import io
 import packetFactory
-import plugins.plugins as plugin_manager
+import plugins.proxyplugins as plugin_manager
 from PSO2DataTools import replace_with_table
 from PSOCryptoUtils import PSO2RC4
 from PSOCryptoUtils import PSO2RSADecrypt
